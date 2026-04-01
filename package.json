@@ -1,0 +1,24 @@
+{
+  "name": "steam-ai",
+  "version": "1.0.0",
+  "description": "Steam.AI - Personal gaming assistant powered by real Steam data",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 3000",
+    "dev": "python3 -m http.server 3000",
+    "proxy": "node proxy-server.js",
+    "build": "echo 'No build step required - single file app'",
+    "deploy": "vercel --prod"
+  },
+  "keywords": ["steam", "gaming", "ai", "claude", "recommendations"],
+  "author": "Steam.AI",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  }
+}
