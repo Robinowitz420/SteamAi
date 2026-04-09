@@ -581,7 +581,7 @@
     <!-- ROW 1 -->
     <div class="chart-row">
       <div class="chart-container">
-        <div class="chart-title">WHERE YOUR LIBRARY ACTUALLY STANDS</div>
+        <div class="chart-title">COMMITMENT LEVEL</div>
         <div id="chart1"></div>
       </div>
       <div class="chart-container">
@@ -601,12 +601,8 @@
         <div id="chart4"></div>
       </div>
       <div class="chart-container">
-        <div class="chart-title">YOUR GAMING DNA</div>
+        <div class="chart-title">YOUR GAMING GENRES</div>
         <div id="chart5"></div>
-      </div>
-      <div class="chart-container">
-        <div class="chart-title">HOW DEEP YOU GO</div>
-        <div id="chart6"></div>
       </div>
     </div>
 
@@ -632,7 +628,7 @@
       <div class="chart-title">AI GAMING ANALYST</div>
       <div class="chat-log" id="chatLog"></div>
       <div class="chat-input-row">
-        <input type="text" class="chat-input" id="chatInput" placeholder="Ask about your library, patterns, what to play, what to stop buying..." />
+        <input type="text" class="chat-input" id="chatInput" placeholder="Ask about your library, patterns, what to play, what to stop buying..." onkeypress="if(event.key==='Enter')sendChat()" />
         <button class="btn" onclick="sendChat()">SEND</button>
       </div>
       <div style="margin-top: 8px;">
@@ -716,12 +712,11 @@
   }
 
   function renderDashboard() {
-    renderChart1(); // Donut - Pile of Shame
+    renderChart1(); // Donut - Commitment Level
     renderChart2(); // Bar - Top 15
     renderChart3(); // Live - Last 2 weeks
-    renderChart4(); // Scatter - Hidden Gems
-    renderChart5(); // Radar - Gaming DNA
-    renderChart6(); // Depth Bars
+    renderChart4(); // Scatter - Critical Reception
+    renderChart5(); // Genre Breakdown
     renderChart7(); // Achievements
     renderChart8(); // Value Analysis
     renderChart9(); // Heatmap
@@ -849,7 +844,7 @@
 
     const validData = scatterData.filter(d => d.score !== null);
     if (validData.length === 0) {
-      document.getElementById('chart4').innerHTML = '<div class="chart-error">No metacritic scores available</div>';
+      document.getElementById('chart4').innerHTML = '<div class="chart-error">No Metacritic data found.<br><br>Many games don\'t have Metacritic scores on Steam.<br>Try loading anyway - your top games may have data.</div>';
       return;
     }
 
@@ -875,85 +870,58 @@
     document.getElementById('chart4').innerHTML = svg;
   }
 
-  // CHART 5: Radar - Gaming DNA
+  // CHART 5: Genre Breakdown
   function renderChart5() {
-    const played = games.filter(g => g.playtime_forever > 0);
-    const avgHours = played.reduce((s, g) => s + (g.playtime_forever / 60), 0) / played.length;
-    const high = played.filter(g => (g.playtime_forever / 60) > 50).length;
-    const over20h = played.filter(g => (g.playtime_forever / 60) > 20).length;
-    const over100h = played.filter(g => (g.playtime_forever / 60) > 100).length;
-    const recent = games.filter(g => (g.playtime_2weeks || 0) > 0).length;
+    // Detect genres from game names using keywords
+    const genreKeywords = {
+      'RPG': ['rpg', 'role', 'dragon', 'elder', 'fallout', 'witcher', 'divinity', 'baldur', 'mass effect', 'final fantasy', 'dark souls', 'elden'],
+      'FPS': ['fps', 'shooter', 'call of duty', 'battlefield', 'counter', 'cs:', 'doom', 'quake', 'halo', 'cod', 'valorant', 'overwatch'],
+      'Strategy': ['strategy', 'total war', 'civilization', 'starcraft', 'age of', 'command', 'warcraft', 'rts', 'xcom', 'crusader'],
+      'Roguelike': ['rogue', 'darkest', 'slay the spire', 'dead cells', 'hades', 'risk of', 'enter the gungeon', 'binding of'],
+      'Survival': ['survival', 'rust', 'ark', 'the forest', 'subnautica', 'don\'t starve', 'terraria', 'minecraft', '7 days'],
+      'Action': ['action', 'assassin', 'batman', 'shadow of', 'god of', 'devil may', 'bayonetta', 'dmc', 'ninja'],
+      'Simulation': ['sim', 'simulator', 'farming', 'flight', 'euro truck', 'train', 'football manager', 'cities'],
+      'Puzzle': ['puzzle', 'portal', 'witness', 'baba', 'tetris', 'candy', 'bejeweled'],
+      'Adventure': ['adventure', 'uncharted', 'tomb raider', 'zelda', 'monkey island', 'life is strange'],
+      'Horror': ['horror', 'resident evil', 'silent hill', 'outlast', 'amnesia', 'alien:', 'dead space', 'phasmophobia']
+    };
 
-    const axes = [
-      { label: 'Commitment', value: Math.min(avgHours / 10, 10) },
-      { label: 'Variety', value: Math.min(played.length / 20, 10) },
-      { label: 'Intensity', value: Math.min((high / played.length) * 20, 10) },
-      { label: 'Completion', value: Math.min((over20h / played.length) * 20, 10) },
-      { label: 'Consistency', value: Math.min((recent / played.length) * 30, 10) },
-      { label: 'Depth', value: Math.min(over100h, 10) }
-    ];
-
-    const center = 140;
-    const maxRadius = 100;
-    const angleStep = (Math.PI * 2) / axes.length;
-
-    const points = axes.map((a, i) => {
-      const angle = i * angleStep - Math.PI / 2;
-      const r = (a.value / 10) * maxRadius;
-      const x = center + r * Math.cos(angle);
-      const y = center + r * Math.sin(angle);
-      return `${x},${y}`;
-    }).join(' ');
-
-    const axisLines = axes.map((a, i) => {
-      const angle = i * angleStep - Math.PI / 2;
-      const x = center + maxRadius * Math.cos(angle);
-      const y = center + maxRadius * Math.sin(angle);
-      const labelX = center + (maxRadius + 20) * Math.cos(angle);
-      const labelY = center + (maxRadius + 20) * Math.sin(angle);
-      return `<line x1="${center}" y1="${center}" x2="${x}" y2="${y}" stroke="var(--border)" stroke-width="1"/>
-        <text x="${labelX}" y="${labelY}" fill="var(--muted)" font-size="10" text-anchor="middle">${a.label}</text>`;
-    }).join('');
-
-    const svg = `<svg class="radar-chart" viewBox="0 0 280 280">
-      ${axisLines}
-      <polygon points="${points}" fill="var(--accent)" fill-opacity="0.2" stroke="var(--accent)" stroke-width="2"/>
-    </svg>`;
-
-    document.getElementById('chart5').innerHTML = svg;
-  }
-
-  // CHART 6: Session Depth Buckets
-  function renderChart6() {
-    const buckets = [
-      { label: 'Bounced\n<1h', count: 0, color: '#1e2d40' },
-      { label: 'Sampled\n1-5h', count: 0, color: '#2a3f5f' },
-      { label: 'Hooked\n5-20h', count: 0, color: '#4a6070' },
-      { label: 'Committed\n20-100h', count: 0, color: '#4fc3f7' },
-      { label: 'Obsessed\n100h+', count: 0, color: '#4caf7d' }
-    ];
-
+    const genreHours = {};
     games.forEach(g => {
+      const name = (g.name || '').toLowerCase();
       const hours = (g.playtime_forever || 0) / 60;
-      if (hours < 1) buckets[0].count++;
-      else if (hours < 5) buckets[1].count++;
-      else if (hours < 20) buckets[2].count++;
-      else if (hours < 100) buckets[3].count++;
-      else buckets[4].count++;
+      let matched = false;
+      for (const [genre, keywords] of Object.entries(genreKeywords)) {
+        if (keywords.some(kw => name.includes(kw))) {
+          genreHours[genre] = (genreHours[genre] || 0) + hours;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        genreHours['Other'] = (genreHours['Other'] || 0) + hours;
+      }
     });
 
-    const maxCount = Math.max(...buckets.map(b => b.count));
-    const barsHTML = buckets.map(b => {
-      const heightPercent = (b.count / maxCount) * 100;
-      const percent = ((b.count / games.length) * 100).toFixed(1);
-      return `<div class="depth-bar">
-        <div class="depth-bar-fill" style="height: ${heightPercent}%; background: ${b.color};"></div>
-        <div class="depth-bar-value">${b.count}</div>
-        <div class="depth-bar-label">${b.label}<br>${percent}%</div>
+    const sorted = Object.entries(genreHours)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8);
+    
+    const maxHours = Math.max(...sorted.map(s => s[1]));
+    const colors = ['#4fc3f7', '#4caf7d', '#ff6b35', '#f44336', '#9c27b0', '#ff9800', '#00bcd4', '#607d8b'];
+
+    const barsHTML = sorted.map(([genre, hours], i) => {
+      const percent = maxHours > 0 ? (hours / maxHours) * 100 : 0;
+      return `<div class="bar-item">
+        <div class="bar-label">${genre}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: ${percent}%; background: ${colors[i % colors.length]};"></div>
+        </div>
+        <div class="bar-value">${Math.round(hours)}h</div>
       </div>`;
     }).join('');
 
-    document.getElementById('chart6').innerHTML = `<div class="depth-bars">${barsHTML}</div>`;
+    document.getElementById('chart5').innerHTML = `<div class="bar-chart">${barsHTML}</div>`;
   }
 
   // CHART 7: Achievement Personality
@@ -965,7 +933,9 @@
 
     for (const g of top10) {
       try {
-        const res = await fetch(`https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1/?appid=${g.appid}&steamid=${config.steamId}&key=${config.apiKey}`);
+        // Use proxy to avoid CORS issues
+        const res = await fetch(`${config.proxyUrl}/api/steam?key=${encodeURIComponent(config.apiKey)}&steamid=${encodeURIComponent(config.steamId)}&appid=${g.appid}&endpoint=achievements`);
+        if (!res.ok) throw new Error('Proxy error');
         const data = await res.json();
         if (data.playerstats?.achievements) {
           const total = data.playerstats.achievements.length;
@@ -974,13 +944,25 @@
           achievements.push({ name: g.name, percent, unlocked, total });
         }
       } catch (e) {
-        // Skip games with no achievement data
+        // Try direct API as fallback (may work on some browsers)
+        try {
+          const res = await fetch(`https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1/?appid=${g.appid}&steamid=${config.steamId}&key=${config.apiKey}`);
+          const data = await res.json();
+          if (data.playerstats?.achievements) {
+            const total = data.playerstats.achievements.length;
+            const unlocked = data.playerstats.achievements.filter(a => a.achieved === 1).length;
+            const percent = total > 0 ? (unlocked / total) * 100 : 0;
+            achievements.push({ name: g.name, percent, unlocked, total });
+          }
+        } catch (e2) {
+          // Skip games with no achievement data
+        }
       }
       await new Promise(resolve => setTimeout(resolve, 100));
     }
 
     if (achievements.length === 0) {
-      document.getElementById('chart7').innerHTML = '<div class="chart-error">No achievement data available</div>';
+      document.getElementById('chart7').innerHTML = '<div class="chart-error">No achievement data available.<br><br>Make sure your Steam profile has "Game Details" set to Public.<br><a href="https://steamcommunity.com/my/edit/settings" target="_blank" style="color: var(--accent);">Open Steam Privacy Settings</a></div>';
       return;
     }
 
@@ -1053,15 +1035,37 @@
     const cellsHTML = games.map(g => {
       const hours = (g.playtime_forever || 0) / 60;
       const intensity = hours / maxHours;
-      let color = '#1e2d40';
-      if (intensity > 0.8) color = '#4caf7d';
-      else if (intensity > 0.6) color = '#4fc3f7';
-      else if (intensity > 0.4) color = '#4a6070';
-      else if (intensity > 0.2) color = '#2a3f5f';
-      return `<div class="heatmap-cell" style="background: ${color};" title="${g.name}: ${Math.round(hours)}h"></div>`;
+      // Better gradients - more visible
+      let color = '#1a1a2e'; // Never played
+      if (hours > 100) color = '#4caf7d'; // 100h+ (green)
+      else if (hours > 50) color = '#4fc3f7'; // 50-100h (cyan)
+      else if (hours > 20) color = '#ff6b35'; // 20-50h (orange)
+      else if (hours > 10) color = '#5a7a9a'; // 10-20h (light gray)
+      else if (hours > 5) color = '#3a5a7a'; // 5-10h (medium gray)
+      else if (hours > 1) color = '#2a4a6a'; // 1-5h (dark gray)
+      else if (hours > 0) color = '#1a3a5a'; // <1h (very dark)
+      return `<div class="heatmap-cell" style="background: ${color};" data-name="${g.name}" data-hours="${Math.round(hours)}"></div>`;
     }).join('');
 
-    document.getElementById('chart9').innerHTML = `<div class="heatmap-grid">${cellsHTML}</div>`;
+    document.getElementById('chart9').innerHTML = `<div class="heatmap-grid" id="heatmapGrid">${cellsHTML}</div>`;
+    
+    // Add hover tooltip
+    const grid = document.getElementById('heatmapGrid');
+    grid.addEventListener('mouseover', (e) => {
+      if (e.target.classList.contains('heatmap-cell')) {
+        const name = e.target.dataset.name;
+        const hours = e.target.dataset.hours;
+        e.target.style.transform = 'scale(1.5)';
+        e.target.style.boxShadow = '0 0 8px var(--accent)';
+        e.target.setAttribute('title', `${name}: ${hours}h`);
+      }
+    });
+    grid.addEventListener('mouseout', (e) => {
+      if (e.target.classList.contains('heatmap-cell')) {
+        e.target.style.transform = '';
+        e.target.style.boxShadow = '';
+      }
+    });
   }
 
   // Chat functions
