@@ -573,18 +573,25 @@
 <!-- PHASE 2: Dashboard -->
 <div class="phase" id="p2">
   <div class="dashboard-nav">
-    <button class="nav-tab active" onclick="showTab('dashboard')">DASHBOARD</button>
-    <button class="nav-tab" onclick="showTab('chat')">CHAT</button>
-    <button class="reset-btn" onclick="show('p0')" style="margin-left: auto; margin-top: 0;">← NEW PROFILE</button>
+    <button class="reset-btn" onclick="show('p0')" style="margin-left: auto;">-- NEW PROFILE</button>
   </div>
 
   <div id="dashboardTab">
-    <!-- AI ANALYSIS BOX -->
+    <!-- AI ANALYSIS BOX - Combined with Chat -->
     <div class="chart-container" style="margin-bottom: 16px;">
-      <div class="chart-title">BEHAVIORAL PROFILE</div>
-      <div id="aiAnalysis" style="max-height: 200px; overflow-y: auto; font-size: 13px; line-height: 1.6;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <div class="chart-title" style="margin-bottom: 0;">AI GAMING ANALYST</div>
+        <button class="btn" onclick="regenerateProfile()" style="font-size: 10px; padding: 4px 8px;">REGENERATE PROFILE</button>
+      </div>
+      <div id="aiAnalysis" style="max-height: 180px; overflow-y: auto; font-size: 13px; line-height: 1.6; margin-bottom: 12px;">
         <div class="chart-loading"><div class="spinner" style="width: 24px; height: 24px; margin: 0 auto;"></div></div>
       </div>
+      <div class="chat-log" id="chatLog" style="max-height: 150px; overflow-y: auto; font-size: 12px; margin-bottom: 8px;"></div>
+      <div class="chat-input-row">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Ask about your library, patterns, what to play..." onkeypress="if(event.key==='Enter')sendChat()" />
+        <button class="btn" onclick="sendChat()">SEND</button>
+      </div>
+      <div id="chatError"></div>
     </div>
 
     <!-- ROW 1 -->
@@ -632,21 +639,7 @@
     </div>
   </div>
 
-  <div id="chatTab" style="display: none;">
-    <div class="chat-container">
-      <div class="chart-title">AI GAMING ANALYST</div>
-      <div class="chat-log" id="chatLog"></div>
-      <div class="chat-input-row">
-        <input type="text" class="chat-input" id="chatInput" placeholder="Ask about your library, patterns, what to play, what to stop buying..." onkeypress="if(event.key==='Enter')sendChat()" />
-        <button class="btn" onclick="sendChat()">SEND</button>
-      </div>
-      <div style="margin-top: 8px;">
-        <button class="btn" onclick="clearChat()">CLEAR CHAT</button>
-      </div>
-      <div id="chatError"></div>
-    </div>
   </div>
-</div>
 
 <script>
   let games = [];
@@ -666,13 +659,6 @@
   function show(id) {
     document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-  }
-
-  function showTab(tab) {
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
-    document.getElementById('dashboardTab').style.display = tab === 'dashboard' ? 'block' : 'none';
-    document.getElementById('chatTab').style.display = tab === 'chat' ? 'block' : 'none';
   }
 
   function log(id, txt, delay=0) {
@@ -733,11 +719,13 @@
   }
 
   // AI Behavioral Analysis
-  async function renderAIAnalysis() {
+  async function renderAIAnalysis(isRegenerate = false) {
     if (!config.anthropicKey) {
       document.getElementById('aiAnalysis').innerHTML = '<div class="chart-error">Add Anthropic API key for AI analysis</div>';
       return;
     }
+
+    document.getElementById('aiAnalysis').innerHTML = '<div class="chart-loading"><div class="spinner" style="width: 24px; height: 24px; margin: 0 auto;"></div></div>';
 
     const totalHours = Math.round(games.reduce((s, g) => s + ((g.playtime_forever || 0) / 60), 0));
     const topGames = games.filter(g => g.playtime_forever > 0).slice(0, 15).map(g => ({
@@ -749,8 +737,12 @@
       name: g.name,
       hours: Math.round((g.playtime_2weeks || 0) / 60)
     }));
+    const lastSession = JSON.parse(localStorage.getItem('steamai_last_session') || '{}');
 
-    const prompt = `You are a brutally honest gaming analyst. Analyze this Steam library and tear the user apart. Be specific, harsh, and funny.
+    let prompt;
+    if (isRegenerate || !lastSession.totalHours) {
+      // First time or regenerate - full behavioral profile
+      prompt = `You are a brutally honest gaming analyst. A user has just loaded their Steam library analysis.
 
 LIBRARY DATA:
 - Total games: ${games.length}
@@ -759,33 +751,64 @@ LIBRARY DATA:
 - Top 15 games by playtime: ${JSON.stringify(topGames)}
 - Recently played (last 2 weeks): ${JSON.stringify(recentGames)}
 
-Provide a behavioral profile with these sections:
-1. BEHAVIORAL PROFILE - What kind of gamer are you? What do your habits say about you?
-2. YOU'RE WRONG ABOUT YOURSELF - What do you think you like vs what you actually play
-3. PLAY THIS TONIGHT - Recommend 2-3 games from their library based on their patterns
-4. STOP BUYING THESE - What types of games should they stop wasting money on?
+Provide a concise welcome and behavioral analysis (max 200 words):
+1. Brief welcome (1 sentence)
+2. BEHAVIORAL PROFILE - What kind of gamer are they? What patterns stand out?
+3. ONE key insight about their habits they might not realize
 
-Keep it concise but brutal. Use specific game names from their data.`;
+Focus on behaviors and patterns, NOT recommendations. Be specific and use game names. Be brutally honest but concise.`;
+    } else {
+      // Returning user - focus on changes
+      const hoursDiff = totalHours - lastSession.totalHours;
+      const newGames = games.length - lastSession.gameCount;
+      
+      prompt = `You are a brutally honest gaming analyst. A user has returned to their Steam library analysis.
+
+PREVIOUS SESSION:
+- Total hours: ${lastSession.totalHours}
+- Games: ${lastSession.gameCount}
+
+CURRENT SESSION:
+- Total hours: ${totalHours}
+- Games: ${games.length}
+- Hours played since last visit: ${hoursDiff}
+- Games added: ${newGames}
+- Recently played: ${JSON.stringify(recentGames)}
+- Top games: ${JSON.stringify(topGames.slice(0, 5))}
+
+Provide a concise update (max 150 words):
+1. Brief welcome back (1 sentence)
+2. What changed since last time - comment on their recent activity
+3. ONE observation about their gaming behavior
+
+Focus on behaviors and changes, NOT recommendations. Be specific and honest.`;
+    }
+
+    // Save current session for next time
+    localStorage.setItem('steamai_last_session', JSON.stringify({ totalHours, gameCount: games.length, timestamp: Date.now() }));
 
     try {
       const res = await fetch(`${config.proxyUrl}/api/claude`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ apiKey: config.anthropicKey, prompt, maxTokens: 800 })
+        body: JSON.stringify({ apiKey: config.anthropicKey, prompt, maxTokens: 500 })
       });
       const data = await res.json();
       const analysis = data.response || 'Analysis failed';
       
-      // Format the analysis
       const formatted = analysis
         .replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--accent);">$1</strong>')
-        .replace(/\n\n/g, '</p><p style="margin: 12px 0;">')
+        .replace(/\n\n/g, '</p><p style="margin: 8px 0;">')
         .replace(/\n/g, '<br>');
       
       document.getElementById('aiAnalysis').innerHTML = `<p style="margin: 0;">${formatted}</p>`;
     } catch (e) {
       document.getElementById('aiAnalysis').innerHTML = `<div class="chart-error">AI analysis failed: ${e.message}</div>`;
     }
+  }
+
+  function regenerateProfile() {
+    renderAIAnalysis(true);
   }
 
   // CHART 1: Donut - Pile of Shame
