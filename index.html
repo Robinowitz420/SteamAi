@@ -22,9 +22,10 @@
     color: var(--text); 
     font-family: 'IBM Plex Mono', monospace; 
     min-height: 100vh; 
-    padding: 32px; 
-    max-width: 1400px; 
+    padding: 16px; 
+    max-width: 1600px; 
     margin: 0 auto; 
+    font-size: 12px;
   }
   
   .phase { display: none; } 
@@ -187,30 +188,30 @@
   .chart-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 12px;
+    margin-bottom: 12px;
   }
   .chart-container {
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 4px;
-    padding: 20px;
+    padding: 12px;
     animation: fadeIn 0.3s ease;
     position: relative;
   }
   .chart-title {
     font-family: 'Rajdhani', sans-serif;
-    font-size: 11px;
+    font-size: 10px;
     letter-spacing: 2px;
     color: var(--muted);
     text-transform: uppercase;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
   .chart-loading {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 200px;
+    min-height: 120px;
     color: var(--muted);
     font-size: 11px;
   }
@@ -578,6 +579,14 @@
   </div>
 
   <div id="dashboardTab">
+    <!-- AI ANALYSIS BOX -->
+    <div class="chart-container" style="margin-bottom: 16px;">
+      <div class="chart-title">BEHAVIORAL PROFILE</div>
+      <div id="aiAnalysis" style="max-height: 200px; overflow-y: auto; font-size: 13px; line-height: 1.6;">
+        <div class="chart-loading"><div class="spinner" style="width: 24px; height: 24px; margin: 0 auto;"></div></div>
+      </div>
+    </div>
+
     <!-- ROW 1 -->
     <div class="chart-row">
       <div class="chart-container">
@@ -712,6 +721,7 @@
   }
 
   function renderDashboard() {
+    renderAIAnalysis(); // AI Behavioral Profile
     renderChart1(); // Donut - Commitment Level
     renderChart2(); // Bar - Top 15
     renderChart3(); // Live - Last 2 weeks
@@ -720,6 +730,62 @@
     renderChart7(); // Achievements
     renderChart8(); // Value Analysis
     renderChart9(); // Heatmap
+  }
+
+  // AI Behavioral Analysis
+  async function renderAIAnalysis() {
+    if (!config.anthropicKey) {
+      document.getElementById('aiAnalysis').innerHTML = '<div class="chart-error">Add Anthropic API key for AI analysis</div>';
+      return;
+    }
+
+    const totalHours = Math.round(games.reduce((s, g) => s + ((g.playtime_forever || 0) / 60), 0));
+    const topGames = games.filter(g => g.playtime_forever > 0).slice(0, 15).map(g => ({
+      name: g.name,
+      hours: Math.round((g.playtime_forever || 0) / 60)
+    }));
+    const neverPlayed = games.filter(g => !g.playtime_forever).length;
+    const recentGames = games.filter(g => (g.playtime_2weeks || 0) > 0).map(g => ({
+      name: g.name,
+      hours: Math.round((g.playtime_2weeks || 0) / 60)
+    }));
+
+    const prompt = `You are a brutally honest gaming analyst. Analyze this Steam library and tear the user apart. Be specific, harsh, and funny.
+
+LIBRARY DATA:
+- Total games: ${games.length}
+- Total hours: ${totalHours}
+- Never played: ${neverPlayed} games
+- Top 15 games by playtime: ${JSON.stringify(topGames)}
+- Recently played (last 2 weeks): ${JSON.stringify(recentGames)}
+
+Provide a behavioral profile with these sections:
+1. BEHAVIORAL PROFILE - What kind of gamer are you? What do your habits say about you?
+2. YOU'RE WRONG ABOUT YOURSELF - What do you think you like vs what you actually play
+3. PLAY THIS TONIGHT - Recommend 2-3 games from their library based on their patterns
+4. STOP BUYING THESE - What types of games should they stop wasting money on?
+
+Keep it concise but brutal. Use specific game names from their data.`;
+
+    try {
+      const res = await fetch(`${config.proxyUrl}/api/claude`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: config.anthropicKey, prompt, maxTokens: 800 })
+      });
+      const data = await res.json();
+      const analysis = data.response || 'Analysis failed';
+      
+      // Format the analysis
+      const formatted = analysis
+        .replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--accent);">$1</strong>')
+        .replace(/\n\n/g, '</p><p style="margin: 12px 0;">')
+        .replace(/\n/g, '<br>');
+      
+      document.getElementById('aiAnalysis').innerHTML = `<p style="margin: 0;">${formatted}</p>`;
+    } catch (e) {
+      document.getElementById('aiAnalysis').innerHTML = `<div class="chart-error">AI analysis failed: ${e.message}</div>`;
+    }
   }
 
   // CHART 1: Donut - Pile of Shame
@@ -870,43 +936,44 @@
     document.getElementById('chart4').innerHTML = svg;
   }
 
-  // CHART 5: Genre Breakdown
-  function renderChart5() {
-    // Detect genres from game names using keywords
-    const genreKeywords = {
-      'RPG': ['rpg', 'role', 'dragon', 'elder', 'fallout', 'witcher', 'divinity', 'baldur', 'mass effect', 'final fantasy', 'dark souls', 'elden'],
-      'FPS': ['fps', 'shooter', 'call of duty', 'battlefield', 'counter', 'cs:', 'doom', 'quake', 'halo', 'cod', 'valorant', 'overwatch'],
-      'Strategy': ['strategy', 'total war', 'civilization', 'starcraft', 'age of', 'command', 'warcraft', 'rts', 'xcom', 'crusader'],
-      'Roguelike': ['rogue', 'darkest', 'slay the spire', 'dead cells', 'hades', 'risk of', 'enter the gungeon', 'binding of'],
-      'Survival': ['survival', 'rust', 'ark', 'the forest', 'subnautica', 'don\'t starve', 'terraria', 'minecraft', '7 days'],
-      'Action': ['action', 'assassin', 'batman', 'shadow of', 'god of', 'devil may', 'bayonetta', 'dmc', 'ninja'],
-      'Simulation': ['sim', 'simulator', 'farming', 'flight', 'euro truck', 'train', 'football manager', 'cities'],
-      'Puzzle': ['puzzle', 'portal', 'witness', 'baba', 'tetris', 'candy', 'bejeweled'],
-      'Adventure': ['adventure', 'uncharted', 'tomb raider', 'zelda', 'monkey island', 'life is strange'],
-      'Horror': ['horror', 'resident evil', 'silent hill', 'outlast', 'amnesia', 'alien:', 'dead space', 'phasmophobia']
-    };
+  // CHART 5: Genre Breakdown (with Steam store API)
+  async function renderChart5() {
+    document.getElementById('chart5').innerHTML = '<div class="chart-loading"><div class="spinner" style="width: 24px; height: 24px; margin: 0 auto;"></div></div>';
 
+    const top50 = games.filter(g => g.playtime_forever > 0).slice(0, 50);
     const genreHours = {};
-    games.forEach(g => {
-      const name = (g.name || '').toLowerCase();
-      const hours = (g.playtime_forever || 0) / 60;
-      let matched = false;
-      for (const [genre, keywords] of Object.entries(genreKeywords)) {
-        if (keywords.some(kw => name.includes(kw))) {
-          genreHours[genre] = (genreHours[genre] || 0) + hours;
-          matched = true;
-          break;
+
+    // Fetch genres from Steam store API in batches
+    for (let i = 0; i < top50.length; i += 5) {
+      const batch = top50.slice(i, i + 5);
+      await Promise.all(batch.map(async g => {
+        try {
+          const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=${g.appid}`);
+          const data = await res.json();
+          const gameData = data[g.appid]?.data;
+          const genres = gameData?.genres || [];
+          const hours = (g.playtime_forever || 0) / 60;
+          
+          genres.forEach(genre => {
+            const name = genre.description || genre;
+            genreHours[name] = (genreHours[name] || 0) + hours;
+          });
+        } catch (e) {
+          // Skip on error
         }
-      }
-      if (!matched) {
-        genreHours['Other'] = (genreHours['Other'] || 0) + hours;
-      }
-    });
+      }));
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
 
     const sorted = Object.entries(genreHours)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 8);
-    
+
+    if (sorted.length === 0) {
+      document.getElementById('chart5').innerHTML = '<div class="chart-error">Unable to load genre data</div>';
+      return;
+    }
+
     const maxHours = Math.max(...sorted.map(s => s[1]));
     const colors = ['#4fc3f7', '#4caf7d', '#ff6b35', '#f44336', '#9c27b0', '#ff9800', '#00bcd4', '#607d8b'];
 
