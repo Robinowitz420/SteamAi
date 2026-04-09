@@ -1058,11 +1058,8 @@ Focus on behaviors and changes, NOT recommendations. Be specific and honest.`;
       return;
     }
 
-    const avgPercent = achievements.reduce((s, a) => s + a.percent, 0) / achievements.length;
-    let personality = 'ACHIEVEMENT IGNORER';
-    if (avgPercent > 80) personality = 'PERFECTIONIST';
-    else if (avgPercent > 50) personality = 'COMPLETIONIST';
-    else if (avgPercent > 20) personality = 'CASUAL HUNTER';
+    // Sort by percent (highest first)
+    achievements.sort((a, b) => b.percent - a.percent);
 
     const itemsHTML = achievements.slice(0, 8).map(a => {
       return `<div class="achievement-item">
@@ -1074,10 +1071,7 @@ Focus on behaviors and changes, NOT recommendations. Be specific and honest.`;
       </div>`;
     }).join('');
 
-    document.getElementById('chart7').innerHTML = `
-      <div style="text-align: center; margin-bottom: 16px; font-family: 'Rajdhani', sans-serif; font-size: 18px; color: var(--accent);">${personality}</div>
-      <div class="achievement-list">${itemsHTML}</div>
-    `;
+    document.getElementById('chart7').innerHTML = `<div class="achievement-list">${itemsHTML}</div>`;
   }
 
   // CHART 8: Value Analysis
