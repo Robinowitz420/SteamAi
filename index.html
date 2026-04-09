@@ -518,6 +518,11 @@ window.onload = () => {
   if (saved.anthropicKey) document.getElementById('anthropicKey').value = saved.anthropicKey;
   if (saved.chat) chatMessages = saved.chat;
   
+  // Set default proxy URL if empty
+  if (!document.getElementById('proxyUrl').value) {
+    document.getElementById('proxyUrl').value = 'https://steamaiapp.vercel.app';
+  }
+  
   if (saved.apiKey) document.getElementById('savedIndicator').textContent = 'CREDENTIALS LOADED';
 };
 
@@ -566,9 +571,17 @@ async function startFetch() {
   log('Establishing secure link...', 0);
 
   try {
-    const res = await fetch(`${proxyUrl}/api/steam?key=${encodeURIComponent(apiKey)}&steamid=${encodeURIComponent(steamId)}`);
+    // Ensure proxy URL doesn't have trailing slash
+    const baseUrl = proxyUrl.replace(/\/$/, '');
+    const res = await fetch(`${baseUrl}/api/steam?key=${encodeURIComponent(apiKey)}&steamid=${encodeURIComponent(steamId)}`);
     updateProgress(30, 'FETCHING LIBRARY DATA...');
     log('Handshake complete', 200);
+    
+    // Check if response is OK
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Server error: ${res.status} - ${text.substring(0, 100)}`);
+    }
     
     const data = await res.json();
     if (data.error) throw new Error(data.error);
