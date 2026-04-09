@@ -973,14 +973,51 @@ async function sendChat() {
   
   try {
     const totalHours = Math.round(games.reduce((s, g) => s + ((g.playtime_forever || 0) / 60), 0));
-    const topGames = games.filter(g => g.playtime_forever > 0).slice(0, 10).map(g => g.name);
+    
+    // Top played games
+    const topGames = games.filter(g => g.playtime_forever > 0).slice(0, 10).map(g => ({
+      name: g.name,
+      hours: Math.round((g.playtime_forever || 0) / 60)
+    }));
+    
+    // Neglected games (owned but barely played)
+    const neglected = games.filter(g => {
+      const hours = (g.playtime_forever || 0) / 60;
+      return hours > 0 && hours < 5;
+    }).slice(0, 15).map(g => ({
+      name: g.name,
+      hours: Math.round((g.playtime_forever || 0) / 60 * 10) / 10
+    }));
+    
+    // Never played
+    const neverPlayed = games.filter(g => !g.playtime_forever).slice(0, 10).map(g => g.name);
+    
+    // Recent activity
+    const recent = games.filter(g => (g.playtime_2weeks || 0) > 0).map(g => ({
+      name: g.name,
+      hours: Math.round((g.playtime_2weeks || 0) / 60)
+    }));
+    
+    const context = `LIBRARY DATA:
+- Total games: ${games.length}
+- Total hours: ${totalHours}
+- Top played: ${JSON.stringify(topGames)}
+- Neglected (< 5h): ${JSON.stringify(neglected)}
+- Never played: ${neverPlayed.join(', ')}
+- Recently active: ${JSON.stringify(recent)}
+
+INSTRUCTIONS:
+- Focus on BEHAVIORAL analysis, not recommendations unless asked
+- When asked for recommendations, prioritize NEGLECTED games from the library
+- Be specific with game titles from their actual library
+- Keep responses under 100 words`;
     
     const res = await fetch(`${config.proxyUrl}/api/claude`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         apiKey: config.anthropicKey,
-        prompt: `You are a gaming analyst AI. User has ${games.length} games, ${totalHours} hours played. Top games: ${topGames.join(', ')}. User asks: "${msg}". Respond concisely (max 100 words).`,
+        prompt: `${context}\n\nUser question: "${msg}"`,
         maxTokens: 300
       })
     });
