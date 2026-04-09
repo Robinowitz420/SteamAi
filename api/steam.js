@@ -49,7 +49,20 @@ export default async function handler(req) {
 
   try {
     const res = await fetch(steamUrl);
-    const data = await res.json();
+    const text = await res.text();
+    
+    // Check if Steam returned HTML (error page)
+    if (text.startsWith('<') || text.startsWith('<!')) {
+      return new Response(JSON.stringify({ 
+        error: 'Steam API returned an error. Check your API key and Steam ID.',
+        hint: 'Get your API key at https://steamcommunity.com/dev/apikey'
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      });
+    }
+    
+    const data = JSON.parse(text);
 
     return new Response(JSON.stringify(data), {
       status: 200,
@@ -61,7 +74,7 @@ export default async function handler(req) {
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   }
 }
