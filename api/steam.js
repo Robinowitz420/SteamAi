@@ -9,6 +9,27 @@ export default async function handler(req) {
   const appid = searchParams.get('appid');
   const endpoint = searchParams.get('endpoint');
 
+  // Store endpoint doesn't need steamid/key
+  if (endpoint === 'store' && appid) {
+    try {
+      const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=${appid}`);
+      const data = await res.json();
+
+      return new Response(JSON.stringify(data), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: e.message }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+  }
+
   if (!steamId || !apiKey) {
     return new Response(JSON.stringify({ error: 'Missing steamid or key' }), {
       status: 400,

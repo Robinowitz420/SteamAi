@@ -909,7 +909,8 @@ Focus on behaviors and changes, NOT recommendations. Be specific and honest.`;
       const batch = top50.slice(i, i + 5);
       await Promise.all(batch.map(async g => {
         try {
-          const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=${g.appid}`);
+          // Use proxy to avoid CORS
+          const res = await fetch(`${config.proxyUrl}/api/steam?appid=${g.appid}&endpoint=store`);
           const data = await res.json();
           const gameData = data[g.appid]?.data;
           const score = gameData?.metacritic?.score || null;
@@ -933,7 +934,7 @@ Focus on behaviors and changes, NOT recommendations. Be specific and honest.`;
 
     const validData = scatterData.filter(d => d.score !== null);
     if (validData.length === 0) {
-      document.getElementById('chart4').innerHTML = '<div class="chart-error">No Metacritic data found.<br><br>Many games don\'t have Metacritic scores on Steam.<br>Try loading anyway - your top games may have data.</div>';
+      document.getElementById('chart4').innerHTML = '<div class="chart-error">No Metacritic data found.<br><br>Many games don\'t have Metacritic scores on Steam.<br>Your top games may not have scores available.</div>';
       return;
     }
 
@@ -966,12 +967,13 @@ Focus on behaviors and changes, NOT recommendations. Be specific and honest.`;
     const top50 = games.filter(g => g.playtime_forever > 0).slice(0, 50);
     const genreHours = {};
 
-    // Fetch genres from Steam store API in batches
+    // Fetch genres from Steam store API via proxy in batches
     for (let i = 0; i < top50.length; i += 5) {
       const batch = top50.slice(i, i + 5);
       await Promise.all(batch.map(async g => {
         try {
-          const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=${g.appid}`);
+          // Use proxy to avoid CORS
+          const res = await fetch(`${config.proxyUrl}/api/steam?appid=${g.appid}&endpoint=store`);
           const data = await res.json();
           const gameData = data[g.appid]?.data;
           const genres = gameData?.genres || [];
@@ -993,7 +995,7 @@ Focus on behaviors and changes, NOT recommendations. Be specific and honest.`;
       .slice(0, 8);
 
     if (sorted.length === 0) {
-      document.getElementById('chart5').innerHTML = '<div class="chart-error">Unable to load genre data</div>';
+      document.getElementById('chart5').innerHTML = '<div class="chart-error">Unable to load genre data.<br><br>Try refreshing the page.</div>';
       return;
     }
 
