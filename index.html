@@ -955,6 +955,10 @@ async function sendChat() {
   const chatLog = document.getElementById('chatLog');
   chatLog.innerHTML += `<div class="bg-surface-container-high p-3 rounded-lg text-xs">${msg}</div>`;
   
+  // Show thinking indicator
+  chatLog.innerHTML += `<div id="thinking" class="text-xs text-slate-500 italic">Verifying game data...</div>`;
+  chatLog.scrollTop = chatLog.scrollHeight;
+  
   try {
     const totalHours = Math.round(games.reduce((s, g) => s + ((g.playtime_forever || 0) / 60), 0));
     
@@ -987,6 +991,42 @@ async function sendChat() {
       `${m.role.toUpperCase()}: ${m.content}`
     ).join('\n\n');
     
+    // Detect if user is asking for specific features
+    const featureKeywords = ['controller', 'mouse', 'keyboard', 'story', 'multiplayer', 'co-op', 'coop', 'short', 'long', 'fps', 'rpg', 'strategy'];
+    const needsFeatureCheck = featureKeywords.some(k => msg.toLowerCase().includes(k));
+    
+    // If asking for features, verify games before recommending
+    let verifiedGames = [];
+    if (needsFeatureCheck) {
+      const candidates = [...neglected.slice(0, 10), ...neverPlayed.slice(0, 5).map(n => ({ name: n, hours: 0 }))];
+      
+      // Check up to 5 games in parallel
+      const checks = candidates.slice(0, 5).map(async g => {
+        try {
+          const res = await fetch(`${config.proxyUrl}/api/gameinfo?game=${encodeURIComponent(g.name)}&feature=${encodeURIComponent(msg)}`);
+          const data = await res.json();
+          return {
+            name: g.name,
+            hours: g.hours,
+            controllerSupport: data.controllerSupport,
+            genres: data.steamInfo?.genres || [],
+            hasFeature: data.hasFeature,
+          };
+        } catch (e) {
+          return { name: g.name, hours: g.hours, error: true };
+        }
+      });
+      
+      verifiedGames = await Promise.all(checks);
+    }
+    
+    // Build verified games section
+    const verifiedSection = verifiedGames.length > 0 
+      ? `\n\nVERIFIED GAME DATA (use this to filter recommendations):\n${verifiedGames.map(g => 
+          `- ${g.name}: Controller=${g.controllerSupport || 'Unknown'}, Genres=${g.genres?.join(', ') || 'Unknown'}`
+        ).join('\n')}`
+      : '';
+    
     const context = `You are a gaming analyst helping users discover games they OWN but neglect.
 
 THEIR LIBRARY:
@@ -994,6 +1034,7 @@ THEIR LIBRARY:
 - Most played: ${JSON.stringify(topGames)}
 - Barely touched (< 10h): ${JSON.stringify(neglected)}
 - Never played: ${neverPlayed.join(', ')}
+${verifiedSection}
 
 PREVIOUS MESSAGES IN THIS CONVERSATION:
 ${conversationHistory || '(None yet)'}
@@ -1001,8 +1042,8 @@ ${conversationHistory || '(None yet)'}
 CRITICAL RULES:
 1. ONLY recommend games from "Barely touched" or "Never played" lists above
 2. DO NOT repeat games you already recommended in this conversation
-3. If user asks for specific features (controller support, story, etc.), ONLY recommend games you're CERTAIN have those features
-4. If unsure about a game's features, say "I'm not sure if [game] has [feature]" rather than guessing
+3. If user asks for specific features (controller, story, etc.), ONLY recommend from the VERIFIED GAME DATA section
+4. If a game shows "Controller=None" or "Unknown", do NOT claim it has controller support
 5. VARY your recommendations - don't keep suggesting the same 2-3 games
 6. Use EXACT game titles from their library
 7. Max 80 words`;
@@ -1018,6 +1059,9 @@ CRITICAL RULES:
     });
     const data = await res.json();
     const response = data.response || 'No response';
+    
+    // Remove thinking indicator
+    document.getElementById('thinking')?.remove();
     
     chatMessages.push({ role: 'assistant', content: response });
     localStorage.setItem('steamai', JSON.stringify({ ...config, chat: chatMessages }));
