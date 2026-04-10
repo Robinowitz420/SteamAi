@@ -387,6 +387,27 @@ INITIATE SCAN
 <!-- TopNavBar -->
 <header class="flex justify-between items-center w-full px-4 md:px-6 h-14 md:h-16 bg-slate-900/60 backdrop-blur-xl border-b border-cyan-500/20 z-20">
 <div class="text-lg md:text-2xl font-black text-cyan-300 tracking-tighter font-headline uppercase">SteamAi HUD</div>
+
+<!-- EJECT BUTTON with Switch Cover -->
+<div class="flex items-center gap-3">
+<div class="relative">
+<!-- Switch Cover -->
+<div id="switchCover" class="absolute inset-0 bg-slate-700 rounded-lg cursor-pointer z-10 flex items-center justify-center transition-all duration-300 hover:bg-slate-600" onclick="toggleSwitchCover()">
+<div class="flex items-center gap-2 px-3 py-1">
+<span class="text-[8px] md:text-[10px] font-headline font-bold text-slate-300 tracking-widest">COVER</span>
+<span class="material-symbols-outlined text-slate-400 text-sm">lock</span>
+</div>
+</div>
+<!-- Eject Button -->
+<button id="ejectBtn" class="relative w-20 md:w-24 h-10 md:h-12 bg-gradient-to-b from-red-500 to-red-700 rounded-lg border-2 border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.3)] hover:shadow-[0_0_30px_rgba(239,68,68,0.6)] transition-all disabled:opacity-50 disabled:cursor-not-allowed" onclick="emergencyGameSuggestion()" disabled>
+<div class="absolute inset-0 rounded-lg bg-gradient-to-b from-white/20 to-transparent"></div>
+<div class="flex flex-col items-center justify-center">
+<span class="text-[10px] md:text-xs font-headline font-black text-white tracking-widest">EJECT</span>
+<span class="text-[8px] text-red-200">GAME</span>
+</div>
+</button>
+</div>
+</div>
 </header>
 
 <!-- Dashboard Content -->
@@ -1074,6 +1095,146 @@ Provide a unique insight they haven't heard before.`;
 
 function regenerateProfile() {
   renderAIAnalysis(true);
+}
+
+// Switch Cover Toggle
+let coverOpen = false;
+function toggleSwitchCover() {
+  const cover = document.getElementById('switchCover');
+  const btn = document.getElementById('ejectBtn');
+  coverOpen = !coverOpen;
+  
+  if (coverOpen) {
+    cover.style.transform = 'translateY(-100%)';
+    cover.style.opacity = '0';
+    cover.innerHTML = `
+      <div class="flex items-center gap-2 px-3 py-1">
+        <span class="text-[8px] md:text-[10px] font-headline font-bold text-slate-300 tracking-widest">OPEN</span>
+        <span class="material-symbols-outlined text-slate-400 text-sm">lock_open</span>
+      </div>
+    `;
+    btn.disabled = false;
+  } else {
+    cover.style.transform = 'translateY(0)';
+    cover.style.opacity = '1';
+    cover.innerHTML = `
+      <div class="flex items-center gap-2 px-3 py-1">
+        <span class="text-[8px] md:text-[10px] font-headline font-bold text-slate-300 tracking-widest">COVER</span>
+        <span class="material-symbols-outlined text-slate-400 text-sm">lock</span>
+      </div>
+    `;
+    btn.disabled = true;
+  }
+}
+
+// Emergency Game Suggestion
+async function emergencyGameSuggestion() {
+  if (!config.anthropicKey) {
+    alert('Add Anthropic API key for game suggestions');
+    return;
+  }
+  
+  // Close the cover
+  toggleSwitchCover();
+  
+  // Show loading in modal
+  const modal = document.createElement('div');
+  modal.id = 'ejectModal';
+  modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4';
+  modal.innerHTML = `
+    <div class="absolute inset-0 bg-black/90" onclick="closeEjectModal()"></div>
+    <div class="relative glass-panel rounded-xl p-6 max-w-lg w-full border border-red-500/30">
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center animate-pulse">
+            <span class="material-symbols-outlined text-red-500">emergency</span>
+          </div>
+          <h3 class="font-headline text-lg font-bold text-red-400">EMERGENCY GAME EJECTION</h3>
+        </div>
+        <button onclick="closeEjectModal()" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div id="ejectContent" class="text-center py-8">
+        <div class="chart-loading"><div class="spinner"></div></div>
+        <p class="text-slate-400 mt-4">Analyzing play habits & searching for perfect match...</p>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  
+  // Build gaming profile for recommendation
+  const totalHours = Math.round(games.reduce((s, g) => s + ((g.playtime_forever || 0) / 60), 0));
+  const topGames = games.filter(g => g.playtime_forever > 0).slice(0, 10).map(g => g.name);
+  const neverPlayed = games.filter(g => !g.playtime_forever).slice(0, 10).map(g => g.name);
+  const recentGames = games.filter(g => (g.playtime_2weeks || 0) > 0).map(g => g.name);
+  
+  // Calculate play style
+  const avgPlaytime = totalHours / games.length;
+  const hardcore = avgPlaytime > 20;
+  const casual = avgPlaytime < 5;
+  const collector = games.filter(g => !g.playtime_forever).length / games.length > 0.5;
+  
+  const prompt = `You are a gaming recommendation AI. Based on this user's Steam library data, suggest ONE specific game they should play next.
+
+USER PROFILE:
+- Total games: ${games.length}
+- Total hours: ${totalHours}
+- Top 10 most played: ${topGames.join(', ')}
+- Recent activity: ${recentGames.join(', ') || 'None in last 2 weeks'}
+- Unplayed games: ${neverPlayed.slice(0, 5).join(', ')}
+- Play style: ${hardcore ? 'Hardcore - deep investment in few games' : casual ? 'Casual - light gaming sessions' : collector ? 'Collector - buys more than plays' : 'Balanced'}
+
+TASK: Search your knowledge for a game that:
+1. Matches their play style and preferences
+2. Is NOT already in their library
+3. Is a hidden gem or highly rated in genres they enjoy
+4. They would genuinely enjoy based on their top played games
+
+RESPOND IN THIS FORMAT:
+**GAME NAME** (Year)
+
+WHY IT FITS: [2-3 sentences explaining why this matches their profile]
+
+WHAT TO EXPECT: [Brief gameplay description]
+
+Be specific and personal. Pick a real game that exists. Do not recommend from their unplayed list.`;
+
+  try {
+    const res = await fetch(`${config.proxyUrl}/api/claude`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apiKey: config.anthropicKey, prompt, maxTokens: 300 })
+    });
+    const data = await res.json();
+    const suggestion = data.response || 'Recommendation failed';
+    
+    const formatted = suggestion
+      .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #ef4444; font-size: 1.25rem;">$1</strong>')
+      .replace(/\n\n/g, '</p><p style="margin: 12px 0;">')
+      .replace(/\n/g, '<br>');
+    
+    document.getElementById('ejectContent').innerHTML = `
+      <div class="text-left">
+        <div class="bg-red-500/10 border-l-2 border-red-500 p-4 rounded-r-lg">
+          <p style="margin: 0; line-height: 1.6;">${formatted}</p>
+        </div>
+        <p class="text-xs text-slate-500 mt-4 text-center">Based on ${totalHours}h across ${games.length} games</p>
+      </div>
+    `;
+  } catch (e) {
+    document.getElementById('ejectContent').innerHTML = `
+      <div class="text-red-400">
+        <span class="material-symbols-outlined text-4xl">error</span>
+        <p class="mt-2">Ejection failed: ${e.message}</p>
+      </div>
+    `;
+  }
+}
+
+function closeEjectModal() {
+  const modal = document.getElementById('ejectModal');
+  if (modal) modal.remove();
 }
 
 function renderChart1() {
