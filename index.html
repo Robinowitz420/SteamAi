@@ -815,10 +815,17 @@ function closeValueModal() {
 
 let analysisHistory = [];
 
-function logAnalysis(text) {
+function logAnalysis(text, focus = '') {
   const timestamp = new Date().toLocaleTimeString();
-  analysisHistory.unshift({ time: timestamp, text: text.substring(0, 100) + (text.length > 100 ? '...' : '') });
-  if (analysisHistory.length > 10) analysisHistory.pop();
+  analysisHistory.unshift({ 
+    time: timestamp, 
+    text: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
+    focus: focus
+  });
+  if (analysisHistory.length > 20) analysisHistory.pop();
+  
+  // Persist to localStorage
+  localStorage.setItem('steamai_analysis_history', JSON.stringify(analysisHistory));
   
   const logEl = document.getElementById('analysisLog');
   if (logEl) {
@@ -900,11 +907,92 @@ function closeGameList() {
   if (modal) modal.remove();
 }
 
+// Analysis focus areas - rotate through these
+const ANALYSIS_FOCUSES = [
+  {
+    name: 'playtime_patterns',
+    focus: 'PLAYTIME PATTERNS - Analyze their time investment. Which games got the most love? Are they spreading time evenly or obsessing over a few? What does their playtime distribution reveal about their gaming personality?',
+    questions: ['Which games dominate their time?', 'Are they a completionist or a sampler?', 'Do they finish what they start?']
+  },
+  {
+    name: 'neglected_library',
+    focus: 'NEGLECTED LIBRARY - Focus on the unplayed and barely touched games. What treasures are gathering dust? What does their backlog say about their purchasing habits?',
+    questions: ['How many games have never been launched?', 'What genres are they avoiding?', 'Are they a collector or a player?']
+  },
+  {
+    name: 'genre_preferences',
+    focus: 'GENRE PREFERENCES - Analyze their gaming tastes. What genres do they gravitate toward? Are they a specialist or a generalist? What does their genre mix reveal?',
+    questions: ['What genres dominate their top played?', 'Are they stuck in a comfort zone?', 'What genres have they ignored?']
+  },
+  {
+    name: 'gaming_habits',
+    focus: 'GAMING HABITS - Analyze their behavioral patterns. Are they a binge gamer or consistent player? Do they play daily or in bursts? What habits define them?',
+    questions: ['Do they stick with games or abandon them?', 'Are they achievement-focused?', 'What motivates their gaming sessions?']
+  },
+  {
+    name: 'value_analysis',
+    focus: 'VALUE ANALYSIS - Analyze their library value. Are they getting their money\'s worth? Which games gave the best entertainment value? Which were "wasted" purchases?',
+    questions: ['Cost per hour analysis', 'Which purchases paid off?', 'Any buyer\'s remorse candidates?']
+  },
+  {
+    name: 'recent_activity',
+    focus: 'RECENT ACTIVITY - Focus on their last 2 weeks. What have they been playing lately? How does recent behavior compare to their history? Any new obsessions?',
+    questions: ['What\'s currently capturing their attention?', 'Any new gaming phases?', 'Are they in a rut or exploring?']
+  },
+  {
+    name: 'completion_rate',
+    focus: 'COMPLETION RATE - Analyze their finish rate. Do they see games through to the end? What percentage of games have they "finished"? Are they a quitter or a finisher?',
+    questions: ['How many games have significant playtime vs barely touched?', 'Do they replay games?', 'What makes them stick with a game?']
+  },
+  {
+    name: 'hidden_gems',
+    focus: 'HIDDEN GEMS - Find the underrated games in their library. What lesser-played games deserve more attention? What hidden treasures are they sitting on?',
+    questions: ['Which underplayed games deserve a second look?', 'What did they miss by not finishing?', 'Any cult classics gathering dust?']
+  }
+];
+
+// Load analysis history from localStorage
+function loadAnalysisHistory() {
+  try {
+    const saved = localStorage.getItem('steamai_analysis_history');
+    if (saved) {
+      analysisHistory = JSON.parse(saved);
+      // Restore log display
+      const logEl = document.getElementById('analysisLog');
+      if (logEl && analysisHistory.length > 0) {
+        logEl.innerHTML = analysisHistory.map(a => `
+          <div class="py-1 border-b border-white/5">
+            <span class="text-tertiary">[${a.time}]</span> ${a.text}
+          </div>
+        `).join('');
+      }
+    }
+  } catch (e) {}
+}
+
+// Get next focus area based on what hasn't been covered recently
+function getNextFocus() {
+  const coveredFocuses = analysisHistory.slice(0, 10).map(a => a.focus);
+  const availableFocuses = ANALYSIS_FOCUSES.filter(f => !coveredFocuses.includes(f.name));
+  
+  // If all focuses have been used, pick randomly but avoid last 3
+  if (availableFocuses.length === 0) {
+    const recentFocuses = coveredFocuses.slice(0, 3);
+    const notRecent = ANALYSIS_FOCUSES.filter(f => !recentFocuses.includes(f.name));
+    return notRecent[Math.floor(Math.random() * notRecent.length)];
+  }
+  
+  return availableFocuses[0];
+}
+
 async function renderAIAnalysis(isRegenerate = false) {
   if (!config.anthropicKey) {
     document.getElementById('aiAnalysis').innerHTML = '<div class="chart-error">Add Anthropic API key for AI analysis</div>';
     return;
   }
+
+  // Load history first
+  loadAnalysisHistory();
 
   document.getElementById('aiAnalysis').innerHTML = '<div class="chart-loading"><div class="spinner"></div></div>';
 
@@ -912,54 +1000,54 @@ async function renderAIAnalysis(isRegenerate = false) {
   const topGames = games.filter(g => g.playtime_forever > 0).slice(0, 15).map(g => ({
     name: g.name, hours: Math.round((g.playtime_forever || 0) / 60)
   }));
-  const neverPlayed = games.filter(g => !g.playtime_forever).length;
+  const neverPlayed = games.filter(g => !g.playtime_forever);
+  const barelyPlayed = games.filter(g => {
+    const hours = (g.playtime_forever || 0) / 60;
+    return hours > 0 && hours < 5;
+  });
   const recentGames = games.filter(g => (g.playtime_2weeks || 0) > 0).map(g => ({
     name: g.name, hours: Math.round((g.playtime_2weeks || 0) / 60)
   }));
   const lastSession = JSON.parse(localStorage.getItem('steamai_last_session') || '{}');
+  
+  // Get next focus area
+  const focusArea = getNextFocus();
+  
+  // Build summary of previous insights to avoid repetition
+  const previousInsights = analysisHistory.slice(0, 5).map(a => a.text).join('\n- ');
 
-  let prompt;
-  if (isRegenerate || !lastSession.totalHours) {
-    prompt = `You are a brutally honest gaming analyst. A user has just loaded their Steam library analysis.
+  // Calculate additional metrics
+  const avgPlaytime = totalHours / games.length;
+  const topGameHours = topGames.reduce((s, g) => s + g.hours, 0);
+  const topGamePercent = totalHours > 0 ? ((topGameHours / totalHours) * 100).toFixed(1) : 0;
+
+  const prompt = `You are a brutally honest gaming analyst. Analyze this Steam library with a specific focus.
 
 LIBRARY DATA:
 - Total games: ${games.length}
 - Total hours: ${totalHours}
-- Never played: ${neverPlayed} games
-- Top 15 games by playtime: ${JSON.stringify(topGames)}
-- Recently played (last 2 weeks): ${JSON.stringify(recentGames)}
+- Never played: ${neverPlayed.length} games (${neverPlayed.slice(0, 5).map(g => g.name).join(', ')}${neverPlayed.length > 5 ? '...' : ''})
+- Barely touched (<5h): ${barelyPlayed.length} games
+- Top 15 games: ${JSON.stringify(topGames)}
+- Top games % of total time: ${topGamePercent}%
+- Average playtime per game: ${avgPlaytime.toFixed(1)}h
+- Recently played (2 weeks): ${JSON.stringify(recentGames)}
 
-Provide a concise welcome and behavioral analysis (max 200 words):
-1. Brief welcome (1 sentence)
-2. BEHAVIORAL PROFILE - What kind of gamer are they? What patterns stand out?
-3. ONE key insight about their habits they might not realize
+TODAY'S FOCUS: ${focusArea.focus}
 
-Focus on behaviors and patterns, NOT recommendations. Be specific and use game names. Be brutally honest but concise.`;
-  } else {
-    const hoursDiff = totalHours - lastSession.totalHours;
-    const newGames = games.length - lastSession.gameCount;
-    
-    prompt = `You are a brutally honest gaming analyst. A user has returned to their Steam library analysis.
+PREVIOUS INSIGHTS YOU'VE ALREADY GIVEN (DO NOT REPEAT THESE):
+- ${previousInsights || 'None yet - this is their first analysis'}
 
-PREVIOUS SESSION:
-- Total hours: ${lastSession.totalHours}
-- Games: ${lastSession.gameCount}
+CRITICAL RULES:
+1. DO NOT repeat insights you've already shared
+2. Focus on TODAY'S FOCUS area: ${focusArea.name}
+3. Answer at least 2 of these questions: ${focusArea.questions.join(', ')}
+4. Be specific - use actual game names from their library
+5. Be brutally honest - don't sugarcoat
+6. Max 150 words
+7. Start directly with your analysis - no "Welcome back" or greeting
 
-CURRENT SESSION:
-- Total hours: ${totalHours}
-- Games: ${games.length}
-- Hours played since last visit: ${hoursDiff}
-- Games added: ${newGames}
-- Recently played: ${JSON.stringify(recentGames)}
-- Top games: ${JSON.stringify(topGames.slice(0, 5))}
-
-Provide a concise update (max 150 words):
-1. Brief welcome back (1 sentence)
-2. What changed since last time - comment on their recent activity
-3. ONE observation about their gaming behavior
-
-Focus on behaviors and changes, NOT recommendations. Be specific and honest.`;
-  }
+Provide a unique insight they haven't heard before.`;
 
   localStorage.setItem('steamai_last_session', JSON.stringify({ totalHours, gameCount: games.length, timestamp: Date.now() }));
 
@@ -978,7 +1066,7 @@ Focus on behaviors and changes, NOT recommendations. Be specific and honest.`;
       .replace(/\n/g, '<br>');
     
     document.getElementById('aiAnalysis').innerHTML = `<div class="bg-primary/5 border-l-2 border-primary p-4 rounded-r-lg"><p style="margin: 0;">${formatted}</p></div>`;
-    logAnalysis(analysis);
+    logAnalysis(analysis, focusArea.name);
   } catch (e) {
     document.getElementById('aiAnalysis').innerHTML = `<div class="chart-error">AI analysis failed: ${e.message}</div>`;
   }
