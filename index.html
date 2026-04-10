@@ -330,77 +330,55 @@ INITIATE SCAN
 </div>
 
 <div class="relative z-10 flex h-screen overflow-hidden scan-line">
-<!-- SideNavBar -->
-<aside class="hidden md:flex flex-col h-full bg-slate-900/40 backdrop-blur-2xl border-r border-cyan-500/10 w-64 shadow-[20px_0_40px_rgba(0,212,255,0.05)]">
-<div class="p-6 border-b border-white/5">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center bg-primary/10">
-<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">rocket</span>
-</div>
-<div>
-<h2 class="text-cyan-400 font-bold font-headline tracking-tighter">STRATOS-1</h2>
-<p class="font-headline text-[10px] tracking-widest uppercase text-slate-500">Steam Analytics Core</p>
-</div>
-</div>
-</div>
-<nav class="flex-1 py-4">
-<a class="flex items-center gap-3 bg-cyan-500/20 text-cyan-200 border-r-4 border-cyan-400 p-4 font-headline text-xs tracking-widest uppercase" href="#">
-<span class="material-symbols-outlined">space_dashboard</span>
-<span>Bridge</span>
-</a>
-</nav>
-<div class="p-4 space-y-2">
-<button onclick="show('p0')" class="w-full py-3 bg-primary/10 text-primary border border-primary/30 font-headline font-bold text-[10px] tracking-widest rounded-xl hover:bg-primary/20 transition-all">
-NEW PROFILE
-</button>
-</div>
-</aside>
-
 <!-- Main Workspace -->
 <main class="flex-1 flex flex-col relative overflow-hidden">
 <!-- TopNavBar -->
 <header class="flex justify-between items-center w-full px-6 h-16 bg-slate-900/60 backdrop-blur-xl border-b border-cyan-500/20 z-20">
-<div class="text-2xl font-black text-cyan-300 tracking-tighter font-headline uppercase">GALACTIC_HUD</div>
+<div class="text-2xl font-black text-cyan-300 tracking-tighter font-headline uppercase">SteamAi HUD</div>
 <div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-slate-400 hover:text-primary cursor-pointer">settings</span>
-<span class="material-symbols-outlined text-slate-400 hover:text-error cursor-pointer" onclick="show('p0')">power_settings_new</span>
+<button onclick="show('p0')" class="px-4 py-2 bg-primary/10 text-primary border border-primary/30 font-headline font-bold text-[10px] tracking-widest rounded-lg hover:bg-primary/20 transition-all">NEW PROFILE</button>
+<span class="material-symbols-outlined text-slate-400 hover:text-error cursor-pointer" onclick="localStorage.clear();show('p0')">power_settings_new</span>
 </div>
 </header>
 
 <!-- Dashboard Content -->
-<div class="flex-1 p-6 grid grid-cols-12 grid-rows-6 gap-4 overflow-y-auto">
-<!-- Status Bar -->
-<div class="col-span-12 row-span-1 flex items-center justify-between px-6 glass-panel rounded-xl border border-primary/10">
-<div class="flex gap-12">
-<div class="flex items-center gap-3">
+<div class="flex-1 p-6 flex flex-col gap-4 overflow-y-auto">
+<!-- Status Bar - Clickable Stats -->
+<div class="flex items-center justify-between px-6 py-4 glass-panel rounded-xl border border-primary/10">
+<div class="flex gap-8">
+<div class="flex items-center gap-3 cursor-pointer hover:bg-white/5 px-3 py-2 rounded-lg transition-all" onclick="showGameList('all')">
 <div class="w-3 h-3 rounded-full bg-tertiary shadow-[0_0_10px_#00fcc0]"></div>
 <div>
 <p class="font-label text-[10px] text-slate-500 tracking-[0.2em]">TOTAL GAMES</p>
-<p class="font-headline text-tertiary text-xs font-bold" id="statGames">--</p>
+<p class="font-headline text-tertiary text-sm font-bold" id="statGames">--</p>
 </div>
 </div>
-<div class="flex items-center gap-3">
+<div class="flex items-center gap-3 cursor-pointer hover:bg-white/5 px-3 py-2 rounded-lg transition-all" onclick="showGameList('hours')">
 <div class="w-3 h-3 rounded-full bg-primary shadow-[0_0_10px_#a8e8ff]"></div>
 <div>
 <p class="font-label text-[10px] text-slate-500 tracking-[0.2em]">TOTAL HOURS</p>
-<p class="font-headline text-primary text-xs font-bold" id="statHours">--</p>
+<p class="font-headline text-primary text-sm font-bold" id="statHours">--</p>
 </div>
 </div>
-<div class="flex items-center gap-3">
+<div class="flex items-center gap-3 cursor-pointer hover:bg-white/5 px-3 py-2 rounded-lg transition-all" onclick="showGameList('never')">
 <div class="w-3 h-3 rounded-full bg-secondary animate-pulse shadow-[0_0_10px_#ffb77d]"></div>
 <div>
 <p class="font-label text-[10px] text-slate-500 tracking-[0.2em]">NEVER PLAYED</p>
-<p class="font-headline text-secondary text-xs font-bold" id="statNeverPlayed">--</p>
+<p class="font-headline text-secondary text-sm font-bold" id="statNeverPlayed">--</p>
 </div>
 </div>
+<div class="flex items-center gap-3 cursor-pointer hover:bg-white/5 px-3 py-2 rounded-lg transition-all" onclick="showGameList('recent')">
+<div class="w-3 h-3 rounded-full bg-tertiary shadow-[0_0_10px_#00fcc0]"></div>
+<div>
+<p class="font-label text-[10px] text-slate-500 tracking-[0.2em]">RECENTLY ACTIVE</p>
+<p class="font-headline text-tertiary text-sm font-bold" id="statRecent">--</p>
 </div>
-<div class="flex items-center gap-6 font-headline text-[10px] tracking-widest text-slate-400" id="statRecent">
-<span>RECENTLY ACTIVE</span>
+</div>
 </div>
 </div>
 
-<!-- AI Officer Box -->
-<div class="col-span-12 lg:col-span-4 row-span-5 glass-panel rounded-xl p-6 relative overflow-hidden flex flex-col border border-primary/5">
+<!-- AI Officer Box - Main Focus -->
+<div class="glass-panel rounded-xl p-6 relative overflow-hidden flex flex-col border border-primary/5 min-h-[400px]">
 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
 <div class="flex items-center gap-4 mb-4">
 <div class="relative">
@@ -410,10 +388,10 @@ NEW PROFILE
 <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-tertiary rounded-full border-2 border-background"></div>
 </div>
 <div class="flex-1">
-<h3 class="font-headline text-sm font-bold text-primary tracking-tight">AI OFFICER KAI</h3>
-<p class="font-label text-[9px] text-slate-500 tracking-[0.2em]">STRATEGIC ADVISOR</p>
+<h3 class="font-headline text-base font-bold text-primary tracking-tight">AI ANALYST</h3>
+<p class="font-label text-[9px] text-slate-500 tracking-[0.2em]">BEHAVIORAL PROFILE & CHAT</p>
 </div>
-<button onclick="regenerateProfile()" class="text-[9px] font-headline tracking-widest text-primary/70 hover:text-primary uppercase">REGENERATE</button>
+<button onclick="regenerateProfile()" class="px-4 py-2 bg-primary/10 text-primary border border-primary/30 font-headline font-bold text-[10px] tracking-widest rounded-lg hover:bg-primary/20 transition-all">REGENERATE ANALYSIS</button>
 </div>
 
 <div class="flex-1 overflow-y-auto mb-4 pr-2 space-y-3" id="aiAnalysis">
@@ -423,28 +401,26 @@ NEW PROFILE
 <div class="flex-1 overflow-y-auto mb-4 pr-2 space-y-2" id="chatLog"></div>
 
 <div class="relative">
-<input id="chatInput" class="w-full bg-surface-container-high border-b border-outline text-sm font-body px-4 py-3 rounded-t-lg focus:outline-none focus:border-primary transition-all placeholder:text-slate-600" placeholder="INSTRUCT KAI..." type="text" onkeypress="if(event.key==='Enter')sendChat()"/>
+<input id="chatInput" class="w-full bg-surface-container-high border-b border-outline text-sm font-body px-4 py-3 rounded-t-lg focus:outline-none focus:border-primary transition-all placeholder:text-slate-600" placeholder="Ask about your gaming habits..." type="text" onkeypress="if(event.key==='Enter')sendChat()"/>
 <button onclick="sendChat()" class="absolute right-3 top-3 text-primary hover:text-primary-container transition-colors">
 <span class="material-symbols-outlined">send</span>
 </button>
 </div>
 </div>
 
-<!-- Main Data Grid -->
-<div class="col-span-12 lg:col-span-8 row-span-5 grid grid-cols-3 grid-rows-3 gap-4 overflow-y-auto">
-<!-- Commitment Core -->
+<!-- Charts Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<!-- Commitment -->
 <div class="glass-panel rounded-xl p-4 border border-secondary/10 flex flex-col items-center justify-center relative overflow-hidden">
-<div class="absolute top-3 left-4">
-<h4 class="font-headline text-[10px] font-bold text-secondary-fixed-dim tracking-widest uppercase">COMMITMENT</h4>
-</div>
-<div id="chart1" class="relative w-28 h-28 flex items-center justify-center">
+<h4 class="font-headline text-[10px] font-bold text-secondary-fixed-dim tracking-widest uppercase mb-2">COMMITMENT</h4>
+<div id="chart1" class="relative w-24 h-24 flex items-center justify-center">
 <div class="chart-loading"><div class="spinner" style="width:16px;height:16px;"></div></div>
 </div>
 </div>
 
 <!-- Time Allocation -->
 <div class="glass-panel rounded-xl p-4 border border-primary/10 flex flex-col">
-<h4 class="font-headline text-[10px] font-bold text-primary tracking-widest uppercase mb-2">TIME ALLOCATION</h4>
+<h4 class="font-headline text-[10px] font-bold text-primary tracking-widest uppercase mb-2">TOP PLAYED</h4>
 <div id="chart2" class="flex-1 flex items-end justify-between px-1">
 <div class="chart-loading"><div class="spinner" style="width:16px;height:16px;"></div></div>
 </div>
@@ -452,7 +428,7 @@ NEW PROFILE
 
 <!-- Recent Activity -->
 <div class="glass-panel rounded-xl p-4 border border-tertiary/10 flex flex-col">
-<h4 class="font-headline text-[10px] font-bold text-tertiary tracking-widest uppercase mb-2">RECENT ACTIVITY</h4>
+<h4 class="font-headline text-[10px] font-bold text-tertiary tracking-widest uppercase mb-2">LAST 2 WEEKS</h4>
 <div id="chart3" class="flex-1 overflow-y-auto space-y-1">
 <div class="chart-loading"><div class="spinner" style="width:16px;height:16px;"></div></div>
 </div>
@@ -460,7 +436,7 @@ NEW PROFILE
 
 <!-- Genres -->
 <div class="glass-panel rounded-xl p-4 border border-secondary/10 flex flex-col">
-<h4 class="font-headline text-[10px] font-bold text-secondary tracking-widest uppercase mb-2">GENRE ANALYSIS</h4>
+<h4 class="font-headline text-[10px] font-bold text-secondary tracking-widest uppercase mb-2">GENRES</h4>
 <div id="chart5" class="flex-1 overflow-y-auto space-y-2">
 <div class="chart-loading"><div class="spinner" style="width:16px;height:16px;"></div></div>
 </div>
@@ -476,27 +452,10 @@ NEW PROFILE
 
 <!-- Value Analysis -->
 <div class="glass-panel rounded-xl p-4 border border-tertiary/10 flex flex-col">
-<h4 class="font-headline text-[10px] font-bold text-tertiary tracking-widest uppercase mb-2">VALUE ANALYSIS</h4>
+<h4 class="font-headline text-[10px] font-bold text-tertiary tracking-widest uppercase mb-2">VALUE</h4>
 <div id="chart8" class="flex-1 grid grid-cols-2 gap-2">
 <div class="chart-loading"><div class="spinner" style="width:16px;height:16px;"></div></div>
 </div>
-</div>
-
-<!-- Library Fingerprint -->
-<div class="glass-panel rounded-xl col-span-3 p-4 border border-tertiary/10 relative flex gap-4">
-<div class="flex-1 flex flex-col">
-<h4 class="font-headline text-[10px] font-bold text-tertiary tracking-widest uppercase mb-2">LIBRARY FINGERPRINT</h4>
-<div id="chart9" class="flex-1 grid grid-cols-4 gap-2">
-<div class="chart-loading"><div class="spinner" style="width:16px;height:16px;"></div></div>
-</div>
-</div>
-<div class="w-24 h-24 relative border border-tertiary/20 rounded-full flex items-center justify-center flex-shrink-0">
-<div class="absolute inset-0 border border-tertiary/10 rounded-full scale-75"></div>
-<div class="absolute inset-0 border border-tertiary/10 rounded-full scale-50"></div>
-<div class="absolute w-full h-px bg-tertiary/20"></div>
-<div class="absolute h-full w-px bg-tertiary/20"></div>
-<div id="radarPoints"></div>
-<div class="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,_rgba(0,252,192,0.1)_0deg,_transparent_90deg)] opacity-40"></div>
 </div>
 </div>
 </div>
@@ -621,7 +580,7 @@ function renderDashboard() {
   document.getElementById('statGames').textContent = games.length;
   document.getElementById('statHours').textContent = `${totalHours.toLocaleString()}H`;
   document.getElementById('statNeverPlayed').textContent = neverPlayed;
-  document.getElementById('statRecent').innerHTML = `<span class="text-primary">${recent}</span> GAMES LAST 2 WEEKS`;
+  document.getElementById('statRecent').textContent = recent;
   
   renderAIAnalysis();
   renderChart1();
@@ -630,7 +589,76 @@ function renderDashboard() {
   renderChart5();
   renderChart7();
   renderChart8();
-  renderChart9();
+}
+
+function showGameList(type) {
+  let title, list;
+  
+  switch(type) {
+    case 'all':
+      title = 'ALL GAMES';
+      list = games.map(g => ({
+        name: g.name,
+        hours: Math.round((g.playtime_forever || 0) / 60)
+      }));
+      break;
+    case 'never':
+      title = 'NEVER PLAYED';
+      list = games.filter(g => !g.playtime_forever).map(g => ({ name: g.name, hours: 0 }));
+      break;
+    case 'recent':
+      title = 'RECENTLY ACTIVE (LAST 2 WEEKS)';
+      list = games.filter(g => (g.playtime_2weeks || 0) > 0)
+        .sort((a, b) => (b.playtime_2weeks || 0) - (a.playtime_2weeks || 0))
+        .map(g => ({
+          name: g.name,
+          hours: Math.round((g.playtime_2weeks || 0) / 60)
+        }));
+      break;
+    case 'hours':
+      title = 'TOP PLAYED GAMES';
+      list = games.filter(g => g.playtime_forever > 0).slice(0, 20).map(g => ({
+        name: g.name,
+        hours: Math.round((g.playtime_forever || 0) / 60)
+      }));
+      break;
+    default:
+      return;
+  }
+  
+  const listHTML = list.slice(0, 50).map(item => `
+    <div class="flex justify-between items-center py-2 px-3 hover:bg-white/5 rounded-lg">
+      <span class="text-sm text-on-surface-variant truncate flex-1">${item.name}</span>
+      <span class="text-xs text-primary ml-4">${item.hours}h</span>
+    </div>
+  `).join('');
+  
+  const modal = document.createElement('div');
+  modal.id = 'gameListModal';
+  modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4';
+  modal.innerHTML = `
+    <div class="absolute inset-0 bg-black/80" onclick="closeGameList()"></div>
+    <div class="relative glass-panel rounded-xl p-6 max-w-2xl w-full max-h-[80vh] flex flex-col border border-primary/20">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-headline text-lg font-bold text-primary">${title}</h3>
+        <button onclick="closeGameList()" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto">
+        ${listHTML || '<p class="text-slate-500 text-center py-8">No games found</p>'}
+      </div>
+      <div class="mt-4 text-xs text-slate-500 text-center">
+        Showing ${Math.min(list.length, 50)} of ${list.length} games
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function closeGameList() {
+  const modal = document.getElementById('gameListModal');
+  if (modal) modal.remove();
 }
 
 async function renderAIAnalysis(isRegenerate = false) {
@@ -914,50 +942,6 @@ function renderChart8() {
       <p class="font-headline text-sm text-tertiary">$${costPerHour}</p>
     </div>
   `;
-}
-
-function renderChart9() {
-  const totalHours = Math.round(games.reduce((s, g) => s + ((g.playtime_forever || 0) / 60), 0));
-  const neverPlayed = games.filter(g => !g.playtime_forever).length;
-  const under1h = games.filter(g => {
-    const hours = (g.playtime_forever || 0) / 60;
-    return hours > 0 && hours < 1;
-  }).length;
-
-  document.getElementById('chart9').innerHTML = `
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-slate-400">Total Simulations</span>
-      <span class="font-headline text-sm text-on-surface">${games.length}</span>
-    </div>
-    <div class="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden">
-      <div class="bg-tertiary h-full" style="width: ${Math.min(100, games.length / 5)}%;"></div>
-    </div>
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-slate-400">Uncharted Worlds</span>
-      <span class="font-headline text-sm text-on-surface">${neverPlayed}</span>
-    </div>
-    <div class="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden">
-      <div class="bg-tertiary/40 h-full" style="width: ${neverPlayed / games.length * 100}%;"></div>
-    </div>
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-slate-400">Total Flight Time</span>
-      <span class="font-headline text-sm text-on-surface">${totalHours.toLocaleString()}H</span>
-    </div>
-    <div class="flex items-center justify-between">
-      <span class="text-xs text-slate-400">Quick Scans</span>
-      <span class="font-headline text-sm text-on-surface">${under1h}</span>
-    </div>
-  `;
-
-  // Add radar points
-  const radarHTML = games.slice(0, 5).map((g, i) => {
-    const angle = (i * 72) * Math.PI / 180;
-    const r = 30 + Math.random() * 30;
-    const x = 50 + r * Math.cos(angle);
-    const y = 50 + r * Math.sin(angle);
-    return `<div class="absolute w-2 h-2 bg-tertiary rounded-full shadow-[0_0_8px_#00fcc0]" style="left: ${x}%; top: ${y}%;"></div>`;
-  }).join('');
-  document.getElementById('radarPoints').innerHTML = radarHTML;
 }
 
 async function sendChat() {
