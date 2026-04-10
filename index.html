@@ -335,16 +335,12 @@ INITIATE SCAN
 <!-- TopNavBar -->
 <header class="flex justify-between items-center w-full px-4 md:px-6 h-14 md:h-16 bg-slate-900/60 backdrop-blur-xl border-b border-cyan-500/20 z-20">
 <div class="text-lg md:text-2xl font-black text-cyan-300 tracking-tighter font-headline uppercase">SteamAi HUD</div>
-<div class="flex items-center gap-2 md:gap-4">
-<button onclick="show('p0')" class="px-2 md:px-4 py-1.5 md:py-2 bg-primary/10 text-primary border border-primary/30 font-headline font-bold text-[9px] md:text-[10px] tracking-widest rounded-lg hover:bg-primary/20 transition-all">NEW PROFILE</button>
-<span class="material-symbols-outlined text-xl md:text-2xl text-slate-400 hover:text-error cursor-pointer" onclick="localStorage.clear();show('p0')">power_settings_new</span>
-</div>
 </header>
 
 <!-- Dashboard Content -->
 <div class="flex-1 p-3 md:p-6 flex flex-col gap-3 md:gap-4 min-h-0">
 <!-- Status Bar - Clickable Stats -->
-<div class="grid grid-cols-2 md:flex md:items-center md:justify-between px-3 md:px-6 py-2 md:py-3 glass-panel rounded-xl border border-primary/10 flex-shrink-0 gap-2 md:gap-0">
+<div class="grid grid-cols-3 md:flex md:items-center md:justify-between px-3 md:px-6 py-2 md:py-3 glass-panel rounded-xl border border-primary/10 flex-shrink-0 gap-2 md:gap-0">
 <div class="flex items-center gap-2 md:gap-3 cursor-pointer hover:bg-white/5 px-2 md:px-3 py-1.5 md:py-2 rounded-lg transition-all" onclick="showGameList('all')">
 <div class="w-2.5 md:w-3 h-2.5 md:h-3 rounded-full bg-tertiary shadow-[0_0_10px_#00fcc0]"></div>
 <div>
@@ -373,6 +369,13 @@ INITIATE SCAN
 <p class="font-headline text-tertiary text-xs md:text-sm font-bold" id="statRecent">--</p>
 </div>
 </div>
+<div class="flex items-center gap-2 md:gap-3 cursor-pointer hover:bg-white/5 px-2 md:px-3 py-1.5 md:py-2 rounded-lg transition-all" onclick="showValueExplanation()">
+<div class="w-2.5 md:w-3 h-2.5 md:h-3 rounded-full bg-green-400 shadow-[0_0_10px_#4ade80]"></div>
+<div>
+<p class="font-label text-[8px] md:text-[10px] text-slate-500 tracking-[0.15em] md:tracking-[0.2em]">VALUE</p>
+<p class="font-headline text-green-400 text-xs md:text-sm font-bold" id="statValue">--</p>
+</div>
+</div>
 </div>
 
 <!-- AI Officer Box - Main Focus -->
@@ -389,7 +392,7 @@ INITIATE SCAN
 <h3 class="font-headline text-sm md:text-base font-bold text-primary tracking-tight">AI ANALYST</h3>
 <p class="font-label text-[8px] md:text-[9px] text-slate-500 tracking-[0.15em] md:tracking-[0.2em] hidden sm:block">BEHAVIORAL PROFILE & CHAT</p>
 </div>
-<button onclick="regenerateProfile()" class="px-2 md:px-4 py-1.5 md:py-2 bg-primary/10 text-primary border border-primary/30 font-headline font-bold text-[8px] md:text-[10px] tracking-widest rounded-lg hover:bg-primary/20 transition-all flex-shrink-0">REGENERATE</button>
+<button onclick="regenerateProfile()" class="px-2 md:px-4 py-1.5 md:py-2 bg-primary/10 text-primary border border-primary/30 font-headline font-bold text-[8px] md:text-[10px] tracking-widest rounded-lg hover:bg-primary/20 transition-all flex-shrink-0">ANALYZE MY LIBRARY</button>
 </div>
 
 <div class="flex-1 overflow-y-auto mb-3 md:mb-4 pr-2 space-y-3 text-xs md:text-sm" id="aiAnalysis">
@@ -448,11 +451,11 @@ INITIATE SCAN
 </div>
 </div>
 
-<!-- Value Analysis -->
-<div class="glass-panel rounded-lg md:rounded-xl p-3 md:p-4 border border-tertiary/10 flex flex-col">
-<h4 class="font-headline text-[9px] md:text-[11px] font-bold text-tertiary tracking-widest uppercase mb-1 md:mb-2">VALUE</h4>
-<div id="chart8" class="flex-1 grid grid-cols-2 gap-1 md:gap-2 text-[8px] md:text-[10px]">
-<div class="chart-loading"><div class="spinner" style="width:12px;height:12px;"></div></div>
+<!-- Analysis Log -->
+<div class="glass-panel rounded-lg md:rounded-xl p-3 md:p-4 border border-tertiary/10 flex flex-col col-span-2 sm:col-span-1">
+<h4 class="font-headline text-[9px] md:text-[11px] font-bold text-tertiary tracking-widest uppercase mb-1 md:mb-2">ANALYSIS LOG</h4>
+<div id="analysisLog" class="flex-1 overflow-y-auto space-y-1 text-[8px] md:text-[10px] text-slate-400">
+<p class="italic">No analysis yet...</p>
 </div>
 </div>
 </div>
@@ -574,11 +577,14 @@ function renderDashboard() {
   const totalHours = Math.round(games.reduce((s, g) => s + ((g.playtime_forever || 0) / 60), 0));
   const neverPlayed = games.filter(g => !g.playtime_forever).length;
   const recent = games.filter(g => (g.playtime_2weeks || 0) > 0).length;
+  const avgPrice = 12;
+  const costPerHour = totalHours > 0 ? (games.length * avgPrice / totalHours).toFixed(2) : '0';
   
   document.getElementById('statGames').textContent = games.length;
   document.getElementById('statHours').textContent = `${totalHours.toLocaleString()}H`;
   document.getElementById('statNeverPlayed').textContent = neverPlayed;
   document.getElementById('statRecent').textContent = recent;
+  document.getElementById('statValue').textContent = `$${costPerHour}/hr`;
   
   renderAIAnalysis();
   renderChart1();
@@ -586,7 +592,62 @@ function renderDashboard() {
   renderChart3();
   renderChart5();
   renderChart7();
-  renderChart8();
+}
+
+function showValueExplanation() {
+  const totalHours = Math.round(games.reduce((s, g) => s + ((g.playtime_forever || 0) / 60), 0));
+  const avgPrice = 12;
+  const costPerHour = totalHours > 0 ? (games.length * avgPrice / totalHours).toFixed(2) : '0';
+  
+  const modal = document.createElement('div');
+  modal.id = 'valueModal';
+  modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4';
+  modal.innerHTML = `
+    <div class="absolute inset-0 bg-black/80" onclick="closeValueModal()"></div>
+    <div class="relative glass-panel rounded-xl p-6 max-w-md w-full border border-green-400/20">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-headline text-lg font-bold text-green-400">VALUE CALCULATION</h3>
+        <button onclick="closeValueModal()" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="space-y-4 text-sm text-slate-300">
+        <p class="text-2xl font-bold text-green-400">$${costPerHour} per hour played</p>
+        <div class="bg-white/5 rounded-lg p-4 space-y-2">
+          <p class="text-xs text-slate-500 uppercase tracking-wider">The Math:</p>
+          <p><span class="text-slate-400">Games owned:</span> <span class="text-white">${games.length}</span></p>
+          <p><span class="text-slate-400">× Average game price:</span> <span class="text-white">$${avgPrice}</span></p>
+          <p><span class="text-slate-400">= Estimated library value:</span> <span class="text-white">$${(games.length * avgPrice).toLocaleString()}</span></p>
+          <p><span class="text-slate-400">÷ Total hours played:</span> <span class="text-white">${totalHours.toLocaleString()}h</span></p>
+          <p class="pt-2 border-t border-white/10"><span class="text-slate-400">= Cost per hour:</span> <span class="text-green-400 font-bold">$${costPerHour}</span></p>
+        </div>
+        <p class="text-xs text-slate-500">This estimates how much entertainment value you've gotten from your library. Lower = better value!</p>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function closeValueModal() {
+  const modal = document.getElementById('valueModal');
+  if (modal) modal.remove();
+}
+
+let analysisHistory = [];
+
+function logAnalysis(text) {
+  const timestamp = new Date().toLocaleTimeString();
+  analysisHistory.unshift({ time: timestamp, text: text.substring(0, 100) + (text.length > 100 ? '...' : '') });
+  if (analysisHistory.length > 10) analysisHistory.pop();
+  
+  const logEl = document.getElementById('analysisLog');
+  if (logEl) {
+    logEl.innerHTML = analysisHistory.map(a => `
+      <div class="py-1 border-b border-white/5">
+        <span class="text-tertiary">[${a.time}]</span> ${a.text}
+      </div>
+    `).join('');
+  }
 }
 
 function showGameList(type) {
@@ -737,6 +798,7 @@ Focus on behaviors and changes, NOT recommendations. Be specific and honest.`;
       .replace(/\n/g, '<br>');
     
     document.getElementById('aiAnalysis').innerHTML = `<div class="bg-primary/5 border-l-2 border-primary p-4 rounded-r-lg"><p style="margin: 0;">${formatted}</p></div>`;
+    logAnalysis(analysis);
   } catch (e) {
     document.getElementById('aiAnalysis').innerHTML = `<div class="chart-error">AI analysis failed: ${e.message}</div>`;
   }
@@ -913,33 +975,6 @@ async function renderChart7() {
   }).join('');
 
   document.getElementById('chart7').innerHTML = barsHTML;
-}
-
-function renderChart8() {
-  const totalGames = games.length;
-  const neverPlayed = games.filter(g => !g.playtime_forever).length;
-  const totalHours = games.reduce((s, g) => s + ((g.playtime_forever || 0) / 60), 0);
-  const avgPrice = 12;
-  const costPerHour = totalHours > 0 ? (totalGames * avgPrice / totalHours).toFixed(2) : '0';
-
-  document.getElementById('chart8').innerHTML = `
-    <div class="bg-surface-container-lowest p-2 rounded-lg border border-white/5 text-center">
-      <p class="text-[8px] text-slate-500">GAMES</p>
-      <p class="font-headline text-sm text-on-surface">${totalGames}</p>
-    </div>
-    <div class="bg-surface-container-lowest p-2 rounded-lg border border-white/5 text-center">
-      <p class="text-[8px] text-slate-500">UNPLAYED</p>
-      <p class="font-headline text-sm text-secondary">${neverPlayed}</p>
-    </div>
-    <div class="bg-surface-container-lowest p-2 rounded-lg border border-white/5 text-center">
-      <p class="text-[8px] text-slate-500">HOURS</p>
-      <p class="font-headline text-sm text-on-surface">${Math.round(totalHours).toLocaleString()}</p>
-    </div>
-    <div class="bg-surface-container-lowest p-2 rounded-lg border border-white/5 text-center">
-      <p class="text-[8px] text-slate-500">$/HOUR</p>
-      <p class="font-headline text-sm text-tertiary">$${costPerHour}</p>
-    </div>
-  `;
 }
 
 async function sendChat() {
