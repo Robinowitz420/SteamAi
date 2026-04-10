@@ -393,17 +393,17 @@ INITIATE SCAN
 <div class="relative">
 <!-- Switch Cover -->
 <div id="switchCover" class="absolute inset-0 bg-slate-700 rounded-lg cursor-pointer z-10 flex items-center justify-center transition-all duration-300 hover:bg-slate-600" onclick="toggleSwitchCover()">
-<div class="flex items-center gap-2 px-3 py-1">
-<span class="text-[8px] md:text-[10px] font-headline font-bold text-slate-300 tracking-widest">COVER</span>
+<div class="flex items-center gap-2 px-2 md:px-3 py-1">
+<span class="text-[7px] md:text-[9px] font-headline font-bold text-slate-300 tracking-widest">EMERGENCY: NEW GAME</span>
 <span class="material-symbols-outlined text-slate-400 text-sm">lock</span>
 </div>
 </div>
 <!-- Eject Button -->
-<button id="ejectBtn" class="relative w-20 md:w-24 h-10 md:h-12 bg-gradient-to-b from-red-500 to-red-700 rounded-lg border-2 border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.3)] hover:shadow-[0_0_30px_rgba(239,68,68,0.6)] transition-all disabled:opacity-50 disabled:cursor-not-allowed" onclick="emergencyGameSuggestion()" disabled>
+<button id="ejectBtn" class="relative w-28 md:w-36 h-10 md:h-12 bg-gradient-to-b from-red-500 to-red-700 rounded-lg border-2 border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.3)] hover:shadow-[0_0_30px_rgba(239,68,68,0.6)] transition-all disabled:opacity-50 disabled:cursor-not-allowed" onclick="emergencyGameSuggestion()" disabled>
 <div class="absolute inset-0 rounded-lg bg-gradient-to-b from-white/20 to-transparent"></div>
 <div class="flex flex-col items-center justify-center">
-<span class="text-[10px] md:text-xs font-headline font-black text-white tracking-widest">EJECT</span>
-<span class="text-[8px] text-red-200">GAME</span>
+<span class="text-[8px] md:text-[10px] font-headline font-black text-white tracking-wider leading-tight">EMERGENCY</span>
+<span class="text-[7px] md:text-[9px] text-red-200 leading-tight">NEW GAME REC</span>
 </div>
 </button>
 </div>
@@ -1128,10 +1128,18 @@ function toggleSwitchCover() {
 }
 
 // Emergency Game Suggestion
+let previousRecommendations = [];
+
 async function emergencyGameSuggestion() {
   if (!config.anthropicKey) {
     alert('Add Anthropic API key for game suggestions');
     return;
+  }
+  
+  // Load previous recommendations
+  const savedRecs = localStorage.getItem('steamai_recommendations');
+  if (savedRecs) {
+    previousRecommendations = JSON.parse(savedRecs);
   }
   
   // Close the cover
@@ -1166,8 +1174,10 @@ async function emergencyGameSuggestion() {
   // Build gaming profile for recommendation
   const totalHours = Math.round(games.reduce((s, g) => s + ((g.playtime_forever || 0) / 60), 0));
   const topGames = games.filter(g => g.playtime_forever > 0).slice(0, 10).map(g => g.name);
-  const neverPlayed = games.filter(g => !g.playtime_forever).slice(0, 10).map(g => g.name);
   const recentGames = games.filter(g => (g.playtime_2weeks || 0) > 0).map(g => g.name);
+  
+  // Get ALL owned game names for exclusion
+  const allOwnedGames = games.map(g => g.name.toLowerCase());
   
   // Calculate play style
   const avgPlaytime = totalHours / games.length;
@@ -1175,30 +1185,34 @@ async function emergencyGameSuggestion() {
   const casual = avgPlaytime < 5;
   const collector = games.filter(g => !g.playtime_forever).length / games.length > 0.5;
   
-  const prompt = `You are a gaming recommendation AI. Based on this user's Steam library data, suggest ONE specific game they should play next.
+  const prompt = `You are a gaming recommendation AI. Suggest ONE specific game this user does NOT own.
+
+CRITICAL: The user OWNS these ${games.length} games. DO NOT recommend ANY of these:
+${allOwnedGames.slice(0, 100).join(', ')}
+${allOwnedGames.length > 100 ? `... and ${allOwnedGames.length - 100} more games` : ''}
+
+PREVIOUS RECOMMENDATIONS (DO NOT REPEAT):
+${previousRecommendations.length > 0 ? previousRecommendations.join(', ') : 'None yet'}
 
 USER PROFILE:
-- Total games: ${games.length}
-- Total hours: ${totalHours}
 - Top 10 most played: ${topGames.join(', ')}
 - Recent activity: ${recentGames.join(', ') || 'None in last 2 weeks'}
-- Unplayed games: ${neverPlayed.slice(0, 5).join(', ')}
-- Play style: ${hardcore ? 'Hardcore - deep investment in few games' : casual ? 'Casual - light gaming sessions' : collector ? 'Collector - buys more than plays' : 'Balanced'}
+- Play style: ${hardcore ? 'Hardcore' : casual ? 'Casual' : collector ? 'Collector' : 'Balanced'}
 
-TASK: Search your knowledge for a game that:
-1. Matches their play style and preferences
-2. Is NOT already in their library
-3. Is a hidden gem or highly rated in genres they enjoy
-4. They would genuinely enjoy based on their top played games
+RULES:
+1. The game MUST NOT be in the owned games list above
+2. The game MUST NOT be in previous recommendations
+3. Match their play style based on top played games
+4. Pick a real, specific game that exists on Steam
 
 RESPOND IN THIS FORMAT:
 **GAME NAME** (Year)
 
-WHY IT FITS: [2-3 sentences explaining why this matches their profile]
+WHY IT FITS: [2-3 sentences]
 
-WHAT TO EXPECT: [Brief gameplay description]
+WHAT TO EXPECT: [Brief description]
 
-Be specific and personal. Pick a real game that exists. Do not recommend from their unplayed list.`;
+Pick ONLY games NOT in their library. This is critical.`;
 
   try {
     const res = await fetch(`${config.proxyUrl}/api/claude`, {
@@ -1208,6 +1222,15 @@ Be specific and personal. Pick a real game that exists. Do not recommend from th
     });
     const data = await res.json();
     const suggestion = data.response || 'Recommendation failed';
+    
+    // Extract game name from suggestion (between ** **)
+    const gameMatch = suggestion.match(/\*\*(.+?)\*\*/);
+    if (gameMatch) {
+      const gameName = gameMatch[1];
+      previousRecommendations.unshift(gameName);
+      if (previousRecommendations.length > 20) previousRecommendations.pop();
+      localStorage.setItem('steamai_recommendations', JSON.stringify(previousRecommendations));
+    }
     
     const formatted = suggestion
       .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #ef4444; font-size: 1.25rem;">$1</strong>')
