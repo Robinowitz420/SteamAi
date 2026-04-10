@@ -964,17 +964,17 @@ async function sendChat() {
       hours: Math.round((g.playtime_forever || 0) / 60)
     }));
     
-    // Neglected games (owned but barely played)
+    // Neglected games (owned but barely played) - expand to 30
     const neglected = games.filter(g => {
       const hours = (g.playtime_forever || 0) / 60;
-      return hours > 0 && hours < 5;
-    }).slice(0, 15).map(g => ({
+      return hours > 0 && hours < 10;
+    }).slice(0, 30).map(g => ({
       name: g.name,
       hours: Math.round((g.playtime_forever || 0) / 60 * 10) / 10
     }));
     
-    // Never played
-    const neverPlayed = games.filter(g => !g.playtime_forever).slice(0, 10).map(g => g.name);
+    // Never played - expand to 20
+    const neverPlayed = games.filter(g => !g.playtime_forever).slice(0, 20).map(g => g.name);
     
     // Recent activity
     const recent = games.filter(g => (g.playtime_2weeks || 0) > 0).map(g => ({
@@ -982,22 +982,31 @@ async function sendChat() {
       hours: Math.round((g.playtime_2weeks || 0) / 60)
     }));
     
-    const context = `You are a brutally honest gaming analyst. You ONLY recommend games the user OWNS but hasn't played much.
+    // Build conversation history
+    const conversationHistory = chatMessages.slice(-6).map(m => 
+      `${m.role.toUpperCase()}: ${m.content}`
+    ).join('\n\n');
+    
+    const context = `You are a gaming analyst helping users discover games they OWN but neglect.
 
 THEIR LIBRARY:
 - Total: ${games.length} games, ${totalHours} hours
 - Most played: ${JSON.stringify(topGames)}
-- Barely touched (< 5h): ${JSON.stringify(neglected)}
+- Barely touched (< 10h): ${JSON.stringify(neglected)}
 - Never played: ${neverPlayed.join(', ')}
-- Last 2 weeks: ${JSON.stringify(recent)}
 
-RULES:
-1. ONLY suggest games from "Barely touched" or "Never played" lists
-2. NO generic advice - use EXACT game titles from their library
-3. Match suggestions to their play patterns (look at "Most played")
-4. Be direct and concise (max 80 words)
-5. If asked for quick action games, check their library for short session games they own but ignore`;
-    
+PREVIOUS MESSAGES IN THIS CONVERSATION:
+${conversationHistory || '(None yet)'}
+
+CRITICAL RULES:
+1. ONLY recommend games from "Barely touched" or "Never played" lists above
+2. DO NOT repeat games you already recommended in this conversation
+3. If user asks for specific features (controller support, story, etc.), ONLY recommend games you're CERTAIN have those features
+4. If unsure about a game's features, say "I'm not sure if [game] has [feature]" rather than guessing
+5. VARY your recommendations - don't keep suggesting the same 2-3 games
+6. Use EXACT game titles from their library
+7. Max 80 words`;
+
     const res = await fetch(`${config.proxyUrl}/api/claude`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
