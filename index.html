@@ -126,12 +126,63 @@ COSMIC ACCESS // <span class="text-primary-container">INITIALIZATION</span>
 <div class="w-full grid grid-cols-1 md:grid-cols-12 gap-6">
 <div class="md:col-span-8 glass-panel rounded-xl p-8 border border-white/5 relative overflow-hidden">
 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+
+<!-- Login Section -->
+<div id="loginSection">
+<div class="mb-8 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container">account_circle</span>
+<span class="font-headline text-xs tracking-widest text-on-surface-variant uppercase">Steam Authentication</span>
+</div>
+<div class="text-[0.65rem] font-mono text-outline-variant">AUTH_REQUIRED</div>
+</div>
+
+<div class="text-center py-8">
+<p class="text-slate-400 mb-6">Sign in with your Steam account to access SteamAi</p>
+<button onclick="loginWithSteam()" class="w-full md:w-auto px-8 py-4 bg-[#171a21] hover:bg-[#1b2838] text-white font-headline font-bold tracking-widest rounded-xl transition-all flex items-center justify-center gap-3 mx-auto">
+<svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3l-.5 3H13v6.95c5.05-.5 9-4.76 9-9.95 0-5.52-4.48-10-10-10z"/></svg>
+SIGN IN WITH STEAM
+</button>
+<p class="text-xs text-slate-500 mt-4">First 250 users get free access!</p>
+</div>
+</div>
+
+<!-- API Setup Section (hidden until logged in) -->
+<div id="apiSetupSection" class="hidden">
 <div class="mb-8 flex items-center justify-between">
 <div class="flex items-center gap-3">
 <span class="material-symbols-outlined text-primary-container">terminal</span>
 <span class="font-headline text-xs tracking-widest text-on-surface-variant uppercase">Secure Access Terminal</span>
 </div>
 <div class="text-[0.65rem] font-mono text-outline-variant">SYS_ID: 0x992_HUB</div>
+</div>
+
+<!-- User Status -->
+<div id="userStatus" class="mb-6 p-4 rounded-lg bg-surface-container-lowest border border-white/5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface" id="userSteamId">--</p>
+<p class="text-xs text-slate-500" id="userAccessType">--</p>
+</div>
+</div>
+<button onclick="logout()" class="text-xs text-slate-400 hover:text-error">Logout</button>
+</div>
+</div>
+
+<!-- Payment Required Notice -->
+<div id="paymentNotice" class="hidden mb-6 p-4 rounded-lg bg-tertiary/10 border border-tertiary/30">
+<div class="flex items-center gap-3 mb-3">
+<span class="material-symbols-outlined text-tertiary">lock</span>
+<span class="font-headline text-sm font-bold text-tertiary">ACCESS RESTRICTED</span>
+</div>
+<p class="text-sm text-slate-300 mb-4">The first 250 users have claimed free access. Purchase lifetime access for $4.99:</p>
+<button onclick="startPayment()" class="w-full px-6 py-3 bg-tertiary text-on-tertiary font-headline font-bold tracking-widest rounded-lg hover:bg-tertiary/80 transition-all">
+UNLOCK FOR $4.99
+</button>
 </div>
 
 <form class="space-y-6" onsubmit="event.preventDefault(); startFetch();">
@@ -179,12 +230,13 @@ COSMIC ACCESS // <span class="text-primary-container">INITIALIZATION</span>
 <span class="text-[0.75rem] text-on-surface-variant font-body">Waiting for tactile contact...</span>
 </div>
 </div>
-<button type="submit" class="w-full md:w-auto h-16 px-10 bg-primary-container text-on-primary-container font-headline font-bold tracking-widest rounded-xl hover:shadow-[0_0_30px_rgba(0,212,255,0.4)] transition-all duration-300 uppercase flex items-center justify-center gap-3 group">
+<button type="submit" id="startButton" class="w-full md:w-auto h-16 px-10 bg-primary-container text-on-primary-container font-headline font-bold tracking-widest rounded-xl hover:shadow-[0_0_30px_rgba(0,212,255,0.4)] transition-all duration-300 uppercase flex items-center justify-center gap-3 group">
 INITIATE SCAN
 <span class="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
 </button>
 </div>
 </form>
+</div>
 
 <div class="mt-8 pt-6 border-t border-white/5 grid grid-cols-3 gap-4 text-[0.6rem] font-mono text-outline/40">
 <div class="flex flex-col gap-1"><span>CPU_TEMP: 42°C</span><span>NET_LATENCY: 4.2ms</span></div>
@@ -469,8 +521,9 @@ INITIATE SCAN
 let games = [];
 let config = {};
 let chatMessages = [];
+let currentUser = null;
 
-window.onload = () => {
+window.onload = async () => {
   const saved = JSON.parse(localStorage.getItem('steamai') || '{}');
   if (saved.apiKey) document.getElementById('apiKey').value = saved.apiKey;
   if (saved.steamId) document.getElementById('steamId').value = saved.steamId;
@@ -484,7 +537,134 @@ window.onload = () => {
   }
   
   if (saved.apiKey) document.getElementById('savedIndicator').textContent = 'CREDENTIALS LOADED';
+  
+  // Check for session from Steam login callback
+  const params = new URLSearchParams(window.location.search);
+  const sessionParam = params.get('session');
+  if (sessionParam) {
+    try {
+      const session = JSON.parse(atob(sessionParam));
+      currentUser = session;
+      localStorage.setItem('steamai_user', JSON.stringify(currentUser));
+      window.history.replaceState({}, '', window.location.pathname);
+    } catch (e) {
+      console.error('Invalid session');
+    }
+  }
+  
+  // Check for existing session
+  const savedUser = localStorage.getItem('steamai_user');
+  if (savedUser) {
+    try {
+      currentUser = JSON.parse(savedUser);
+    } catch (e) {}
+  }
+  
+  // Check for payment success
+  if (params.get('mock_payment') === 'true' || params.get('session_id')) {
+    const steamId = params.get('steam_id');
+    if (steamId) {
+      await markUserPaid(steamId);
+    }
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+  
+  // Initialize auth state
+  await checkAuthState();
 };
+
+async function checkAuthState() {
+  if (!currentUser || !currentUser.steamId) {
+    // Not logged in - show login section
+    document.getElementById('loginSection').classList.remove('hidden');
+    document.getElementById('apiSetupSection').classList.add('hidden');
+    return;
+  }
+  
+  // Check user access status
+  try {
+    const res = await fetch(`${config.proxyUrl || 'https://steamaiapp.vercel.app'}/api/users?action=status&steamId=${currentUser.steamId}`);
+    const data = await res.json();
+    
+    document.getElementById('loginSection').classList.add('hidden');
+    document.getElementById('apiSetupSection').classList.remove('hidden');
+    document.getElementById('userSteamId').textContent = `Steam ID: ${currentUser.steamId}`;
+    
+    if (data.hasAccess) {
+      document.getElementById('userAccessType').textContent = data.hasPaid ? 'Premium Access' : 'Early Adopter (Free)';
+      document.getElementById('paymentNotice').classList.add('hidden');
+    } else {
+      document.getElementById('userAccessType').textContent = 'Payment Required';
+      document.getElementById('paymentNotice').classList.remove('hidden');
+      document.getElementById('startButton').disabled = true;
+      document.getElementById('startButton').classList.add('opacity-50', 'cursor-not-allowed');
+    }
+    
+    // Pre-fill Steam ID
+    document.getElementById('steamId').value = currentUser.steamId;
+    
+  } catch (e) {
+    // Fallback: allow access if we can't check
+    document.getElementById('loginSection').classList.add('hidden');
+    document.getElementById('apiSetupSection').classList.remove('hidden');
+    document.getElementById('userSteamId').textContent = `Steam ID: ${currentUser.steamId}`;
+    document.getElementById('userAccessType').textContent = 'Access Granted';
+    document.getElementById('steamId').value = currentUser.steamId;
+  }
+}
+
+function loginWithSteam() {
+  const callback = window.location.origin + window.location.pathname;
+  window.location.href = `${config.proxyUrl || 'https://steamaiapp.vercel.app'}/api/auth?action=login&callback=${encodeURIComponent(callback)}`;
+}
+
+function logout() {
+  currentUser = null;
+  localStorage.removeItem('steamai_user');
+  document.getElementById('loginSection').classList.remove('hidden');
+  document.getElementById('apiSetupSection').classList.add('hidden');
+}
+
+async function startPayment() {
+  if (!currentUser || !currentUser.steamId) {
+    alert('Please log in first');
+    return;
+  }
+  
+  try {
+    const res = await fetch(`${config.proxyUrl || 'https://steamaiapp.vercel.app'}/api/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        steamId: currentUser.steamId,
+        successUrl: window.location.origin + window.location.pathname,
+        cancelUrl: window.location.href,
+      }),
+    });
+    
+    const data = await res.json();
+    
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Payment initialization failed');
+    }
+  } catch (e) {
+    alert('Payment error: ' + e.message);
+  }
+}
+
+async function markUserPaid(steamId) {
+  try {
+    // In production, this would be handled by the Stripe webhook
+    // For mock payments, we'll update locally
+    const paidUsers = JSON.parse(localStorage.getItem('steamai_paid') || '[]');
+    if (!paidUsers.includes(steamId)) {
+      paidUsers.push(steamId);
+      localStorage.setItem('steamai_paid', JSON.stringify(paidUsers));
+    }
+  } catch (e) {}
+}
 
 function show(id) {
   document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
