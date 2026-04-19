@@ -107,7 +107,7 @@ function renderHeroBanner() {
     const memberSince = profile.timecreated ? new Date(profile.timecreated * 1000).getFullYear() : 'Unknown';
     const analyzedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     
-    document.getElementById('heroAvatar').src = profile.avatarfull || '';
+    document.getElementById('heroAvatar').src = profile.avatar || '';
     document.getElementById('heroUsername').textContent = profile.personaname || 'Unknown';
     document.getElementById('heroUsername').href = profile.profileurl || '#';
     document.getElementById('heroTotalGames').textContent = steamData.games.length;
@@ -120,25 +120,25 @@ function renderHeroBanner() {
 
 // ==================== DNA TAGS ====================
 const DNA_EMOJIS = {
-    'STRATEGY BRAIN': 'BRAIN', 'SALE HOARDER': 'CART', 'GRAND STRATEGIST': 'CHESS', 'SURVIVAL ADDICT': 'AXE',
-    'RPG FANATIC': 'SWORD', 'ROGUE LOVER': 'SKULL', 'SOULSBORNE VETERAN': 'FLAME', 'DUNGEON CRAWLER': 'DUNGEON',
-    'WORLD BUILDER': 'CITY', 'COLONY MANAGER': 'COLONY', 'DARK FANTASY': 'MOON', 'SPACE CADET': 'ROCKET',
-    'LORE GOBLIN': 'BOOK', 'TACTICIAN': 'PIECE', 'MILSIM DEVOTEE': 'GUN', 'PIXEL PILGRIM': 'PIXEL',
-    'WARLORD': 'CROWN', 'MERCENARY CAPTAIN': 'SWORD', 'CHICKEN DINNER': 'CHICKEN', 'ETERNAL EXILE': 'CASTLE',
-    'SPACE EMPEROR': 'GALAXY', 'DRAGONBORN': 'DRAGON', 'WITCHER': 'WOLF', 'VAULT DWELLER': 'VAULT',
-    'COMMANDER': 'STAR', 'ARCHITECT OF RUIN': 'RUINS', 'DUNGEON MASTER': 'DICE', 'MERCHANT PRINCE': 'COIN',
-    'BUNDLE VICTIM': 'BOX', 'THE CURATOR': 'MUSEUM', 'COMPLETIONIST': 'TICK', 'ACHIEVEMENT HUNTER': 'TROPHY',
-    'ACHIEVEMENT IGNORER': 'IGNORE', 'THE PURIST': 'DIAMOND', 'DIGITAL HOARDER': 'HARD', 'EARLY ADOPTER': 'EARLY',
-    'FRANCHISE COLLECTOR': 'SERIES', 'HIDDEN GEM HUNTER': 'GEM', 'CONTRARIAN': 'THUMB', 'PARALLEL PLAYER': 'PARALLEL',
-    'FALSE STARTER': 'START', 'TUTORIAL DROPOUT': 'EXIT', 'NEVER FINISHES': 'UNFINISHED', 'GENRE TOURIST': 'MAP',
-    'THE ARCHAEOLOGIST': 'OLD', 'NICHE LORD': 'NICHE', 'WISHLIST WARRIOR': 'LIST', 'IMPULSE BUYER': 'IMPULSE',
-    'HUMBLE ADDICT': 'HUMBLE', 'OBSESSIVE': 'OBSESS', 'ONE TRICK PONY': 'ONE', 'DEEP DIVER': 'DEEP',
-    'BUTTERFLY': 'BUTTERFLY', 'BINGE MACHINE': 'BINGE', 'THE LOYALIST': 'LOYAL', 'SPEED RUNNER': 'SPEED',
-    'THE GHOST': 'GHOST', 'RUBBER BAND PLAYER': 'RUBBER', 'THE MONOGAMIST': 'MONO', 'CHRONIC RETURNER': 'RETURN'
+    'STRATEGY BRAIN': '🧠', 'SALE HOARDER': '🛒', 'GRAND STRATEGIST': '♟️', 'SURVIVAL ADDICT': '🏕️',
+    'RPG FANATIC': '⚔️', 'ROGUE LOVER': '💀', 'SOULSBORNE VETERAN': '🗡️', 'DUNGEON CRAWLER': '🕳️',
+    'WORLD BUILDER': '🏗️', 'COLONY MANAGER': '🏘️', 'DARK FANTASY': '🌑', 'SPACE CADET': '🚀',
+    'LORE GOBLIN': '📖', 'TACTICIAN': '♟️', 'MILSIM DEVOTEE': '🎖️', 'PIXEL PILGRIM': '🎮',
+    'WARLORD': '⚔️', 'MERCENARY CAPTAIN': '🛡️', 'CHICKEN DINNER': '🍗', 'ETERNAL EXILE': '🏰',
+    'SPACE EMPEROR': '🌌', 'DRAGONBORN': '🐉', 'WITCHER': '🐺', 'VAULT DWELLER': '☢️',
+    'COMMANDER': '🎖️', 'ARCHITECT OF RUIN': '🏚️', 'DUNGEON MASTER': '🎲', 'MERCHANT PRINCE': '💰',
+    'BUNDLE VICTIM': '📦', 'THE CURATOR': '🏛️', 'COMPLETIONIST': '✅', 'ACHIEVEMENT HUNTER': '🏆',
+    'ACHIEVEMENT IGNORER': '🚫', 'THE PURIST': '💎', 'DIGITAL HOARDER': '💾', 'EARLY ADOPTER': '🚀',
+    'FRANCHISE COLLECTOR': '📚', 'HIDDEN GEM HUNTER': '💎', 'CONTRARIAN': '🤘', 'PARALLEL PLAYER': '🔀',
+    'FALSE STARTER': '🏁', 'TUTORIAL DROPOUT': '🎓', 'NEVER FINISHES': '🚧', 'GENRE TOURIST': '🗺️',
+    'THE ARCHAEOLOGIST': '🦕', 'NICHE LORD': '🎯', 'WISHLIST WARRIOR': '📝', 'IMPULSE BUYER': '💸',
+    'HUMBLE ADDICT': '🎁', 'OBSESSIVE': '🔥', 'ONE TRICK PONY': '🐴', 'DEEP DIVER': '🤿',
+    'BUTTERFLY': '🦋', 'BINGE MACHINE': '📺', 'THE LOYALIST': '❤️', 'SPEED RUNNER': '⚡',
+    'THE GHOST': '👻', 'RUBBER BAND PLAYER': '🔄', 'THE MONOGAMIST': '💍', 'CHRONIC RETURNER': '🔁'
 };
 
 function renderDNATags() {
-    const tags = badgeState.earned.map(id => BADGES.find(b => b.id === id)).filter(b => b && b.category === 'trait' || b.category === 'genre' || b.category === 'behavioral').slice(0, 8);
+    const tags = badgeState.earned.map(id => BADGES.find(b => b.id === id)).filter(b => b && (b.category === 'trait' || b.category === 'genre' || b.category === 'behavioral')).slice(0, 8);
     if (tags.length === 0) return;
     
     const container = document.getElementById('dnaTags');
@@ -146,7 +146,7 @@ function renderDNATags() {
     if (!container || !section) return;
     
     container.innerHTML = tags.map((tag, i) => {
-        const emoji = DNA_EMOJIS[tag.name] || 'GAME';
+        const emoji = DNA_EMOJIS[tag.name] || '🎮';
         const colorClass = `dna-tag-${(i % 5) + 1}`;
         return `<div class="dna-tag ${colorClass}">${emoji} ${tag.name}</div>`;
     }).join('');
@@ -443,7 +443,7 @@ function renderTopGamesChart() {
     const top10 = [...steamData.games].sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)).slice(0, 10);
     const maxPT = top10[0]?.playtime_forever || 1;
     document.getElementById('topGamesChart').innerHTML = `
-        <h5 class="font-headline font-bold text-sm text-primary tracking-widest uppercase mb-8">MAX_UTILIZATION</h5>
+        <h5 class="section-header">MAX_UTILIZATION</h5>
         <div class="space-y-4">${top10.map((g, i) => {
             const hours = Math.round((g.playtime_forever || 0) / 60);
             const pct = ((g.playtime_forever || 0) / maxPT) * 100;
@@ -459,7 +459,7 @@ function renderBrutalStats() {
     const never = steamData.games.filter(g => (g.playtime_forever || 0) === 0).length;
     const played10 = steamData.games.filter(g => (g.playtime_forever || 0) >= 600).length;
     document.getElementById('brutalStats').innerHTML = `
-        <h5 class="font-headline font-bold text-sm text-secondary tracking-widest uppercase mb-8">BRUTAL_METRICS</h5>
+        <h5 class="section-header">BRUTAL_METRICS</h5>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">sports_esports</span><span class="text-3xl font-headline font-bold text-white">${total}</span><span class="text-[9px] font-label text-slate-500 uppercase">Total_Games</span></div>
             <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">timer</span><span class="text-3xl font-headline font-bold text-white">${Math.round((topG.playtime_forever || 0) / 60)}H</span><span class="text-[9px] font-label text-slate-500 uppercase">In_Top_Game</span></div>
@@ -470,7 +470,8 @@ function renderBrutalStats() {
 
 // ==================== GAME RECOMMENDATION ENGINE ====================
 document.addEventListener('click', e => {
-    if (e.target.classList.contains('mood-btn')) e.target.classList.toggle('selected');
+    const btn = e.target.closest('.mood-btn');
+    if (btn) btn.classList.toggle('selected');
 });
 
 function getSelectedMoods() {
