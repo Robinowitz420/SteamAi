@@ -1,0 +1,518 @@
+// ==================== GLOBAL STATE ====================
+let steamData = { games: [], wishlist: [], profile: null, apiKey: '', steamId: '' };
+let chatState = { chats: {}, currentChatId: null };
+let analysisState = { shameScore: 0, heroHeadline: '', weeklyPick: null, lastSession: null };
+let badgeState = { earned: [], filter: 'all' };
+
+// ==================== TAB SWITCHING ====================
+function switchTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    const id = 'tab' + tab.charAt(0).toUpperCase() + tab.slice(1);
+    document.getElementById(id).classList.remove('hidden');
+    document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+}
+
+// ==================== STEAM LOGIN ====================
+function loginWithSteam() { window.location.href = '/api/steam-login'; }
+
+// ==================== APP INIT ====================
+async function initializeApp() {
+    const steamApiKey = document.getElementById('steamApiKey').value.trim();
+    const steamId = document.getElementById('steamId').value.trim();
+    if (!steamApiKey || !steamId) { showSetupError('Please login with Steam or fill in both fields'); return; }
+    try {
+        steamData.apiKey = steamApiKey;
+        steamData.steamId = steamId;
+        localStorage.setItem('steamData', JSON.stringify({ apiKey: steamApiKey, steamId: steamId }));
+        loadLastSession();
+        await fetchSteamProfile();
+        await fetchSteamData();
+        document.getElementById('setup').classList.add('hidden');
+        document.getElementById('mainContent').classList.remove('hidden');
+        showSetupSuccess('Steam.AI initialized successfully!');
+    } catch (error) {
+        showSetupError(`Failed to load Steam data: ${error.message}`);
+    }
+}
+
+// Auto-init from URL params (Steam callback) or localStorage
+(function autoInit() {
+    const params = new URLSearchParams(window.location.search);
+    const steamIdParam = params.get('steam_id');
+    if (steamIdParam) {
+        document.getElementById('steamId').value = steamIdParam;
+        history.replaceState(null, '', '/');
+    }
+    const saved = localStorage.getItem('steamData');
+    if (saved) {
+        const d = JSON.parse(saved);
+        document.getElementById('steamApiKey').value = d.apiKey || '';
+        document.getElementById('steamId').value = d.steamId || steamIdParam || '';
+        if (d.apiKey && d.steamId) initializeApp();
+    }
+})();
+
+async function fetchSteamProfile() {
+    try {
+        const r = await fetch(`/api/steam-profile?apikey=${steamData.apiKey}&steamid=${steamData.steamId}`);
+        if (r.ok) { steamData.profile = await r.json(); updateProfileDisplay(steamData.profile); }
+    } catch (e) { console.error('Profile fetch error:', e); }
+}
+
+function updateProfileDisplay(profile) {
+    if (!profile) return;
+    const avatar = document.getElementById('topBarAvatar');
+    const placeholder = document.getElementById('topBarAvatarPlaceholder');
+    const username = document.getElementById('topBarUsername');
+    if (profile.avatar) { avatar.src = profile.avatar; avatar.classList.remove('hidden'); placeholder.classList.add('hidden'); }
+    if (profile.personaname) { username.textContent = profile.personaname; }
+}
+
+async function fetchSteamData() {
+    const r = await fetch(`/api/steam?apikey=${steamData.apiKey}&steamid=${steamData.steamId}`);
+    if (!r.ok) throw new Error(`Steam API error: ${r.status}`);
+    const data = await r.json();
+    if (data.response && data.response.games) { steamData.games = data.response.games; }
+    else { throw new Error('No games found. Your profile might be private.'); }
+    steamData.wishlist = [];
+    updateStats();
+}
+
+function updateStats() {
+    calculateShameScore();
+    renderTopGamesChart();
+    renderBrutalStats();
+    renderReturnToGame();
+    renderBacklogBreakdown();
+    renderGraveyard();
+    loadMomentumTracking();
+    generateHeroHeadline();
+    loadOrGenerateWeeklyPick();
+    checkAndRenderBadges();
+    saveCurrentSession();
+    loadChatHistory();
+}
+
+// ==================== SHAME SCORE ====================
+function calculateShameScore() {
+    let score = 100;
+    steamData.games.forEach(game => {
+        const hours = (game.playtime_forever || 0) / 60;
+        if (hours === 0) score -= 0.5;
+        else if (hours < 1) score -= 0.2;
+        else if (hours >= 1 && hours <= 5) score -= 0.1;
+        else if (hours > 20) score += 0.3;
+    });
+    score = Math.max(0, Math.min(100, Math.round(score)));
+    analysisState.shameScore = score;
+    renderShameScore(score);
+}
+
+function renderShameScore(score) {
+    let verdict = score >= 80 ? 'RESPECTABLE' : score >= 60 ? 'AVERAGE HOARDER' : score >= 40 ? 'CHRONIC HOARDER' : 'FULL SHAME';
+    document.getElementById('shameScore').textContent = score;
+    document.getElementById('shameVerdict').textContent = verdict;
+    document.getElementById('shameBar').style.width = score + '%';
+    generateShameExplanation(score);
+}
+
+async function generateShameExplanation(score) {
+    const unplayed = steamData.games.filter(g => (g.playtime_forever || 0) === 0).length;
+    const lowPlay = steamData.games.filter(g => (g.playtime_forever || 0) > 0 && (g.playtime_forever || 0) < 300).length;
+    const heavyPlay = steamData.games.filter(g => (g.playtime_forever || 0) >= 1200).length;
+    const prompt = `A Steam user has a Backlog Shame Score of ${score}/100. They have ${steamData.games.length} total games, ${unplayed} never launched, ${lowPlay} barely touched, and ${heavyPlay} heavily played. Write ONE brutally honest sentence (max 25 words) explaining why their score is what it is. Be funny and specific. No quotes.`;
+    try {
+        const explanation = await callAI(prompt);
+        document.getElementById('shameExplanation').textContent = explanation.trim();
+    } catch (e) {
+        document.getElementById('shameExplanation').textContent = `${unplayed} games never launched. ${lowPlay} barely touched. That's why.`;
+    }
+}
+
+// ==================== SOCIAL SHARING ====================
+function getShareText() {
+    return `My Steam Backlog Shame Score is ${analysisState.shameScore}/100 — ${analysisState.heroHeadline || 'my library is judging me'}. Find yours at Steam.AI`;
+}
+
+function shareToSocial(platform) {
+    const text = getShareText();
+    navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard! Share on ' + platform.toUpperCase()));
+    const encoded = encodeURIComponent(text);
+    const url = encodeURIComponent(window.location.href);
+    const shareUrls = {
+        twitter: `https://twitter.com/intent/tweet?text=${encoded}`,
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encoded}`,
+        instagram: null,
+        tiktok: null,
+        reddit: `https://www.reddit.com/submit?title=${encoded}&url=${url}`
+    };
+    if (shareUrls[platform]) {
+        window.open(shareUrls[platform], '_blank', 'width=600,height=400');
+    } else {
+        showToast('Text copied! Paste it on ' + platform.toUpperCase());
+    }
+}
+
+function showToast(message) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// ==================== AI CALL (GROQ) ====================
+async function callAI(prompt) {
+    const r = await fetch('/api/groq', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt }) });
+    if (!r.ok) throw new Error(`AI API error: ${r.status}`);
+    const data = await r.json();
+    return data.response;
+}
+
+// ==================== HERO HEADLINE ====================
+async function generateHeroHeadline() {
+    const top20 = [...steamData.games].sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)).slice(0, 20).map(g => `${g.name}: ${Math.round((g.playtime_forever || 0) / 60)}h`).join('\n');
+    const prompt = `Analyze this Steam library and extract ONE brutally honest, funny sentence roasting this player for not playing games in their library.\n\nLIBRARY DATA:\n${top20}\n\nTotal games: ${steamData.games.length}\nUnplayed: ${steamData.games.filter(g => (g.playtime_forever || 0) === 0).length}\nShame Score: ${analysisState.shameScore}/100\n\nRespond with ONLY one sentence. No quotes. Max 15 words. Make fun of their backlog.`;
+    try {
+        const headline = await callAI(prompt);
+        analysisState.heroHeadline = headline.trim();
+        document.getElementById('heroHeadline').textContent = headline.trim().toUpperCase();
+    } catch (e) {
+        document.getElementById('heroHeadline').textContent = 'YOUR LIBRARY SPEAKS VOLUMES';
+    }
+}
+
+// ==================== WEEKLY PICK ====================
+async function loadOrGenerateWeeklyPick() {
+    const saved = localStorage.getItem('steamai_weekly_pick');
+    if (saved) { const d = JSON.parse(saved); if (new Date(d.timestamp) > new Date(Date.now() - 7*24*60*60*1000)) { analysisState.weeklyPick = d; renderWeeklyPick(d); return; } }
+    await generateWeeklyPick();
+}
+
+async function generateWeeklyPick() {
+    const unplayedOrLow = steamData.games.filter(g => (g.playtime_forever || 0) < 300 && (g.playtime_forever || 0) > 0).sort((a, b) => (a.playtime_forever || 0) - (b.playtime_forever || 0)).slice(0, 20);
+    if (unplayedOrLow.length === 0) return;
+    const gamesList = unplayedOrLow.map(g => `${g.name}: ${Math.round((g.playtime_forever || 0) / 60)}h`).join('\n');
+    const prompt = `Pick ONE game for this player to play this week.\n\nGAMES:\n${gamesList}\n\nFormat:\nGAME: [name]\nWHY: [one sentence]\nFIRST_10: [one sentence]`;
+    try {
+        const response = await callAI(prompt);
+        const pickData = {
+            game: (response.match(/GAME:\s*(.+)/i) || [,'Unknown'])[1].trim(),
+            why: (response.match(/WHY:\s*(.+)/i) || [,''])[1].trim(),
+            first10: (response.match(/FIRST_10:\s*(.+)/i) || [,''])[1].trim(),
+            timestamp: Date.now()
+        };
+        analysisState.weeklyPick = pickData;
+        localStorage.setItem('steamai_weekly_pick', JSON.stringify(pickData));
+        renderWeeklyPick(pickData);
+    } catch (e) { console.error('Weekly pick error:', e); }
+}
+
+function renderWeeklyPick(pickData) {
+    if (!pickData || !pickData.game) return;
+    document.getElementById('weeklyPick').innerHTML = `
+        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><span class="material-symbols-outlined text-[120px] text-[#2ecc71]">auto_awesome</span></div>
+        <div class="relative z-10 space-y-4">
+            <span class="bg-[#2ecc71]/10 text-[#2ecc71] font-label text-[10px] px-2 py-1 border border-[#2ecc71]/30">RECOMMENDED_FOR_CLOSURE</span>
+            <h3 class="text-4xl font-headline font-bold text-white tracking-tight">THIS WEEK: ${pickData.game.toUpperCase()}</h3>
+            <p class="text-slate-400 text-sm leading-relaxed max-w-xl font-body">${pickData.why || ''} ${pickData.first10 ? '<span class="text-[#2ecc71]">First 10 min: ' + pickData.first10 + '</span>' : ''}</p>
+            <button onclick="generateWeeklyPick()" class="flex items-center gap-2 text-[#2ecc71] font-headline font-bold text-sm tracking-widest">REFRESH PICK <span class="material-symbols-outlined text-sm">refresh</span></button>
+        </div>`;
+}
+
+// ==================== SESSION MANAGEMENT ====================
+function loadLastSession() {
+    const saved = localStorage.getItem('steamai_last_session');
+    if (saved) { analysisState.lastSession = JSON.parse(saved); }
+}
+
+function saveCurrentSession() {
+    const sessionData = { timestamp: Date.now(), shameScore: analysisState.shameScore, heroHeadline: analysisState.heroHeadline, unplayedCount: steamData.games.filter(g => (g.playtime_forever || 0) === 0).length };
+    localStorage.setItem('steamai_last_session', JSON.stringify(sessionData));
+    analysisState.lastSession = sessionData;
+}
+
+// ==================== MOMENTUM TRACKING ====================
+function loadMomentumTracking() {
+    const saved = localStorage.getItem('steamai_last_snapshot');
+    if (saved) { renderMomentumTracking(calculateMomentum(JSON.parse(saved))); }
+    saveCurrentSnapshot();
+}
+
+function saveCurrentSnapshot() {
+    localStorage.setItem('steamai_last_snapshot', JSON.stringify({ timestamp: Date.now(), games: steamData.games.map(g => ({ appid: g.appid, name: g.name, playtime_forever: g.playtime_forever || 0 })) }));
+}
+
+function calculateMomentum(last) {
+    const daysSince = Math.round((Date.now() - last.timestamp) / (1000*60*60*24));
+    const lastPT = {}; last.games.forEach(g => lastPT[g.appid] = g.playtime_forever);
+    const neglected = [], revisited = [], backlogProgress = [];
+    steamData.games.forEach(game => {
+        const cur = game.playtime_forever || 0, prev = lastPT[game.appid] || 0, diff = cur - prev;
+        if (prev === cur && cur > 0) neglected.push(game);
+        if (diff >= 30 && prev > 0) revisited.push({ game, diff: diff / 60 });
+        if (diff > 30) backlogProgress.push({ game, diff: diff / 60 });
+    });
+    return { daysSince, neglected, revisited: revisited.sort((a, b) => b.diff - a.diff), backlogProgress: backlogProgress.sort((a, b) => b.diff - a.diff).slice(0, 5) };
+}
+
+function renderMomentumTracking(data) {
+    if (data.daysSince === 0) return;
+    document.getElementById('momentumTracking').innerHTML = `
+        <div class="flex items-center justify-between border-b border-outline-variant/10 pb-4"><h4 class="font-headline font-bold text-xl text-white tracking-widest uppercase">Momentum Tracking (${data.daysSince} days)</h4></div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-surface-container-low p-6 border-t border-outline-variant/20"><p class="font-label text-[10px] text-primary mb-2">REVISITED</p><p class="text-3xl font-headline font-bold text-white">${data.revisited.length}</p>${data.revisited.slice(0,3).map(i => `<p class="text-[10px] text-slate-400 mt-1">${i.game.name} +${i.diff.toFixed(1)}h</p>`).join('')}</div>
+            <div class="bg-surface-container-low p-6 border-t border-outline-variant/20"><p class="font-label text-[10px] text-secondary mb-2">STILL NEGLECTED</p><p class="text-3xl font-headline font-bold text-white">${data.neglected.length}</p></div>
+            <div class="bg-surface-container-low p-6 border-t border-outline-variant/20"><p class="font-label text-[10px] text-primary mb-2">BACKLOG PROGRESS</p><p class="text-3xl font-headline font-bold text-white">${data.backlogProgress.length > 0 ? '+' + data.backlogProgress.length : '--'}</p>${data.backlogProgress.slice(0,2).map(i => `<p class="text-[10px] text-slate-400 mt-1">${i.game.name} +${i.diff.toFixed(1)}h</p>`).join('')}</div>
+        </div>`;
+}
+
+// ==================== RETURN TO GAME ====================
+function renderReturnToGame() {
+    const sorted = [...steamData.games].sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0));
+    document.getElementById('returnGameSelect').innerHTML = `<option value="">Select a game...</option>${sorted.map(g => `<option value="${g.appid}" data-name="${g.name}" data-hours="${Math.round((g.playtime_forever || 0) / 60)}">${g.name} (${Math.round((g.playtime_forever || 0) / 60)}h)</option>`).join('')}`;
+}
+
+async function generateReentryGuide() {
+    const select = document.getElementById('returnGameSelect');
+    const option = select.options[select.selectedIndex];
+    if (!option.value) { alert('Please select a game'); return; }
+    const gameName = option.dataset.name, hours = option.dataset.hours;
+    const prompt = `User has played ${gameName} for ${hours} hours but has not played recently. Generate a re-entry guide.\n\nReturn EXACTLY this format:\n\nYOU LEFT OFF:\n- (2 bullet points)\n\nREMEMBER THIS:\n- (2 bullet points)\n\nDO THIS FIRST (10 mins):\n- (2 bullet points)\n\nBe specific and actionable.`;
+    document.getElementById('reentryGuide').innerHTML = '<div class="reentry-guide"><p style="color:#666">Generating re-entry guide...</p></div>';
+    try {
+        const response = await callAI(prompt);
+        const parseBullets = (text) => text ? text.trim().split('\n').map(l => l.replace(/^[\s\-\*]+/, '').trim()).filter(l => l.length > 0) : [];
+        const leftOff = parseBullets((response.match(/YOU LEFT OFF:\s*([\s\S]*?)(?=REMEMBER THIS:|$)/i) || [,''])[1]);
+        const remember = parseBullets((response.match(/REMEMBER THIS:\s*([\s\S]*?)(?=DO THIS FIRST:|$)/i) || [,''])[1]);
+        const doFirst = parseBullets((response.match(/DO THIS FIRST[^:]*:\s*([\s\S]*?)(?=$)/i) || [,''])[1]);
+        document.getElementById('reentryGuide').innerHTML = `<div class="reentry-guide"><h4>YOU LEFT OFF</h4><ul>${leftOff.map(b => `<li>${b}</li>`).join('')}</ul><h4>REMEMBER THIS</h4><ul>${remember.map(b => `<li>${b}</li>`).join('')}</ul><h4>DO THIS FIRST (10 mins)</h4><ul>${doFirst.map(b => `<li>${b}</li>`).join('')}</ul></div>`;
+    } catch (e) { document.getElementById('reentryGuide').innerHTML = '<div class="reentry-guide"><p style="color:#ff3e6c">Failed to generate guide. Try again.</p></div>'; }
+}
+
+// ==================== BACKLOG BREAKDOWN ====================
+function renderBacklogBreakdown() {
+    const gamesWithComp = steamData.games.map(g => ({ ...g, hours: (g.playtime_forever || 0) / 60, completion: calculateCompletionScore((g.playtime_forever || 0) / 60) }));
+    const lowest = gamesWithComp.filter(g => g.hours > 0 && g.completion < 60).sort((a, b) => a.completion - b.completion).slice(0, 10);
+    const near = gamesWithComp.filter(g => g.completion >= 60 && g.completion < 100).sort((a, b) => b.completion - a.completion).slice(0, 5);
+    const cls = c => c < 30 ? 'text-secondary' : c < 60 ? 'text-amber-500' : 'text-primary';
+    document.getElementById('lowCompletionBody').innerHTML = lowest.length > 0 ? lowest.map(g => `<tr class="hover:bg-primary/5"><td class="py-4 text-white font-medium">${g.name}</td><td class="py-4 text-slate-400">${g.hours.toFixed(1)}H</td><td class="py-4 text-right ${cls(g.completion)}">${String(g.completion).padStart(2,'0')}%</td></tr>`).join('') : '<tr><td colspan="3" class="py-4 text-slate-500">No low completion games</td></tr>';
+    document.getElementById('nearCompleteBody').innerHTML = near.length > 0 ? near.map(g => `<tr class="hover:bg-primary/5"><td class="py-4 text-white font-medium">${g.name}</td><td class="py-4 text-slate-400">${g.hours.toFixed(1)}H</td><td class="py-4 text-right ${cls(g.completion)}">${g.completion}%</td></tr>`).join('') : '<tr><td colspan="3" class="py-4 text-slate-500">No near-complete games</td></tr>';
+}
+
+function calculateCompletionScore(hours) {
+    if (hours === 0) return 0; if (hours < 2) return 10; if (hours < 10) return 30; if (hours < 25) return 60; if (hours < 50) return 85; return 100;
+}
+
+// ==================== GRAVEYARD ====================
+function renderGraveyard() {
+    const graveyardGames = steamData.games.filter(g => (g.playtime_forever || 0) < 120).sort((a, b) => (a.playtime_forever || 0) - (b.playtime_forever || 0)).slice(0, 10);
+    if (graveyardGames.length === 0) { document.getElementById('graveyard').classList.add('hidden'); return; }
+    document.getElementById('graveyardList').innerHTML = graveyardGames.map(g => `
+        <div class="border border-outline-variant/20 bg-surface overflow-hidden group hover:border-secondary transition-colors cursor-pointer">
+            <img src="https://cdn.akamai.steamstatic.com/steam/apps/${g.appid}/header.jpg" alt="${g.name}" class="w-full h-[43px] object-cover group-hover:brightness-110 transition-all" onerror="this.style.display='none'"/>
+            <div class="px-3 py-2"><p class="text-[10px] text-white font-medium uppercase truncate">${g.name}</p><p class="text-[9px] text-slate-500 font-label">${Math.round((g.playtime_forever || 0) / 60)}h played</p></div>
+        </div>`).join('');
+}
+
+function reviveRandomGame() {
+    const g = steamData.games.filter(g => (g.playtime_forever || 0) < 120).sort(() => Math.random() - 0.5).slice(0, 1);
+    if (g.length === 0) return;
+    document.getElementById('returnGameSelect').value = g[0].appid;
+    generateReentryGuide();
+    switchTab('analysis');
+}
+
+// ==================== TOP GAMES CHART ====================
+function renderTopGamesChart() {
+    const top10 = [...steamData.games].sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)).slice(0, 10);
+    const maxPT = top10[0]?.playtime_forever || 1;
+    document.getElementById('topGamesChart').innerHTML = `
+        <h5 class="font-headline font-bold text-sm text-primary tracking-widest uppercase mb-8">MAX_UTILIZATION</h5>
+        <div class="space-y-4">${top10.map((g, i) => {
+            const hours = Math.round((g.playtime_forever || 0) / 60);
+            const pct = ((g.playtime_forever || 0) / maxPT) * 100;
+            const opacity = 1 - (i * 0.08);
+            return `<div class="flex items-center gap-3 group"><img src="https://cdn.akamai.steamstatic.com/steam/apps/${g.appid}/header.jpg" alt="${g.name}" class="w-[92px] h-[43px] object-cover border border-outline-variant/20 opacity-70 group-hover:opacity-100 transition-opacity flex-shrink-0" onerror="this.style.display='none'"/><div class="flex-1 min-w-0 space-y-1"><div class="flex justify-between text-[10px] font-label"><span class="text-white truncate">${g.name}</span><span class="text-primary flex-shrink-0 ml-2">${hours}H</span></div><div class="h-1 bg-slate-800 w-full"><div class="h-full bg-primary transition-all duration-1000" style="width:${pct}%;opacity:${opacity}"></div></div></div></div>`;
+        }).join('')}</div>`;
+}
+
+// ==================== BRUTAL STATS ====================
+function renderBrutalStats() {
+    const total = steamData.games.length;
+    const topG = steamData.games.reduce((max, g) => (g.playtime_forever || 0) > (max.playtime_forever || 0) ? g : max, steamData.games[0] || {});
+    const never = steamData.games.filter(g => (g.playtime_forever || 0) === 0).length;
+    const played10 = steamData.games.filter(g => (g.playtime_forever || 0) >= 600).length;
+    document.getElementById('brutalStats').innerHTML = `
+        <h5 class="font-headline font-bold text-sm text-secondary tracking-widest uppercase mb-8">BRUTAL_METRICS</h5>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">sports_esports</span><span class="text-3xl font-headline font-bold text-white">${total}</span><span class="text-[9px] font-label text-slate-500 uppercase">Total_Games</span></div>
+            <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">timer</span><span class="text-3xl font-headline font-bold text-white">${Math.round((topG.playtime_forever || 0) / 60)}H</span><span class="text-[9px] font-label text-slate-500 uppercase">In_Top_Game</span></div>
+            <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">skull</span><span class="text-3xl font-headline font-bold text-white">${never}</span><span class="text-[9px] font-label text-slate-500 uppercase">Never_Launched</span></div>
+            <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">show_chart</span><span class="text-3xl font-headline font-bold text-white">${played10}</span><span class="text-[9px] font-label text-slate-500 uppercase">Played_10h+</span></div>
+        </div>`;
+}
+
+// ==================== GAME RECOMMENDATION ENGINE ====================
+document.addEventListener('click', e => {
+    if (e.target.classList.contains('mood-btn')) e.target.classList.toggle('selected');
+});
+
+function getSelectedMoods() {
+    return [...document.querySelectorAll('.mood-btn.selected')].map(b => b.dataset.mood);
+}
+
+async function getRecommendations() {
+    const moods = getSelectedMoods();
+    const time = document.getElementById('availableTime').value;
+    if (moods.length === 0) { showToast('Select at least one mood'); return; }
+    const top30 = [...steamData.games].sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)).slice(0, 30).map(g => `${g.name}: ${Math.round((g.playtime_forever || 0) / 60)}h`).join('\n');
+    const prompt = `Recommend 3 games from this player's Steam library based on their current mood.\n\nMOODS: ${moods.join(', ')}\nTIME AVAILABLE: ${time} minutes\n\nLIBRARY:\n${top30}\n\nFor each game, provide:\nGAME: [name]\nWHY: [one sentence matching mood]\nQUICK_START: [one sentence]\n\nList 3 recommendations.`;
+    document.getElementById('recommendations').innerHTML = '<div class="p-6 text-center"><div class="loading mx-auto"></div><p class="text-slate-500 font-label text-xs mt-4">Analyzing library against your moods...</p></div>';
+    try {
+        const response = await callAI(prompt);
+        const recs = response.split(/GAME:/i).filter(s => s.trim()).map(s => {
+            const lines = s.trim().split('\n');
+            const name = lines[0]?.replace(/\[|\]/g, '').trim();
+            const why = (s.match(/WHY:\s*(.+)/i) || [,''])[1]?.trim();
+            const quickStart = (s.match(/QUICK_START:\s*(.+)/i) || [,''])[1]?.trim();
+            return { name, why, quickStart };
+        }).filter(r => r.name);
+        document.getElementById('recommendations').innerHTML = recs.map(r => `
+            <div class="bg-surface-container border border-outline-variant/20 p-6 mt-4">
+                <h5 class="font-headline font-bold text-lg text-white">${r.name}</h5>
+                <p class="text-slate-400 text-sm font-body mt-2">${r.why}</p>
+                ${r.quickStart ? `<p class="text-primary text-xs font-label mt-2">QUICK START: ${r.quickStart}</p>` : ''}
+            </div>`).join('');
+    } catch (e) {
+        document.getElementById('recommendations').innerHTML = '<p class="text-secondary font-label text-xs mt-4">Failed to get recommendations. Try again.</p>';
+    }
+}
+
+// ==================== CHAT SYSTEM ====================
+function createNewChat() {
+    const id = 'chat_' + Date.now();
+    chatState.chats[id] = { id, title: 'New Session', messages: [], createdAt: Date.now() };
+    chatState.currentChatId = id;
+    renderChatMessages();
+    renderChatHistory();
+}
+
+function loadChatHistory() {
+    const saved = localStorage.getItem('steamai_chats');
+    if (saved) {
+        const d = JSON.parse(saved);
+        chatState.chats = d.chats || {};
+        chatState.currentChatId = d.currentChatId;
+        if (!chatState.currentChatId && Object.keys(chatState.chats).length > 0) {
+            chatState.currentChatId = Object.keys(chatState.chats)[0];
+        }
+        if (!chatState.currentChatId) createNewChat();
+        else { renderChatMessages(); renderChatHistory(); }
+    } else { createNewChat(); }
+}
+
+function saveChatHistory() {
+    localStorage.setItem('steamai_chats', JSON.stringify({ chats: chatState.chats, currentChatId: chatState.currentChatId }));
+}
+
+function renderChatHistory() {
+    const list = document.getElementById('chatHistoryList');
+    const sorted = Object.values(chatState.chats).sort((a, b) => b.createdAt - a.createdAt);
+    list.innerHTML = sorted.map(c => `
+        <div class="chat-history-item ${c.id === chatState.currentChatId ? 'active' : ''}" onclick="loadChat('${c.id}')">
+            <p class="text-[10px] text-white/80 font-label truncate">${c.title}</p>
+            <p class="text-[8px] text-slate-600 font-label">${new Date(c.createdAt).toLocaleDateString()}</p>
+        </div>`).join('');
+}
+
+function loadChat(id) {
+    if (!chatState.chats[id]) return;
+    chatState.currentChatId = id;
+    renderChatMessages();
+    renderChatHistory();
+}
+
+function renderChatMessages() {
+    const chat = chatState.chats[chatState.currentChatId];
+    if (!chat) return;
+    const container = document.getElementById('chatMessages');
+    container.innerHTML = chat.messages.map(m => `
+        <div class="flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'} max-w-2xl">
+            <div class="text-[9px] font-label ${m.role === 'user' ? 'text-primary' : 'text-slate-500'} mb-2 uppercase">${m.role === 'user' ? 'You' : 'System_Observer'}</div>
+            <div class="${m.role === 'user' ? 'bg-primary/10 border border-primary/20 text-primary' : 'bg-surface-container-high text-slate-300'} p-4 text-sm font-body leading-relaxed">${m.content}</div>
+        </div>`).join('');
+    container.scrollTop = container.scrollHeight;
+}
+
+async function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    if (!chatState.currentChatId) createNewChat();
+    const chat = chatState.chats[chatState.currentChatId];
+    chat.messages.push({ role: 'user', content: msg });
+    input.value = '';
+    renderChatMessages();
+    const top10 = [...steamData.games].sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)).slice(0, 10).map(g => `${g.name}: ${Math.round((g.playtime_forever || 0) / 60)}h`).join(', ');
+    const context = `You are Steam.AI, a brutally honest gaming analyst. The user has ${steamData.games.length} games, shame score ${analysisState.shameScore}/100. Top games: ${top10}. Be concise, funny, and helpful. Roast their backlog.`;
+    const history = chat.messages.slice(-8).map(m => `${m.role}: ${m.content}`).join('\n');
+    const prompt = `${context}\n\nConversation:\n${history}\n\nRespond concisely (max 3 sentences).`;
+    try {
+        const response = await callAI(prompt);
+        chat.messages.push({ role: 'assistant', content: response.trim() });
+        // Generate title for new chats
+        if (chat.title === 'New Session' && chat.messages.length >= 2) {
+            try {
+                const titlePrompt = `Summarize this conversation in 3-5 words. No quotes. Just the title:\n${chat.messages.slice(0,2).map(m => m.content).join('\n')}`;
+                chat.title = (await callAI(titlePrompt)).trim().substring(0, 40);
+            } catch (e) { chat.title = msg.substring(0, 30); }
+        }
+    } catch (e) {
+        chat.messages.push({ role: 'assistant', content: 'Error: Could not reach AI. Try again.' });
+    }
+    renderChatMessages();
+    renderChatHistory();
+    saveChatHistory();
+}
+
+// Enter key for chat
+document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.activeElement?.id === 'chatInput') sendMessage();
+});
+
+// ==================== HELP MODAL ====================
+function showHelp(type) {
+    const modal = document.getElementById('helpModal');
+    const title = document.getElementById('helpTitle');
+    const content = document.getElementById('helpContent');
+    modal.classList.remove('hidden');
+    if (type === 'privacy') {
+        title.textContent = 'PRIVACY & SECURITY';
+        content.innerHTML = `<ul class="space-y-3"><li><strong class="text-primary">Your Steam API Key:</strong> Processed entirely in your browser. Never sent to our servers or stored anywhere.</li><li><strong class="text-primary">AI Features:</strong> Powered by Groq's free tier. No API key needed from you.</li><li><strong class="text-primary">Your Data:</strong> All analysis runs client-side. Nothing is logged or shared.</li><li><strong class="text-primary">Open Source:</strong> <a href="https://github.com/Robinowitz420/SteamAi" target="_blank" class="text-primary hover:underline">View the code on GitHub</a> and verify for yourself.</li></ul>`;
+    } else if (type === 'steam') {
+        title.textContent = 'STEAM API KEY';
+        content.innerHTML = `<p>Get your Steam Web API key from <a href="https://steamcommunity.com/dev/apikey" target="_blank" class="text-primary hover:underline">steamcommunity.com/dev/apikey</a></p><p class="mt-2 text-slate-500">This key is used only in your browser to fetch your game library. It is never stored on any server.</p>`;
+    } else if (type === 'steamid') {
+        title.textContent = 'STEAM ID 64';
+        content.innerHTML = `<p>Your 17-digit Steam ID. This is auto-filled when you sign in through Steam.</p><p class="mt-2">You can also find it at <a href="https://steamid.io" target="_blank" class="text-primary hover:underline">steamid.io</a></p>`;
+    }
+}
+
+function closeHelp() { document.getElementById('helpModal').classList.add('hidden'); }
+
+// ==================== SETUP HELPERS ====================
+function showSetupError(msg) {
+    const el = document.getElementById('setupError');
+    el.textContent = msg; el.classList.remove('hidden');
+    document.getElementById('setupSuccess').classList.add('hidden');
+}
+
+function showSetupSuccess(msg) {
+    const el = document.getElementById('setupSuccess');
+    el.textContent = msg; el.classList.remove('hidden');
+    document.getElementById('setupError').classList.add('hidden');
+}

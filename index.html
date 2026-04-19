@@ -7,566 +7,231 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@300;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<script>
     tailwind.config = {
         darkMode: "class",
         theme: {
             extend: {
                 colors: {
-                    "primary": "#a8e8ff",
-                    "on-primary": "#003642",
-                    "primary-container": "#00d4ff",
-                    "on-primary-container": "#00586b",
-                    "secondary": "#ffb2ba",
-                    "on-secondary": "#670021",
-                    "secondary-container": "#c60147",
-                    "on-secondary-container": "#ffd6da",
-                    "surface": "#0a0a0f",
-                    "surface-container": "#131318",
-                    "surface-container-low": "#1b1b20",
-                    "surface-container-high": "#2a292f",
-                    "surface-container-highest": "#35343a",
-                    "outline-variant": "#3c494e",
-                    "background": "#050508",
-                    "error": "#ffb4ab",
-                    "success": "#2ecc71",
+                    "primary": "#a8e8ff", "on-primary": "#003642", "primary-container": "#00d4ff",
+                    "secondary": "#ffb2ba", "on-secondary": "#670021", "secondary-container": "#c60147",
+                    "surface": "#0a0a0f", "surface-container": "#131318", "surface-container-low": "#1b1b20",
+                    "surface-container-high": "#2a292f", "surface-container-highest": "#35343a",
+                    "outline-variant": "#3c494e", "background": "#050508", "error": "#ffb4ab", "success": "#2ecc71",
                 },
-                fontFamily: {
-                    "headline": ["Rajdhani", "sans-serif"],
-                    "body": ["IBM Plex Mono", "monospace"],
-                    "label": ["IBM Plex Mono", "monospace"]
-                },
-                borderRadius: {
-                    "DEFAULT": "0px",
-                    "lg": "0px",
-                    "xl": "0px",
-                    "full": "0px"
-                },
+                fontFamily: { "headline": ["Rajdhani","sans-serif"], "body": ["IBM Plex Mono","monospace"], "label": ["IBM Plex Mono","monospace"] },
+                borderRadius: { "DEFAULT":"0px", "lg":"0px", "xl":"0px", "full":"0px" },
             },
         },
     }
 </script>
 <style>
-.grain-overlay {
-    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAeoTWJ9tzob5eZ5kTCpPsGaUUD3DA1NPhTXsLx8_-TA6nYu_POD3Erf4YWUXt7oJg9PdmnrULqSO_JHGpegkKhZQzrOH-ZCY-2Fmi9YrIgPGOJ1VTC-D3c-Z4Hm6UXGcEUw2FYyR-XS_CzGmxeEYtEcC5MTmkqQBpTA9PkGOrCVikbIhKYttHRLUss2b4ZVc4MnJzm1PJKiUi4xg_zoHTjQKINIaDiVFsHex58d67DHpcg3Sr5G6hxPK16FoSW1M0S4iPH2Q4MEpf4);
-    opacity: 0.03;
-    pointer-events: none
-}
-.scanline {
-    width: 100%;
-    height: 1px;
-    background: rgba(0, 212, 255, 0.1);
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100;
-    animation: scan 8s linear infinite
-}
-@keyframes scan {
-    0% { transform: translateY(0); } 
-    100% { transform: translateY(100vh); }
-}
-.glitch-hover:hover {
-    animation: glitch 0.2s steps(2) infinite
-}
-@keyframes glitch {
-    0% { transform: translate(0); text-shadow: 2px 0 #ff3e6c; } 
-    50% { transform: translate(-1px, 1px); text-shadow: -2px 0 #00d4ff; } 
-    100% { transform: translate(0); }
-}
-.custom-scrollbar::-webkit-scrollbar { width: 4px }
-.custom-scrollbar::-webkit-scrollbar-track { background: #050508 }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: #1f1f25 }
-
-/* Reentry guide styles */
-.reentry-guide { margin-top: 20px; padding: 20px; background: rgba(0, 212, 255, 0.05); border-left: 2px solid #00d4ff; }
-.reentry-guide h4 { color: #00d4ff; font-size: 14px; letter-spacing: 1px; margin-bottom: 10px; margin-top: 15px; text-transform: uppercase; }
-.reentry-guide h4:first-child { margin-top: 0; }
-.reentry-guide ul { list-style: none; padding: 0; }
-.reentry-guide li { color: #e0e0e0; font-size: 13px; padding: 5px 0 5px 15px; position: relative; }
-.reentry-guide li::before { content: ">"; color: #00d4ff; position: absolute; left: 0; }
-
-/* Mood button selected state */
-.mood-btn.selected { background: rgba(0, 212, 255, 0.2) !important; border-color: #00d4ff !important; color: #00d4ff !important; }
-
-/* Loading spinner */
-.loading { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #00d4ff; animation: spin 1s ease-in-out infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Chat messages */
-.message { padding: 12px 16px; margin: 8px 0; border-radius: 4px; max-width: 80%; }
-.message.user { background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.2); margin-left: auto; color: #00d4ff; }
-.message.assistant { background: #2a292f; color: #e0e0e0; }
-
-/* Hidden class */
-.hidden { display: none !important; }
-
-/* Bar chart styles */
-.bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-.bar-label { flex: 1; font-size: 11px; color: #e0e0e0; }
-.bar-container { flex: 2; height: 4px; background: #1f1f25; position: relative; }
-.bar-fill { height: 100%; background: #00d4ff; transition: width 1s ease-out; }
-.bar-value { font-size: 11px; color: #00d4ff; min-width: 40px; text-align: right; }
-
-/* DNA tags */
-.dna-tags { display: flex; flex-wrap: gap: 8px; }
-.dna-tag { padding: 6px 12px; background: #35343a; color: #e0e0e0; font-size: 10px; font-family: 'IBM Plex Mono', monospace; border: 1px solid #3c494e; }
-
-/* Shame score */
-.shame-score-number { font-size: 120px; line-height: 1; }
-.shame-score-label { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
-.shame-score-verdict { font-size: 12px; color: #ffb2ba; margin-top: 8px; }
-
-/* Stats cards */
-.stat-card { text-align: center; }
-.stat-icon { font-size: 24px; margin-bottom: 8px; }
-.stat-number { font-size: 32px; font-weight: bold; }
-.stat-label { font-size: 10px; text-transform: uppercase; opacity: 0.7; }
-.stat-sublabel { font-size: 8px; opacity: 0.5; margin-top: 4px; }
-
-/* Comparison section */
-.comparison-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.comparison-column h4 { color: #00d4ff; margin-bottom: 12px; font-size: 12px; text-transform: uppercase; }
-.game-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(60, 73, 78, 0.2); }
-.game-item .name { color: #e0e0e0; font-size: 12px; }
-.game-item .hours { color: #a0a0a0; font-size: 11px; }
-
-/* Momentum tracking */
-.momentum-card { padding: 24px; background: #131318; border: 1px solid #3c494e; }
-.momentum-section { margin-top: 20px; }
-.momentum-section h4 { color: #00d4ff; font-size: 12px; text-transform: uppercase; margin-bottom: 12px; }
-.momentum-item { display: flex; justify-content: space-between; padding: 8px 0; }
-.momentum-item .game-name { color: #e0e0e0; font-size: 12px; }
-.momentum-item .game-hours { color: #00d4ff; font-size: 11px; }
-
-/* Backlog breakdown */
-.backlog-table { width: 100%; }
-.backlog-table th { text-align: left; padding: 12px 8px; font-size: 11px; color: #666; text-transform: uppercase; border-bottom: 1px solid #3c494e; }
-.backlog-table td { padding: 16px 8px; font-size: 11px; border-bottom: 1px solid rgba(60, 73, 78, 0.1); }
-.backlog-section-label { color: #00d4ff; font-size: 12px; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; }
-
-/* Graveyard */
-.graveyard-card { padding: 32px; background: #131318; border: 1px solid #c60147; }
-.graveyard-challenge { color: #ffb2ba; font-size: 14px; margin-bottom: 20px; font-style: italic; }
-.graveyard-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
-.graveyard-item { padding: 12px; background: #0a0a0f; border: 1px solid #3c494e; text-align: center; font-size: 10px; text-transform: uppercase; }
-.revive-btn { background: #c60147; color: white; padding: 8px 16px; border: none; font-family: 'Rajdhani', sans-serif; font-weight: bold; text-transform: uppercase; cursor: pointer; }
-
-/* Weekly pick */
-.weekly-pick-card { padding: 32px; background: #131318; border: 1px solid #2ecc71; position: relative; overflow: hidden; }
-.weekly-pick-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-.weekly-pick-title { color: #2ecc71; font-size: 16px; text-transform: uppercase; }
-.refresh-pick-btn { background: none; border: 1px solid #2ecc71; color: #2ecc71; padding: 4px 8px; font-size: 10px; cursor: pointer; }
-.weekly-pick-content p { color: #e0e0e0; font-size: 14px; line-height: 1.6; }
-.weekly-pick-content strong { color: #2ecc71; }
-
-/* Return to game */
-.return-game-card { padding: 24px; background: #131318; border: 1px solid #3c494e; }
-.return-game-selector { display: flex; gap: 12px; margin-bottom: 16px; }
-.return-game-selector select { flex: 1; background: #0a0a0f; border: 1px solid #3c494e; color: white; padding: 8px; }
-.return-game-selector button { background: #00d4ff; color: #050508; padding: 8px 16px; border: none; font-family: 'Rajdhani', sans-serif; font-weight: bold; cursor: pointer; }
-
-/* Profile sections */
-.profile-section { margin-bottom: 32px; }
-.profile-section h4 { color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; }
-.brutal-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-
-/* Last analysis banner */
-.last-analysis-banner { padding: 12px 20px; background: rgba(0, 212, 255, 0.05); border-left: 2px solid #00d4ff; }
-.last-analysis-info { font-size: 10px; color: #a0a0a0; }
-.score-change { font-weight: bold; }
-.score-change.up { color: #2ecc71; }
-.score-change.down { color: #ff3e6c; }
-
-/* Hero headline */
-.hero-headline-container { margin-bottom: 20px; }
-.hero-headline { font-size: 64px; font-weight: bold; line-height: 1; margin-bottom: 16px; }
-.share-button { background: #00d4ff; color: #050508; padding: 8px 16px; border: none; font-family: 'Rajdhani', sans-serif; font-weight: bold; cursor: pointer; }
+.grain-overlay{background-image:url(https://lh3.googleusercontent.com/aida-public/AB6AXuAeoTWJ9tzob5eZ5kTCpPsGaUUD3DA1NPhTXsLx8_-TA6nYu_POD3Erf4YWUXt7oJg9PdmnrULqSO_JHGpegkKhZQzrOH-ZCY-2Fmi9YrIgPGOJ1VTC-D3c-Z4Hm6UXGcEUw2FYyR-XS_CzGmxeEYtEcC5MTmkqQBpTA9PkGOrCVikbIhKYttHRLUss2b4ZVc4MnJzm1PJKiUi4xg_zoHTjQKINIaDiVFsHex58d67DHpcg3Sr5G6hxPK16FoSW1M0S4iPH2Q4MEpf4);opacity:0.03;pointer-events:none}
+.scanline{width:100%;height:1px;background:rgba(0,212,255,0.1);position:fixed;top:0;left:0;z-index:100;animation:scan 8s linear infinite}
+@keyframes scan{0%{transform:translateY(0)}100%{transform:translateY(100vh)}}
+.glitch-hover:hover{animation:glitch 0.2s steps(2) infinite}
+@keyframes glitch{0%{transform:translate(0);text-shadow:2px 0 #ff3e6c}50%{transform:translate(-1px,1px);text-shadow:-2px 0 #00d4ff}100%{transform:translate(0)}}
+.custom-scrollbar::-webkit-scrollbar{width:4px}.custom-scrollbar::-webkit-scrollbar-track{background:#050508}.custom-scrollbar::-webkit-scrollbar-thumb{background:#1f1f25}
+.hidden{display:none!important}
+.mood-btn.selected{background:rgba(0,212,255,0.2)!important;border-color:#00d4ff!important;color:#00d4ff!important}
+@keyframes platinumGlow{0%,100%{box-shadow:0 0 5px rgba(229,228,226,0.3)}50%{box-shadow:0 0 15px rgba(229,228,226,0.6),0 0 30px rgba(229,228,226,0.2)}}
+.badge-platinum.earned{animation:platinumGlow 2s ease-in-out infinite}
+.tab-btn{transition:all 0.2s}.tab-btn.active{color:#00d4ff;border-bottom:2px solid #00d4ff}.tab-btn:not(.active){color:#4a5568;border-bottom:2px solid transparent}.tab-btn:not(.active):hover{color:#a0aec0}
+.toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:#131318;border:1px solid #2ecc71;color:#2ecc71;padding:12px 24px;font-family:'IBM Plex Mono',monospace;font-size:12px;animation:toastIn 0.3s ease-out,toastOut 0.3s ease-in 2.7s forwards}
+@keyframes toastIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes toastOut{from{opacity:1}to{opacity:0}}
+.chat-history-item{padding:8px 12px;cursor:pointer;border-left:2px solid transparent;transition:all 0.15s}.chat-history-item:hover{background:rgba(0,212,255,0.05);border-left-color:#00d4ff}.chat-history-item.active{background:rgba(0,212,255,0.1);border-left-color:#00d4ff}
+.reentry-guide{margin-top:20px;padding:20px;background:rgba(0,212,255,0.05);border-left:2px solid #00d4ff}
+.reentry-guide h4{color:#00d4ff;font-size:14px;letter-spacing:1px;margin-bottom:10px;margin-top:15px;text-transform:uppercase}
+.reentry-guide h4:first-child{margin-top:0}
+.reentry-guide ul{list-style:none;padding:0}
+.reentry-guide li{color:#e0e0e0;font-size:13px;padding:5px 0 5px 15px;position:relative}
+.reentry-guide li::before{content:">";color:#00d4ff;position:absolute;left:0}
+.badge-filter.active{color:#00d4ff!important;border-color:rgba(0,212,255,0.3)!important;background:rgba(0,212,255,0.1)!important}
 </style>
 </head>
 <body class="bg-background text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container overflow-x-hidden">
 <div class="grain-overlay fixed inset-0 z-50"></div>
 <div class="scanline"></div>
 
-<!-- SIDEBAR -->
-<aside class="fixed left-0 top-0 h-screen w-[280px] border-r border-outline-variant/20 bg-gradient-to-b from-[#0a0a0f] to-[#050508] flex flex-col py-8 z-50 overflow-y-auto custom-scrollbar">
-<div class="px-8 mb-10">
-    <h1 class="text-[28px] font-headline font-bold text-[#00d4ff] tracking-tighter after:content-['_'] after:animate-pulse">STEAM.AI</h1>
-    <p class="text-[10px] font-label text-slate-500 tracking-[0.3em] mt-1">V2.0.4-STABLE</p>
-</div>
-<div class="px-6 mb-8">
-    <button onclick="createNewChat()" class="w-full py-3 border border-primary/30 text-primary font-headline font-bold tracking-widest text-sm hover:bg-primary/10 hover:shadow-[0_0_15px_rgba(0,212,255,0.2)] transition-all flex items-center justify-center gap-2 group">
-        <span class="material-symbols-outlined text-sm">add</span>
-        NEW CHAT
-    </button>
-</div>
-<nav class="flex-1 space-y-1">
-    <a class="flex items-center gap-4 py-3 px-8 text-[#00d4ff] border-l-2 border-[#ff3e6c] bg-[#00d4ff]/5 font-headline font-bold tracking-widest text-sm transition-all" href="#">
-        <span class="material-symbols-outlined" data-icon="sports_esports">sports_esports</span>
-        DASHBOARD
-    </a>
-</nav>
-<div class="mt-auto pt-8 border-t border-outline-variant/10">
-    <div id="sidebarProfile" class="px-8 mb-6 flex items-center gap-3">
-        <div class="w-8 h-8 bg-surface-container-high border border-outline-variant/30 flex items-center justify-center overflow-hidden">
-            <img id="sidebarAvatar" class="w-full h-full object-cover hidden" alt="Avatar"/>
-            <span id="sidebarAvatarPlaceholder" class="material-symbols-outlined text-primary text-lg" data-icon="account_circle">account_circle</span>
-        </div>
-        <div>
-            <p id="sidebarUsername" class="text-[10px] font-label text-white/90">OPERATOR_01</p>
-            <p id="sidebarStatus" class="text-[9px] font-label text-primary uppercase">Sync: Active</p>
-        </div>
-    </div>
-</div>
-</aside>
-
 <!-- TOP BAR -->
-<header class="fixed top-0 right-0 w-[calc(100%-280px)] h-16 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/10 z-40 flex justify-between items-center px-8 ml-[280px]">
-<div class="flex gap-8">
-    <a class="text-primary font-headline font-bold text-xs tracking-[0.2em]" href="#">ANALYTICS</a>
-    <a class="text-slate-500 hover:text-primary font-headline text-xs tracking-[0.2em] transition-colors" href="#">TELEMETRY</a>
-    <a class="text-slate-500 hover:text-primary font-headline text-xs tracking-[0.2em] transition-colors" href="#">ARCHIVE</a>
-</div>
-<div class="flex items-center gap-6">
-    <button onclick="showHelp('privacy')" class="flex items-center gap-1 text-[9px] font-label text-[#2ecc71]/70 hover:text-[#2ecc71] transition-colors" title="Privacy Info">
-        <span class="material-symbols-outlined text-sm">shield</span>
-        SECURE
-    </button>
-    <span class="material-symbols-outlined text-slate-500 hover:text-primary cursor-pointer transition-colors" data-icon="refresh">refresh</span>
-    <div class="relative">
-        <span class="material-symbols-outlined text-slate-500 hover:text-primary cursor-pointer transition-colors" data-icon="notifications">notifications</span>
-        <span class="absolute top-0 right-0 w-1.5 h-1.5 bg-secondary"></span>
+<header class="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/10 z-40 flex items-center justify-between px-8">
+    <div class="flex items-center gap-4">
+        <h1 class="text-[22px] font-headline font-bold text-[#00d4ff] tracking-tighter">STEAM.AI</h1>
+        <div class="flex items-center gap-2 ml-4">
+            <div class="w-8 h-8 bg-surface-container-high border border-outline-variant/30 flex items-center justify-center overflow-hidden">
+                <img id="topBarAvatar" class="w-full h-full object-cover hidden" alt="Avatar"/>
+                <span id="topBarAvatarPlaceholder" class="material-symbols-outlined text-primary text-lg">account_circle</span>
+            </div>
+            <span id="topBarUsername" class="text-[11px] font-label text-white/80">OPERATOR_01</span>
+        </div>
     </div>
-</div>
+    <div class="flex items-center gap-1">
+        <button onclick="switchTab('home')" class="tab-btn active px-6 py-5 font-headline font-bold text-sm tracking-[0.15em]" data-tab="home">HOME</button>
+        <button onclick="switchTab('analysis')" class="tab-btn px-6 py-5 font-headline font-bold text-sm tracking-[0.15em]" data-tab="analysis">ANALYSIS</button>
+        <button onclick="switchTab('terminal')" class="tab-btn px-6 py-5 font-headline font-bold text-sm tracking-[0.15em]" data-tab="terminal">AI TERMINAL</button>
+    </div>
+    <div class="flex items-center gap-6">
+        <button onclick="showHelp('privacy')" class="flex items-center gap-1 text-[9px] font-label text-[#2ecc71]/70 hover:text-[#2ecc71] transition-colors"><span class="material-symbols-outlined text-sm">shield</span>SECURE</button>
+        <span class="material-symbols-outlined text-slate-500 hover:text-primary cursor-pointer transition-colors" onclick="location.reload()">refresh</span>
+    </div>
 </header>
 
-<!-- MAIN CONTENT AREA -->
-<main id="mainContent" class="ml-[280px] pt-16 min-h-screen hidden">
+<!-- MAIN CONTENT -->
+<main id="mainContent" class="pt-16 min-h-screen hidden">
 
-<!-- Last Analysis Banner -->
-<div id="lastAnalysisBanner" class="w-full bg-surface-container-low border-b border-outline-variant/10 px-8 py-2 flex items-center justify-between">
-    <div class="text-[10px] font-label text-primary/70 tracking-widest">
-        [LAST SCAN: <span id="lastScanDate">--</span>] | SCORE: <span id="lastScanScore">--</span> | <span id="lastScanHours">--</span>
-    </div>
-    <div class="text-[10px] font-label text-slate-500 flex gap-4">
-        <span>SYSTEM_LOAD: 12%</span>
-        <span>THREAD_MONITOR: ACTIVE</span>
-    </div>
-</div>
-
-<div class="p-12 space-y-16 max-w-[1400px]">
-
-<!-- Hero Headline -->
-<section class="space-y-6">
-    <h2 id="heroHeadline" class="text-6xl md:text-8xl font-headline font-bold text-white tracking-tighter leading-none max-w-4xl">
-        ANALYZING LIBRARY...
-    </h2>
-    <div class="flex items-center gap-4">
-        <button onclick="shareHeadline()" class="bg-primary text-on-primary font-headline font-bold px-8 py-2 tracking-widest text-sm hover:brightness-110 transition-all glitch-hover">
-            SHARE THIS SHAME
-        </button>
-        <div class="px-4 py-2 bg-surface-container border border-outline-variant/20 text-[10px] text-slate-400 font-label">
-            DATA_SOURCE: STEAM_API_v3
+<!-- TAB: HOME -->
+<div id="tabHome" class="tab-content">
+<div class="p-12 space-y-16 max-w-[1400px] mx-auto">
+<!-- Hero + Shame Score -->
+<section class="grid grid-cols-12 gap-8">
+    <div class="col-span-12 lg:col-span-7 space-y-4">
+        <h2 id="heroHeadline" class="text-5xl md:text-6xl font-headline font-bold text-white tracking-tighter leading-none">ANALYZING LIBRARY...</h2>
+        <div class="flex flex-wrap items-center gap-3 mt-4">
+            <span class="text-[10px] font-label text-slate-500 mr-2">SHARE:</span>
+            <button onclick="shareToSocial('twitter')" class="flex items-center gap-1 px-3 py-1.5 bg-[#1da1f2]/10 border border-[#1da1f2]/30 text-[#1da1f2] text-[10px] font-label hover:bg-[#1da1f2]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>X</button>
+            <button onclick="shareToSocial('facebook')" class="flex items-center gap-1 px-3 py-1.5 bg-[#1877f2]/10 border border-[#1877f2]/30 text-[#1877f2] text-[10px] font-label hover:bg-[#1877f2]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>FACEBOOK</button>
+            <button onclick="shareToSocial('instagram')" class="flex items-center gap-1 px-3 py-1.5 bg-[#e4405f]/10 border border-[#e4405f]/30 text-[#e4405f] text-[10px] font-label hover:bg-[#e4405f]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>INSTAGRAM</button>
+            <button onclick="shareToSocial('tiktok')" class="flex items-center gap-1 px-3 py-1.5 bg-[#00f2ea]/10 border border-[#00f2ea]/30 text-[#00f2ea] text-[10px] font-label hover:bg-[#00f2ea]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>TIKTOK</button>
+            <button onclick="shareToSocial('reddit')" class="flex items-center gap-1 px-3 py-1.5 bg-[#ff4500]/10 border border-[#ff4500]/30 text-[#ff4500] text-[10px] font-label hover:bg-[#ff4500]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>REDDIT</button>
         </div>
     </div>
-</section>
-
-<!-- Key Metrics Grid -->
-<section class="grid grid-cols-12 gap-6">
-    <!-- Backlog Shame Score -->
     <div class="col-span-12 lg:col-span-5 bg-surface-container border-l-4 border-primary p-8 flex flex-col justify-center">
         <div class="flex items-baseline gap-4">
-            <span id="shameScore" class="text-[120px] font-headline font-bold text-primary leading-none tracking-tighter">--</span>
+            <span id="shameScore" class="text-[72px] font-headline font-bold text-primary leading-none tracking-tighter">--</span>
             <div class="space-y-1">
-                <span class="block font-headline font-bold text-xl text-white uppercase">Backlog Shame Score</span>
+                <span class="block font-headline font-bold text-lg text-white uppercase">Backlog Shame Score</span>
                 <span id="shameVerdict" class="block font-label text-[10px] text-secondary">CALCULATING...</span>
             </div>
         </div>
-        <div class="mt-6 h-1 w-full bg-slate-800 relative overflow-hidden">
-            <div id="shameBar" class="absolute inset-y-0 left-0 bg-primary transition-all duration-1000" style="width: 0%"></div>
-        </div>
-    </div>
-    
-    <!-- Weekly Pick Card -->
-    <div id="weeklyPick" class="col-span-12 lg:col-span-7 bg-surface-container border border-[#2ecc71]/40 p-8 relative overflow-hidden group">
-        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <span class="material-symbols-outlined text-[120px]" data-icon="auto_awesome">auto_awesome</span>
-        </div>
-        <div class="relative z-10 space-y-4">
-            <span class="bg-[#2ecc71]/10 text-[#2ecc71] font-label text-[10px] px-2 py-1 border border-[#2ecc71]/30">ANALYZING_LIBRARY</span>
-            <h3 class="text-4xl font-headline font-bold text-white tracking-tight">LOADING...</h3>
-            <p class="text-slate-400 text-sm leading-relaxed max-w-xl font-body">
-                Scanning your game collection for optimal recommendations...
-            </p>
-        </div>
+        <div class="mt-4 h-1 w-full bg-slate-800 relative overflow-hidden"><div id="shameBar" class="absolute inset-y-0 left-0 bg-primary transition-all duration-1000" style="width:0%"></div></div>
+        <p id="shameExplanation" class="mt-3 text-[11px] font-body text-slate-400 leading-relaxed"></p>
     </div>
 </section>
 
-<!-- Momentum Tracking -->
-<section id="momentumTracking" class="space-y-8">
+<!-- Weekly Pick -->
+<section id="weeklyPick" class="bg-surface-container border border-[#2ecc71]/40 p-8 relative overflow-hidden group">
+    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><span class="material-symbols-outlined text-[120px] text-[#2ecc71]">auto_awesome</span></div>
+    <div class="relative z-10 space-y-4">
+        <span class="bg-[#2ecc71]/10 text-[#2ecc71] font-label text-[10px] px-2 py-1 border border-[#2ecc71]/30">ANALYZING_LIBRARY</span>
+        <h3 class="text-4xl font-headline font-bold text-white tracking-tight">LOADING...</h3>
+        <p class="text-slate-400 text-sm leading-relaxed max-w-xl font-body">Scanning your game collection...</p>
+    </div>
+</section>
+
+<!-- BADGES -->
+<section class="space-y-8">
     <div class="flex items-center justify-between border-b border-outline-variant/10 pb-4">
-        <h4 class="font-headline font-bold text-xl text-white tracking-widest uppercase">Momentum Tracking</h4>
-        <span class="font-label text-[10px] text-slate-500">REALTIME_UPDATES_ENABLED</span>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-surface-container-low p-6 border-t border-outline-variant/20">
-            <p class="font-label text-[10px] text-primary mb-2">REVISITED</p>
-            <p class="text-3xl font-headline font-bold text-white">--</p>
-            <p class="text-[10px] text-slate-500 mt-1 uppercase italic">Awaiting data...</p>
+        <div class="flex items-center gap-4">
+            <h4 class="font-headline font-bold text-2xl text-white tracking-widest uppercase">BADGES</h4>
+            <span id="badgeCount" class="text-[11px] font-label text-primary">0 / 0 EARNED</span>
         </div>
-        <div class="bg-surface-container-low p-6 border-t border-outline-variant/20">
-            <p class="font-label text-[10px] text-secondary mb-2">STILL NEGLECTED</p>
-            <p class="text-3xl font-headline font-bold text-white">--</p>
-            <p class="text-[10px] text-slate-500 mt-1 uppercase italic">Awaiting data...</p>
-        </div>
-        <div class="bg-surface-container-low p-6 border-t border-outline-variant/20">
-            <p class="font-label text-[10px] text-primary mb-2">BACKLOG PROGRESS</p>
-            <p class="text-3xl font-headline font-bold text-white">--</p>
-            <p class="text-[10px] text-slate-500 mt-1 uppercase italic">Awaiting data...</p>
+        <div class="flex gap-1">
+            <button onclick="filterBadges('all')" class="badge-filter active px-3 py-1 text-[9px] font-label border border-outline-variant/20">ALL</button>
+            <button onclick="filterBadges('trait')" class="badge-filter px-3 py-1 text-[9px] font-label text-slate-500 border border-outline-variant/20 hover:text-primary transition-all">TRAIT</button>
+            <button onclick="filterBadges('genre')" class="badge-filter px-3 py-1 text-[9px] font-label text-slate-500 border border-outline-variant/20 hover:text-primary transition-all">GENRE</button>
+            <button onclick="filterBadges('behavioral')" class="badge-filter px-3 py-1 text-[9px] font-label text-slate-500 border border-outline-variant/20 hover:text-primary transition-all">BEHAVIORAL</button>
+            <button onclick="filterBadges('challenge')" class="badge-filter px-3 py-1 text-[9px] font-label text-slate-500 border border-outline-variant/20 hover:text-primary transition-all">CHALLENGE</button>
         </div>
     </div>
-    <div id="momentumTrend" class="p-6 bg-[#00d4ff]/5 border-l-2 border-[#00d4ff] italic text-slate-400 font-body text-sm leading-relaxed">
-        Session data will appear after your next visit...
+    <div id="featuredBadges" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+    <div id="badgeGrid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3"></div>
+</section>
+</div>
+</div>
+
+<!-- TAB: ANALYSIS -->
+<div id="tabAnalysis" class="tab-content hidden">
+<div class="p-12 space-y-16 max-w-[1400px] mx-auto">
+<section id="topGamesChart" class="bg-surface-container-low p-8 border-t-2 border-primary">
+    <h5 class="font-headline font-bold text-sm text-primary tracking-widest uppercase mb-8">MAX_UTILIZATION</h5>
+    <p class="text-slate-500 font-label text-xs">Loading...</p>
+</section>
+<section id="brutalStats" class="bg-surface-container-low p-8 border-t-2 border-secondary">
+    <h5 class="font-headline font-bold text-sm text-secondary tracking-widest uppercase mb-8">BRUTAL_METRICS</h5>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">sports_esports</span><span class="text-3xl font-headline font-bold text-white">--</span><span class="text-[9px] font-label text-slate-500 uppercase">Total_Games</span></div>
+        <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">timer</span><span class="text-3xl font-headline font-bold text-white">--</span><span class="text-[9px] font-label text-slate-500 uppercase">In_Top_Game</span></div>
+        <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">skull</span><span class="text-3xl font-headline font-bold text-white">--</span><span class="text-[9px] font-label text-slate-500 uppercase">Never_Launched</span></div>
+        <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">show_chart</span><span class="text-3xl font-headline font-bold text-white">--</span><span class="text-[9px] font-label text-slate-500 uppercase">Played_10h+</span></div>
     </div>
 </section>
-
-<!-- Return to Game -->
-<section id="returnToGame" class="bg-surface-container border border-outline-variant/20 p-8 space-y-6">
-    <div class="flex items-center gap-3">
-        <span class="material-symbols-outlined text-primary text-2xl">refresh</span>
-        <h4 class="font-headline font-bold text-xl text-white tracking-widest uppercase">Return to a Game</h4>
+<section id="momentumTracking" class="space-y-8">
+    <div class="flex items-center justify-between border-b border-outline-variant/10 pb-4"><h4 class="font-headline font-bold text-xl text-white tracking-widest uppercase">Momentum Tracking</h4></div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-surface-container-low p-6 border-t border-outline-variant/20"><p class="font-label text-[10px] text-primary mb-2">REVISITED</p><p class="text-3xl font-headline font-bold text-white">--</p></div>
+        <div class="bg-surface-container-low p-6 border-t border-outline-variant/20"><p class="font-label text-[10px] text-secondary mb-2">STILL NEGLECTED</p><p class="text-3xl font-headline font-bold text-white">--</p></div>
+        <div class="bg-surface-container-low p-6 border-t border-outline-variant/20"><p class="font-label text-[10px] text-primary mb-2">BACKLOG PROGRESS</p><p class="text-3xl font-headline font-bold text-white">--</p></div>
     </div>
+</section>
+<section id="returnToGame" class="bg-surface-container border border-outline-variant/20 p-8 space-y-6">
+    <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-2xl">refresh</span><h4 class="font-headline font-bold text-xl text-white tracking-widest uppercase">Return to a Game</h4></div>
     <div class="flex gap-4">
-        <select id="returnGameSelect" class="flex-1 bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary transition-colors">
-            <option value="">Select a game...</option>
-        </select>
-        <button onclick="generateReentryGuide()" class="bg-primary text-on-primary font-headline font-bold px-6 py-3 tracking-widest text-sm hover:brightness-110 transition-all">
-            HELP ME JUMP BACK IN
-        </button>
+        <select id="returnGameSelect" class="flex-1 bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary"><option value="">Select a game...</option></select>
+        <button onclick="generateReentryGuide()" class="bg-primary text-on-primary font-headline font-bold px-6 py-3 tracking-widest text-sm hover:brightness-110">HELP ME JUMP BACK IN</button>
     </div>
     <div id="reentryGuide"></div>
 </section>
-
-<!-- Backlog Breakdown Tables -->
 <section id="backlogBreakdown" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-    <div class="space-y-6">
-        <h5 class="font-headline font-bold text-lg text-white border-b border-outline-variant/10 pb-2">CRITICAL_FAILURES: LOW COMPLETION</h5>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left font-label text-[11px]">
-                <thead>
-                    <tr class="text-slate-500 border-b border-outline-variant/5">
-                        <th class="py-3 font-medium">GAME_ID</th>
-                        <th class="py-3 font-medium">TIME_PLAYED</th>
-                        <th class="py-3 font-medium text-right">COMPLETION</th>
-                    </tr>
-                </thead>
-                <tbody id="lowCompletionBody" class="divide-y divide-outline-variant/5">
-                    <tr><td colspan="3" class="py-4 text-slate-500">Loading...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="space-y-6">
-        <h5 class="font-headline font-bold text-lg text-white border-b border-outline-variant/10 pb-2">STRATEGIC_TARGETS: FINISH THESE</h5>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left font-label text-[11px]">
-                <thead>
-                    <tr class="text-slate-500 border-b border-outline-variant/5">
-                        <th class="py-3 font-medium">GAME_ID</th>
-                        <th class="py-3 font-medium">TIME_PLAYED</th>
-                        <th class="py-3 font-medium text-right">COMPLETION</th>
-                    </tr>
-                </thead>
-                <tbody id="nearCompleteBody" class="divide-y divide-outline-variant/5">
-                    <tr><td colspan="3" class="py-4 text-slate-500">Loading...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <div class="space-y-6"><h5 class="font-headline font-bold text-lg text-white border-b border-outline-variant/10 pb-2">CRITICAL_FAILURES</h5><table class="w-full text-left font-label text-[11px]"><thead><tr class="text-slate-500 border-b border-outline-variant/5"><th class="py-3">GAME</th><th class="py-3">TIME</th><th class="py-3 text-right">%</th></tr></thead><tbody id="lowCompletionBody"><tr><td colspan="3" class="py-4 text-slate-500">Loading...</td></tr></tbody></table></div>
+    <div class="space-y-6"><h5 class="font-headline font-bold text-lg text-white border-b border-outline-variant/10 pb-2">STRATEGIC_TARGETS</h5><table class="w-full text-left font-label text-[11px]"><thead><tr class="text-slate-500 border-b border-outline-variant/5"><th class="py-3">GAME</th><th class="py-3">TIME</th><th class="py-3 text-right">%</th></tr></thead><tbody id="nearCompleteBody"><tr><td colspan="3" class="py-4 text-slate-500">Loading...</td></tr></tbody></table></div>
 </section>
-
-<!-- The Graveyard -->
 <section id="graveyard" class="bg-surface-container border border-secondary/30 p-10 relative">
-    <div class="flex items-center justify-between mb-8">
-        <div>
-            <h4 class="text-3xl font-headline font-bold text-secondary tracking-widest uppercase">THE GRAVEYARD</h4>
-            <p class="text-slate-500 font-label text-[10px] mt-1">GAMES DISCONTINUED FOR OVER 24 MONTHS</p>
-        </div>
-        <button onclick="reviveRandomGame()" class="bg-secondary text-on-secondary font-headline font-bold px-6 py-2 tracking-widest text-xs hover:brightness-110 transition-all">
-            REVIVE ONE
-        </button>
-    </div>
-    <div id="graveyardList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        <div class="border border-outline-variant/20 bg-surface px-4 py-3">
-            <p class="text-[10px] text-slate-500 font-label">Loading...</p>
-        </div>
-    </div>
+    <div class="flex items-center justify-between mb-8"><div><h4 class="text-3xl font-headline font-bold text-secondary tracking-widest uppercase">THE GRAVEYARD</h4><p class="text-slate-500 font-label text-[10px] mt-1">GAMES DISCONTINUED</p></div><button onclick="reviveRandomGame()" class="bg-secondary text-on-secondary font-headline font-bold px-6 py-2 tracking-widest text-xs hover:brightness-110">REVIVE ONE</button></div>
+    <div id="graveyardList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"><div class="border border-outline-variant/20 bg-surface px-4 py-3"><p class="text-[10px] text-slate-500 font-label">Loading...</p></div></div>
 </section>
-
-<!-- Gaming Profile Detailed Grid -->
-<section class="grid grid-cols-12 gap-8">
-    <!-- Top Playtime -->
-    <div id="topGamesChart" class="col-span-12 lg:col-span-4 bg-surface-container-low p-8 border-t-2 border-primary">
-        <h5 class="font-headline font-bold text-sm text-primary tracking-widest uppercase mb-8">MAX_UTILIZATION</h5>
-        <div class="space-y-6">
-            <p class="text-slate-500 font-label text-xs">Loading top games...</p>
-        </div>
-    </div>
-    
-    <!-- Library DNA -->
-    <div id="libraryDNA" class="col-span-12 lg:col-span-4 bg-surface-container-low p-8 border-t-2 border-outline-variant">
-        <h5 class="font-headline font-bold text-sm text-slate-400 tracking-widest uppercase mb-8">LIBRARY_DNA_TAGS</h5>
-        <div class="flex flex-wrap gap-2">
-            <span class="px-3 py-1 bg-surface-container-highest text-[10px] font-label text-slate-500">ANALYZING...</span>
-        </div>
-    </div>
-    
-    <!-- Brutal Stats -->
-    <div id="brutalStats" class="col-span-12 lg:col-span-4 bg-surface-container-low p-8 border-t-2 border-secondary">
-        <h5 class="font-headline font-bold text-sm text-secondary tracking-widest uppercase mb-8">BRUTAL_METRICS</h5>
-        <div class="grid grid-cols-2 gap-8">
-            <div class="flex flex-col">
-                <span class="material-symbols-outlined text-secondary text-xl mb-1">sports_esports</span>
-                <span class="text-3xl font-headline font-bold text-white">--</span>
-                <span class="text-[9px] font-label text-slate-500 uppercase">Total_Games</span>
-            </div>
-            <div class="flex flex-col">
-                <span class="material-symbols-outlined text-secondary text-xl mb-1">timer</span>
-                <span class="text-3xl font-headline font-bold text-white">--</span>
-                <span class="text-[9px] font-label text-slate-500 uppercase">In_Top_Game</span>
-            </div>
-            <div class="flex flex-col">
-                <span class="material-symbols-outlined text-secondary text-xl mb-1">skull</span>
-                <span class="text-3xl font-headline font-bold text-white">--</span>
-                <span class="text-[9px] font-label text-slate-500 uppercase">Never_Launched</span>
-            </div>
-            <div class="flex flex-col">
-                <span class="material-symbols-outlined text-secondary text-xl mb-1">show_chart</span>
-                <span class="text-3xl font-headline font-bold text-white">--</span>
-                <span class="text-[9px] font-label text-slate-500 uppercase">Played_10h+</span>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Play Tonight -->
+<!-- Game Recommendation Engine -->
 <section class="bg-[#050508] border border-outline-variant/30 p-12">
     <div class="max-w-3xl mx-auto space-y-10">
-        <div class="text-center space-y-2">
-            <h4 class="text-4xl font-headline font-bold text-white tracking-tighter uppercase">PLAY_TONIGHT_OPTIMIZER</h4>
-            <p class="text-slate-500 font-label text-xs">CALCULATING PROBABILITY OF DOPAMINE RELEASE</p>
+        <div class="text-center space-y-2"><h4 class="text-4xl font-headline font-bold text-white tracking-tighter uppercase">GAME_RECOMMENDATION_ENGINE</h4><p class="text-slate-500 font-label text-xs">SELECT YOUR MOODS AND TIME WINDOW</p></div>
+        <div class="space-y-4">
+            <label class="block font-label text-[10px] text-primary uppercase">Available_Window</label>
+            <select id="availableTime" class="w-full bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary"><option value="30">30 MINUTES</option><option value="60">1 HOUR</option><option value="120">2 HOURS</option><option value="240">4+ HOURS</option></select>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="space-y-4">
-                <label class="block font-label text-[10px] text-primary uppercase">Available_Window</label>
-                <select id="availableTime" class="w-full bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary transition-colors">
-                    <option value="30">30 MINUTES</option>
-                    <option value="60">1 HOUR</option>
-                    <option value="120">2 HOURS</option>
-                    <option value="240">4+ HOURS</option>
-                </select>
-            </div>
-            <div class="space-y-4">
-                <label class="block font-label text-[10px] text-primary uppercase">Target_Mood</label>
-                <div class="flex flex-wrap gap-2">
-                    <button class="mood-btn px-4 py-2 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="relaxed">RELAXED</button>
-                    <button class="mood-btn px-4 py-2 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="focused">FOCUSED</button>
-                    <button class="mood-btn px-4 py-2 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="creative">CREATIVE</button>
-                    <button class="mood-btn px-4 py-2 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="competitive">COMPETITIVE</button>
-                    <button class="mood-btn px-4 py-2 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="adventure">ADVENTURE</button>
-                </div>
-            </div>
+        <div class="space-y-6">
+            <div><p class="font-label text-[9px] text-slate-500 uppercase tracking-widest mb-2">ENERGY</p><div class="flex flex-wrap gap-2"><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="exhausted">EXHAUSTED</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="wired">WIRED</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="flow state">FLOW STATE</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="euphoric">EUPHORIC</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="angry">ANGRY</button></div></div>
+            <div><p class="font-label text-[9px] text-slate-500 uppercase tracking-widest mb-2">FEELING</p><div class="flex flex-wrap gap-2"><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="melancholic">MELANCHOLIC</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="anxious">ANXIOUS</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="contemplative">CONTEMPLATIVE</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="nostalgic">NOSTALGIC</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="cozy">COZY</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="rainy day">RAINY DAY</button></div></div>
+            <div><p class="font-label text-[9px] text-slate-500 uppercase tracking-widest mb-2">CRAVING</p><div class="flex flex-wrap gap-2"><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="story hungry">STORY HUNGRY</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="just one more turn">JUST ONE MORE TURN</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="power fantasy">POWER FANTASY</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="puzzle brain">PUZZLE BRAIN</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="exploration">EXPLORATION</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="chaos">CHAOS</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="grinding">GRINDING</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="challenge seeker">CHALLENGE SEEKER</button></div></div>
+            <div><p class="font-label text-[9px] text-slate-500 uppercase tracking-widest mb-2">CONTEXT</p><div class="flex flex-wrap gap-2"><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="solo">SOLO</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="party mode">PARTY MODE</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="background game">BACKGROUND GAME</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="strategic">STRATEGIC</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="social">SOCIAL</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="competitive">COMPETITIVE</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="late night">LATE NIGHT</button><button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="sunday morning">SUNDAY MORNING</button></div></div>
         </div>
-        <button onclick="getRecommendations()" class="w-full bg-white text-black font-headline font-bold py-4 tracking-[0.4em] hover:bg-primary transition-all glitch-hover">
-            EXECUTE_RECOMMENDATION
-        </button>
+        <button onclick="getRecommendations()" class="w-full bg-white text-black font-headline font-bold py-4 tracking-[0.4em] hover:bg-primary transition-all glitch-hover">EXECUTE_RECOMMENDATION</button>
         <div id="recommendations"></div>
     </div>
 </section>
+</div>
+</div>
 
-<!-- Chat Interface -->
-<section class="bg-surface-container border border-outline-variant/10 flex flex-col h-[600px]">
-    <div class="p-6 border-b border-outline-variant/10 flex justify-between items-center bg-surface/50">
-        <div class="flex items-center gap-3">
-            <div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-            <span class="font-headline font-bold text-sm tracking-widest text-white uppercase">AI_TERMINAL_SESSION</span>
-        </div>
-        <span class="text-[9px] font-label text-slate-500">ENCRYPTION: AES-256-GCM</span>
+<!-- TAB: AI TERMINAL -->
+<div id="tabTerminal" class="tab-content hidden">
+<div class="flex h-[calc(100vh-64px)]">
+    <div class="w-[260px] bg-surface-container border-r border-outline-variant/10 flex flex-col">
+        <div class="p-4 border-b border-outline-variant/10"><button onclick="createNewChat()" class="w-full py-2 border border-primary/30 text-primary font-headline font-bold tracking-widest text-xs hover:bg-primary/10 transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">add</span>NEW CHAT</button></div>
+        <div id="chatHistoryList" class="flex-1 overflow-y-auto custom-scrollbar"></div>
     </div>
-    <div id="chatMessages" class="flex-1 p-8 overflow-y-auto space-y-8 custom-scrollbar">
-        <div class="flex flex-col items-start max-w-2xl">
-            <div class="text-[9px] font-label text-primary mb-2 uppercase">System_Observer</div>
-            <div class="bg-surface-container-high p-4 text-sm font-body leading-relaxed text-slate-300">
-                Initializing Steam.AI... Enter your API credentials to begin analysis of your gaming library.
-            </div>
+    <div class="flex-1 flex flex-col">
+        <div class="p-4 border-b border-outline-variant/10 flex items-center gap-3 bg-surface/50"><div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div><span class="font-headline font-bold text-sm tracking-widest text-white uppercase">AI_TERMINAL_SESSION</span></div>
+        <div id="chatMessages" class="flex-1 p-8 overflow-y-auto space-y-8 custom-scrollbar">
+            <div class="flex flex-col items-start max-w-2xl"><div class="text-[9px] font-label text-primary mb-2 uppercase">System_Observer</div><div class="bg-surface-container-high p-4 text-sm font-body leading-relaxed text-slate-300">Steam.AI terminal online. Ask me anything about your library.</div></div>
         </div>
+        <div class="p-4 border-t border-outline-variant/10 bg-surface/50"><div class="relative"><input id="chatInput" class="w-full bg-background border border-outline-variant/30 px-6 py-4 font-label text-xs focus:outline-none focus:border-primary pr-16 text-white placeholder:text-slate-600" placeholder="TYPE_MESSAGE_TO_AI..." type="text"/><button onclick="sendMessage()" class="absolute right-4 top-1/2 -translate-y-1/2 text-primary hover:text-white transition-colors"><span class="material-symbols-outlined">send</span></button></div></div>
     </div>
-    <div class="p-6 border-t border-outline-variant/10 bg-surface/50">
-        <div class="relative">
-            <input id="chatInput" class="w-full bg-background border border-outline-variant/30 px-6 py-4 font-label text-xs focus:outline-none focus:border-primary transition-colors pr-16 text-white placeholder:text-slate-600" placeholder="TYPE_MESSAGE_TO_AI..." type="text"/>
-            <button onclick="sendMessage()" class="absolute right-4 top-1/2 -translate-y-1/2 text-primary hover:text-white transition-colors">
-                <span class="material-symbols-outlined">send</span>
-            </button>
-        </div>
-    </div>
-</section>
-
+</div>
 </div>
 </main>
 
 <!-- SETUP OVERLAY -->
 <div id="setup" class="fixed inset-0 z-[100] bg-background/95 backdrop-blur-2xl flex items-center justify-center p-6">
 <div class="max-w-xl w-full border border-primary/40 bg-surface-container p-12 space-y-10 shadow-[0_0_100px_rgba(0,212,255,0.1)]">
-    <div class="space-y-2 text-center">
-        <h2 class="text-6xl font-headline font-bold text-white tracking-tighter">STEAM.AI</h2>
-        <p class="font-label text-[10px] text-primary tracking-[0.5em]">SYSTEM_INITIALIZATION_PHASE</p>
-    </div>
-    <!-- Steam Login Button -->
-    <div class="space-y-4">
-        <button onclick="loginWithSteam()" class="w-full py-4 bg-[#1b2838] border border-[#2a475e]/50 text-white font-headline font-bold text-lg tracking-widest hover:bg-[#2a475e] transition-all flex items-center justify-center gap-3">
-            <svg class="w-6 h-6" viewBox="0 0 256 259" fill="currentColor"><path d="M127.779 0C57.268 0 .039 56.983 0 127.779c0 69.996 56.278 126.943 126.363 127.779L95.323 208.37c-3.232-1.705-5.313-5.067-5.313-8.749v-40.479c0-3.529 1.914-6.768 5.013-8.478l32.756-18.042V0z"/><path d="M252.589 98.065c-16.494-39.632-55.498-67.398-100.849-67.398-1.322 0-2.641.021-3.958.055v132.533l32.757 18.042c3.099 1.71 5.013 4.949 5.013 8.478v40.479c0 3.682-2.081 7.044-5.313 8.749l-31.04 47.188C185.923 253.063 256 196.778 256 127.779c0-10.421-1.254-20.549-3.619-30.258l.208.544z"/></svg>
-            SIGN IN THROUGH STEAM
-        </button>
-        <p class="text-center text-[10px] text-slate-500 font-label">OR ENTER YOUR STEAM API KEY MANUALLY</p>
-    </div>
+    <div class="space-y-2 text-center"><h2 class="text-6xl font-headline font-bold text-white tracking-tighter">STEAM.AI</h2><p class="font-label text-[10px] text-primary tracking-[0.5em]">SYSTEM_INITIALIZATION_PHASE</p></div>
+    <div class="space-y-4"><button onclick="loginWithSteam()" class="w-full py-4 bg-[#1b2838] border border-[#2a475e]/50 text-white font-headline font-bold text-lg tracking-widest hover:bg-[#2a475e] transition-all flex items-center justify-center gap-3"><svg class="w-6 h-6" viewBox="0 0 256 259" fill="currentColor"><path d="M127.779 0C57.268 0 .039 56.983 0 127.779c0 69.996 56.278 126.943 126.363 127.779L95.323 208.37c-3.232-1.705-5.313-5.067-5.313-8.749v-40.479c0-3.529 1.914-6.768 5.013-8.478l32.756-18.042V0z"/><path d="M252.589 98.065c-16.494-39.632-55.498-67.398-100.849-67.398-1.322 0-2.641.021-3.958.055v132.533l32.757 18.042c3.099 1.71 5.013 4.949 5.013 8.478v40.479c0 3.682-2.081 7.044-5.313 8.749l-31.04 47.188C185.923 253.063 256 196.778 256 127.779c0-10.421-1.254-20.549-3.619-30.258l.208.544z"/></svg>SIGN IN THROUGH STEAM</button><p class="text-center text-[10px] text-slate-500 font-label">OR ENTER YOUR STEAM API KEY MANUALLY</p></div>
     <div class="space-y-8">
-        <div class="space-y-2">
-            <label class="block font-label text-[10px] text-slate-500 uppercase flex items-center gap-2">STEAM_API_KEY <span class="material-symbols-outlined text-[#2ecc71] text-xs" title="Your key never leaves your browser">lock</span></label>
-            <div class="relative">
-                <input id="steamApiKey" class="w-full bg-background border border-outline-variant/30 px-4 py-3 text-primary font-body text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all pr-10" placeholder="Get from steamcommunity.com/dev/apikey" type="password"/>
-                <button onclick="showHelp('steam')" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors">
-                    <span class="material-symbols-outlined text-sm">help</span>
-                </button>
-            </div>
-        </div>
-        <div class="space-y-2">
-            <label class="block font-label text-[10px] text-slate-500 uppercase">STEAM_ID_64</label>
-            <div class="relative">
-                <input id="steamId" class="w-full bg-background border border-outline-variant/30 px-4 py-3 text-primary font-body text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all pr-10" placeholder="Auto-filled after Steam login" type="text" readonly/>
-                <button onclick="showHelp('steamid')" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors">
-                    <span class="material-symbols-outlined text-sm">help</span>
-                </button>
-            </div>
-        </div>
+        <div class="space-y-2"><label class="block font-label text-[10px] text-slate-500 uppercase flex items-center gap-2">STEAM_API_KEY <span class="material-symbols-outlined text-[#2ecc71] text-xs">lock</span></label><div class="relative"><input id="steamApiKey" class="w-full bg-background border border-outline-variant/30 px-4 py-3 text-primary font-body text-xs focus:outline-none focus:border-primary pr-10" placeholder="Get from steamcommunity.com/dev/apikey" type="password"/><button onclick="showHelp('steam')" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary"><span class="material-symbols-outlined text-sm">help</span></button></div></div>
+        <div class="space-y-2"><label class="block font-label text-[10px] text-slate-500 uppercase">STEAM_ID_64</label><div class="relative"><input id="steamId" class="w-full bg-background border border-outline-variant/30 px-4 py-3 text-primary font-body text-xs focus:outline-none focus:border-primary pr-10" placeholder="Auto-filled after Steam login" type="text" readonly/><button onclick="showHelp('steamid')" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary"><span class="material-symbols-outlined text-sm">help</span></button></div></div>
     </div>
-    <!-- Privacy Notice -->
-    <div class="bg-[#2ecc71]/5 border border-[#2ecc71]/20 p-4 space-y-2">
-        <div class="flex items-center gap-2 text-[#2ecc71] font-headline font-bold text-xs tracking-widest">
-            <span class="material-symbols-outlined text-sm">shield</span>
-            YOUR DATA STAYS PRIVATE
-        </div>
-        <ul class="text-[10px] text-slate-400 font-label space-y-1">
-            <li class="flex items-center gap-2"><span class="text-[#2ecc71]">&#10003;</span> Your Steam API key is processed locally in your browser</li>
-            <li class="flex items-center gap-2"><span class="text-[#2ecc71]">&#10003;</span> We never store, log, or share your credentials</li>
-            <li class="flex items-center gap-2"><span class="text-[#2ecc71]">&#10003;</span> AI features powered by free Groq API - no key needed</li>
-            <li class="flex items-center gap-2"><span class="text-[#2ecc71]">&#10003;</span> <a href="https://github.com/Robinowitz420/SteamAi" target="_blank" class="text-primary hover:underline">Open source - verify for yourself</a></li>
-        </ul>
-    </div>
+    <div class="bg-[#2ecc71]/5 border border-[#2ecc71]/20 p-4 space-y-2"><div class="flex items-center gap-2 text-[#2ecc71] font-headline font-bold text-xs tracking-widest"><span class="material-symbols-outlined text-sm">shield</span>YOUR DATA STAYS PRIVATE</div><ul class="text-[10px] text-slate-400 font-label space-y-1"><li class="flex items-center gap-2"><span class="text-[#2ecc71]">&#10003;</span> Your Steam API key is processed locally in your browser</li><li class="flex items-center gap-2"><span class="text-[#2ecc71]">&#10003;</span> We never store, log, or share your credentials</li><li class="flex items-center gap-2"><span class="text-[#2ecc71]">&#10003;</span> AI features powered by free Groq API - no key needed</li><li class="flex items-center gap-2"><span class="text-[#2ecc71]">&#10003;</span> <a href="https://github.com/Robinowitz420/SteamAi" target="_blank" class="text-primary hover:underline">Open source - verify for yourself</a></li></ul></div>
     <div id="setupError" class="hidden bg-error/20 border border-error text-error px-4 py-3 text-xs font-label"></div>
     <div id="setupSuccess" class="hidden bg-success/20 border border-success text-success px-4 py-3 text-xs font-label"></div>
-    <button onclick="initializeApp()" class="w-full py-5 bg-gradient-to-r from-primary-container to-blue-600 text-on-primary font-headline font-bold text-lg tracking-[0.3em] hover:brightness-110 transition-all glitch-hover">
-        INITIALIZE
-    </button>
+    <button onclick="initializeApp()" class="w-full py-5 bg-gradient-to-r from-primary-container to-blue-600 text-on-primary font-headline font-bold text-lg tracking-[0.3em] hover:brightness-110 transition-all glitch-hover">INITIALIZE</button>
     <p class="text-center font-label text-[9px] text-slate-600 uppercase tracking-widest">Awaiting authentication sequence...</p>
 </div>
 </div>
@@ -574,1012 +239,12 @@
 <!-- Help Modal -->
 <div id="helpModal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-6">
     <div class="max-w-md w-full bg-surface-container border border-outline-variant/30 p-8 space-y-6">
-        <div class="flex justify-between items-center">
-            <h3 id="helpTitle" class="text-xl font-headline font-bold text-white"></h3>
-            <button onclick="closeHelp()" class="text-slate-500 hover:text-white transition-colors">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-        </div>
-        <div id="helpContent" class="text-slate-300 text-sm space-y-4"></div>
+        <div class="flex justify-between items-center"><h3 id="helpTitle" class="font-headline font-bold text-lg text-white"></h3><button onclick="closeHelp()" class="text-slate-500 hover:text-white"><span class="material-symbols-outlined">close</span></button></div>
+        <div id="helpContent" class="text-sm text-slate-300 font-body leading-relaxed"></div>
     </div>
 </div>
 
-<script>
-// Global state
-let steamData = {
-    games: [],
-    wishlist: [],
-    profile: null,
-    apiKey: '',
-    steamId: ''
-};
-
-let chatState = {
-    chats: {},
-    currentChatId: null
-};
-
-let analysisState = {
-    shameScore: 0,
-    heroHeadline: '',
-    lastSession: null,
-    weeklyPick: null,
-    dnaTags: []
-};
-
-// Login with Steam (OpenID)
-function loginWithSteam() {
-    window.location.href = '/api/steam-login';
-}
-
-// Initialize app
-async function initializeApp() {
-    console.log('initializeApp called');
-    
-    const steamApiKey = document.getElementById('steamApiKey').value.trim();
-    const steamId = document.getElementById('steamId').value.trim();
-
-    console.log('Form values:', {
-        steamApiKey: !!steamApiKey,
-        steamId: !!steamId
-    });
-
-    if (!steamApiKey || !steamId) {
-        showSetupError('Please login with Steam or fill in both fields');
-        return;
-    }
-
-    try {
-        steamData.apiKey = steamApiKey;
-        steamData.steamId = steamId;
-        
-        localStorage.setItem('steamData', JSON.stringify({
-            apiKey: steamApiKey,
-            steamId: steamId
-        }));
-
-        console.log('Fetching Steam data...');
-        loadLastSession();
-        await fetchSteamProfile();
-        await fetchSteamData();
-        console.log('Steam data fetched successfully');
-        
-        document.getElementById('setup').classList.add('hidden');
-        document.getElementById('mainContent').classList.remove('hidden');
-        showSetupSuccess('Steam.AI initialized successfully!');
-        
-    } catch (error) {
-        console.error('Initialization error:', error);
-        showSetupError(`Failed to load Steam data: ${error.message}`);
-    }
-}
-
-async function fetchSteamProfile() {
-    try {
-        const profileUrl = `/api/steam-profile?apikey=${steamData.apiKey}&steamid=${steamData.steamId}`;
-        const response = await fetch(profileUrl);
-        
-        if (response.ok) {
-            const profile = await response.json();
-            steamData.profile = profile;
-            updateSidebarProfile(profile);
-        }
-    } catch (error) {
-        console.error('Error fetching profile:', error);
-    }
-}
-
-function updateSidebarProfile(profile) {
-    if (!profile) return;
-    
-    const avatar = document.getElementById('sidebarAvatar');
-    const placeholder = document.getElementById('sidebarAvatarPlaceholder');
-    const username = document.getElementById('sidebarUsername');
-    const status = document.getElementById('sidebarStatus');
-    
-    if (profile.avatar) {
-        avatar.src = profile.avatar;
-        avatar.classList.remove('hidden');
-        placeholder.classList.add('hidden');
-    }
-    
-    if (profile.personaname) {
-        username.textContent = profile.personaname;
-    }
-    
-    const stateMap = {0: 'Offline', 1: 'Online', 2: 'Busy', 3: 'Away', 4: 'Snooze', 5: 'Looking to Trade', 6: 'Looking to Play'};
-    status.textContent = stateMap[profile.personastate] || 'Sync: Active';
-}
-
-async function fetchSteamData() {
-    const gamesUrl = `/api/steam?apikey=${steamData.apiKey}&steamid=${steamData.steamId}`;
-    
-    console.log('Fetching from:', gamesUrl);
-    
-    const gamesResponse = await fetch(gamesUrl);
-    console.log('Response status:', gamesResponse.status);
-    
-    if (!gamesResponse.ok) {
-        const errorText = await gamesResponse.text();
-        console.error('API Error:', errorText);
-        throw new Error(`Steam API error: ${gamesResponse.status} - ${errorText}`);
-    }
-    
-    const gamesData = await gamesResponse.json();
-    console.log('Games data:', gamesData);
-    
-    if (gamesData.response && gamesData.response.games) {
-        steamData.games = gamesData.response.games;
-        console.log(`Loaded ${steamData.games.length} games`);
-    } else {
-        console.error('No games in response:', gamesData);
-        throw new Error('No games found. Your profile might be private.');
-    }
-    
-    steamData.wishlist = [];
-    updateStats();
-}
-
-function updateStats() {
-    calculateShameScore();
-    renderTopGamesChart();
-    renderBrutalStats();
-    renderReturnToGame();
-    renderBacklogBreakdown();
-    renderGraveyard();
-    loadMomentumTracking();
-    generateLibraryDNA().then(() => generateHeroHeadline());
-    loadOrGenerateWeeklyPick();
-    saveCurrentSession();
-}
-
-function calculateShameScore() {
-    let score = 100;
-    
-    steamData.games.forEach(game => {
-        const hours = (game.playtime_forever || 0) / 60;
-        if (hours === 0) score -= 0.5;
-        else if (hours < 1) score -= 0.2;
-        else if (hours >= 1 && hours <= 5) score -= 0.1;
-        else if (hours > 20) score += 0.3;
-    });
-    
-    score = Math.max(0, Math.min(100, Math.round(score)));
-    analysisState.shameScore = score;
-    renderShameScore(score);
-}
-
-function renderShameScore(score) {
-    let verdict = score >= 80 ? 'RESPECTABLE' : score >= 60 ? 'AVERAGE HOARDER' : score >= 40 ? 'CHRONIC HOARDER' : 'FULL SHAME';
-    
-    document.getElementById('shameScore').textContent = score;
-    document.getElementById('shameVerdict').textContent = verdict;
-    document.getElementById('shameBar').style.width = score + '%';
-}
-
-function loadLastSession() {
-    const saved = localStorage.getItem('steamai_last_session');
-    if (saved) {
-        analysisState.lastSession = JSON.parse(saved);
-        renderLastAnalysisBanner();
-    }
-}
-
-function renderLastAnalysisBanner() {
-    if (!analysisState.lastSession) return;
-    
-    const last = analysisState.lastSession;
-    const date = new Date(last.timestamp);
-    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    
-    let newHours = 0;
-    if (last.topGames) {
-        last.topGames.forEach(savedGame => {
-            const currentGame = steamData.games.find(g => g.appid === savedGame.appid);
-            if (currentGame) {
-                const diff = (currentGame.playtime_forever || 0) - (savedGame.playtime_forever || 0);
-                if (diff > 0) newHours += diff / 60;
-            }
-        });
-    }
-    
-    const scoreDiff = analysisState.shameScore - (last.shameScore || 0);
-    const scoreChange = scoreDiff !== 0 ? (scoreDiff > 0 ? '+' : '') + scoreDiff : '';
-    
-    document.getElementById('lastScanDate').textContent = dateStr;
-    document.getElementById('lastScanScore').textContent = (last.shameScore || '--') + (scoreChange ? ` [${scoreChange}]` : '');
-    document.getElementById('lastScanHours').textContent = newHours > 0 ? `${newHours.toFixed(1)}h played since last visit` : '';
-}
-
-function saveCurrentSession() {
-    const top5 = steamData.games.sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)).slice(0, 5)
-        .map(g => ({ appid: g.appid, name: g.name, playtime_forever: g.playtime_forever }));
-    
-    const sessionData = {
-        timestamp: Date.now(),
-        shameScore: analysisState.shameScore,
-        heroHeadline: analysisState.heroHeadline,
-        topGames: top5,
-        unplayedCount: steamData.games.filter(g => (g.playtime_forever || 0) === 0).length
-    };
-    
-    localStorage.setItem('steamai_last_session', JSON.stringify(sessionData));
-    analysisState.lastSession = sessionData;
-}
-
-async function generateHeroHeadline() {
-    const top20 = steamData.games.sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)).slice(0, 20)
-        .map(g => `${g.name}: ${Math.round((g.playtime_forever || 0) / 60)}h`).join('\n');
-    
-    const prompt = `Analyze this Steam library and extract ONE brutally honest, interesting sentence about this player's gaming personality.
-
-LIBRARY DATA:
-${top20}
-
-Total games: ${steamData.games.length}
-Unplayed: ${steamData.games.filter(g => (g.playtime_forever || 0) === 0).length}
-Shame Score: ${analysisState.shameScore}/100
-
-Respond with ONLY one sentence. No quotes. Max 15 words.`;
-    
-    try {
-        const headline = await callAI(prompt);
-        analysisState.heroHeadline = headline.trim();
-        document.getElementById('heroHeadline').textContent = headline.trim().toUpperCase();
-    } catch (error) {
-        console.error('Error generating headline:', error);
-        document.getElementById('heroHeadline').textContent = 'YOUR LIBRARY SPEAKS VOLUMES';
-    }
-}
-
-function shareHeadline() {
-    const text = `Steam.AI told me: "${analysisState.heroHeadline}"`;
-    navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
-}
-
-async function loadOrGenerateWeeklyPick() {
-    const saved = localStorage.getItem('steamai_weekly_pick');
-    if (saved) {
-        const pickData = JSON.parse(saved);
-        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        if (new Date(pickData.timestamp) > weekAgo) {
-            analysisState.weeklyPick = pickData;
-            renderWeeklyPick(pickData);
-            return;
-        }
-    }
-    await generateWeeklyPick();
-}
-
-async function generateWeeklyPick() {
-    const unplayedOrLow = steamData.games.filter(g => (g.playtime_forever || 0) < 300 && (g.playtime_forever || 0) > 0)
-        .sort((a, b) => (a.playtime_forever || 0) - (b.playtime_forever || 0)).slice(0, 20);
-    
-    if (unplayedOrLow.length === 0) return;
-    
-    const gamesList = unplayedOrLow.map(g => `${g.name}: ${Math.round((g.playtime_forever || 0) / 60)}h`).join('\n');
-    
-    const prompt = `Pick ONE game for this player to play this week.
-
-GAMES:
-${gamesList}
-
-Format:
-GAME: [name]
-WHY: [one sentence]
-FIRST_10: [one sentence]`;
-    
-    try {
-        const response = await callAI(prompt);
-        const gameMatch = response.match(/GAME:\s*(.+)/i);
-        const whyMatch = response.match(/WHY:\s*(.+)/i);
-        const first10Match = response.match(/FIRST_10:\s*(.+)/i);
-        
-        const pickData = {
-            game: gameMatch ? gameMatch[1].trim() : 'Unknown',
-            why: whyMatch ? whyMatch[1].trim() : '',
-            first10: first10Match ? first10Match[1].trim() : '',
-            timestamp: Date.now()
-        };
-        
-        analysisState.weeklyPick = pickData;
-        localStorage.setItem('steamai_weekly_pick', JSON.stringify(pickData));
-        renderWeeklyPick(pickData);
-    } catch (error) {
-        console.error('Error generating weekly pick:', error);
-    }
-}
-
-function renderWeeklyPick(pickData) {
-    if (!pickData || !pickData.game) return;
-    
-    document.getElementById('weeklyPick').innerHTML = `
-        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <span class="material-symbols-outlined text-[120px]" data-icon="auto_awesome">auto_awesome</span>
-        </div>
-        <div class="relative z-10 space-y-4">
-            <span class="bg-[#2ecc71]/10 text-[#2ecc71] font-label text-[10px] px-2 py-1 border border-[#2ecc71]/30">RECOMMENDED_FOR_CLOSURE</span>
-            <h3 class="text-4xl font-headline font-bold text-white tracking-tight">THIS WEEK: ${pickData.game.toUpperCase()}</h3>
-            <p class="text-slate-400 text-sm leading-relaxed max-w-xl font-body">
-                ${pickData.why ? pickData.why : ''} ${pickData.first10 ? '<span class="text-primary">First 10 min: ' + pickData.first10 + '</span>' : ''}
-            </p>
-            <button onclick="generateWeeklyPick()" class="flex items-center gap-2 text-[#2ecc71] font-headline font-bold text-sm tracking-widest">
-                REFRESH PICK <span class="material-symbols-outlined text-sm">refresh</span>
-            </button>
-        </div>
-    `;
-}
-
-function renderReturnToGame() {
-    const sortedGames = steamData.games.sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0));
-    
-    document.getElementById('returnGameSelect').innerHTML = `
-        <option value="">Select a game...</option>
-        ${sortedGames.map(game => `
-            <option value="${game.appid}" data-name="${game.name}" data-hours="${Math.round((game.playtime_forever || 0) / 60)}">
-                ${game.name} (${Math.round((game.playtime_forever || 0) / 60)}h)
-            </option>
-        `).join('')}
-    `;
-}
-
-async function generateReentryGuide() {
-    const select = document.getElementById('returnGameSelect');
-    const option = select.options[select.selectedIndex];
-    
-    if (!option.value) {
-        alert('Please select a game');
-        return;
-    }
-    
-    const gameName = option.dataset.name;
-    const hours = option.dataset.hours;
-    
-    const prompt = `User has played ${gameName} for ${hours} hours but has not played recently. Generate a re-entry guide.
-
-Return EXACTLY this format:
-
-YOU LEFT OFF:
-- (2 bullet points)
-
-REMEMBER THIS:
-- (2 bullet points)
-
-DO THIS FIRST (10 mins):
-- (2 bullet points)
-
-Be specific and actionable.`;
-    
-    document.getElementById('reentryGuide').innerHTML = '<div class="reentry-guide"><p style="color: #666;">Generating re-entry guide...</p></div>';
-    
-    try {
-        const response = await callAI(prompt);
-        
-        const leftOffMatch = response.match(/YOU LEFT OFF:\s*([\s\S]*?)(?=REMEMBER THIS:|$)/i);
-        const rememberMatch = response.match(/REMEMBER THIS:\s*([\s\S]*?)(?=DO THIS FIRST:|$)/i);
-        const doFirstMatch = response.match(/DO THIS FIRST[^:]*:\s*([\s\S]*?)(?=$)/i);
-        
-        const parseBullets = (text) => {
-            if (!text) return [];
-            return text.trim().split('\n').map(line => line.replace(/^[\s\-\*]+/, '').trim()).filter(line => line.length > 0);
-        };
-        
-        const leftOffBullets = parseBullets(leftOffMatch ? leftOffMatch[1] : '');
-        const rememberBullets = parseBullets(rememberMatch ? rememberMatch[1] : '');
-        const doFirstBullets = parseBullets(doFirstMatch ? doFirstMatch[1] : '');
-        
-        document.getElementById('reentryGuide').innerHTML = `
-            <div class="reentry-guide">
-                <h4>YOU LEFT OFF</h4>
-                <ul>${leftOffBullets.map(b => `<li>${b}</li>`).join('')}</ul>
-                <h4>REMEMBER THIS</h4>
-                <ul>${rememberBullets.map(b => `<li>${b}</li>`).join('')}</ul>
-                <h4>DO THIS FIRST (10 mins)</h4>
-                <ul>${doFirstBullets.map(b => `<li>${b}</li>`).join('')}</ul>
-            </div>
-        `;
-    } catch (error) {
-        console.error('Error generating re-entry guide:', error);
-        document.getElementById('reentryGuide').innerHTML = '<div class="reentry-guide"><p style="color: #ff3e6c;">Failed to generate guide. Try again.</p></div>';
-    }
-}
-
-function loadMomentumTracking() {
-    const savedSnapshot = localStorage.getItem('steamai_last_snapshot');
-    
-    if (savedSnapshot) {
-        const lastSnapshot = JSON.parse(savedSnapshot);
-        const momentumData = calculateMomentum(lastSnapshot);
-        renderMomentumTracking(momentumData);
-    } else {
-        document.getElementById('momentumTracking').innerHTML = `
-            <div class="flex items-center justify-between border-b border-outline-variant/10 pb-4">
-                <h4 class="font-headline font-bold text-xl text-white tracking-widest uppercase">Momentum Tracking</h4>
-            </div>
-            <div class="p-6 bg-[#00d4ff]/5 border-l-2 border-[#00d4ff] italic text-slate-400 font-body text-sm">
-                Check back after your next session to see your progress!
-            </div>
-        `;
-    }
-    
-    saveCurrentSnapshot();
-}
-
-function saveCurrentSnapshot() {
-    const snapshot = {
-        timestamp: Date.now(),
-        games: steamData.games.map(g => ({ appid: g.appid, name: g.name, playtime_forever: g.playtime_forever || 0 }))
-    };
-    localStorage.setItem('steamai_last_snapshot', JSON.stringify(snapshot));
-}
-
-function calculateMomentum(lastSnapshot) {
-    const daysSince = Math.round((Date.now() - lastSnapshot.timestamp) / (1000 * 60 * 60 * 24));
-    const lastPlaytimes = {};
-    lastSnapshot.games.forEach(g => lastPlaytimes[g.appid] = g.playtime_forever);
-    
-    const neglected = [];
-    const revisited = [];
-    const backlogProgress = [];
-    
-    steamData.games.forEach(game => {
-        const currentPlaytime = game.playtime_forever || 0;
-        const lastPlaytime = lastPlaytimes[game.appid] || 0;
-        const diff = currentPlaytime - lastPlaytime;
-        const diffHours = diff / 60;
-        
-        if (lastPlaytime === currentPlaytime && currentPlaytime > 0) neglected.push({ game, diff: 0 });
-        if (diff >= 30 && lastPlaytime > 0) revisited.push({ game, diff: diffHours });
-        if (diff > 30) backlogProgress.push({ game, diff: diffHours });
-    });
-    
-    return { daysSince, neglected, revisited: revisited.sort((a, b) => b.diff - a.diff), backlogProgress: backlogProgress.sort((a, b) => b.diff - a.diff).slice(0, 5) };
-}
-
-function renderMomentumTracking(data) {
-    if (data.daysSince === 0) {
-        document.getElementById('momentumTracking').classList.add('hidden');
-        return;
-    }
-    
-    document.getElementById('momentumTracking').innerHTML = `
-        <div class="flex items-center justify-between border-b border-outline-variant/10 pb-4">
-            <h4 class="font-headline font-bold text-xl text-white tracking-widest uppercase">Momentum Tracking (${data.daysSince} days)</h4>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-surface-container-low p-6 border-t border-outline-variant/20">
-                <p class="font-label text-[10px] text-primary mb-2">REVISITED</p>
-                <p class="text-3xl font-headline font-bold text-white">${data.revisited.length} GAMES</p>
-                ${data.revisited.slice(0, 3).map(i => `<p class="text-[10px] text-slate-400 mt-1">${i.game.name} +${i.diff.toFixed(1)}h</p>`).join('')}
-            </div>
-            <div class="bg-surface-container-low p-6 border-t border-outline-variant/20">
-                <p class="font-label text-[10px] text-secondary mb-2">STILL NEGLECTED</p>
-                <p class="text-3xl font-headline font-bold text-white">${data.neglected.length} GAMES</p>
-            </div>
-            <div class="bg-surface-container-low p-6 border-t border-outline-variant/20">
-                <p class="font-label text-[10px] text-primary mb-2">BACKLOG PROGRESS</p>
-                <p class="text-3xl font-headline font-bold text-white">${data.backlogProgress.length > 0 ? '+' + data.backlogProgress.length : '--'}</p>
-                ${data.backlogProgress.slice(0, 2).map(i => `<p class="text-[10px] text-slate-400 mt-1">${i.game.name} +${i.diff.toFixed(1)}h</p>`).join('')}
-            </div>
-        </div>
-    `;
-}
-
-function calculateCompletionScore(hours) {
-    if (hours === 0) return 0;
-    if (hours < 2) return 10;
-    if (hours < 10) return 30;
-    if (hours < 25) return 60;
-    if (hours < 50) return 85;
-    return 100;
-}
-
-function renderBacklogBreakdown() {
-    const gamesWithCompletion = steamData.games.map(game => {
-        const hours = (game.playtime_forever || 0) / 60;
-        return { ...game, hours, completion: calculateCompletionScore(hours) };
-    });
-    
-    const lowestCompletion = gamesWithCompletion.filter(g => g.hours > 0 && g.completion < 60)
-        .sort((a, b) => a.completion - b.completion).slice(0, 10);
-    
-    const nearComplete = gamesWithCompletion.filter(g => g.completion >= 60 && g.completion < 100)
-        .sort((a, b) => b.completion - a.completion).slice(0, 5);
-    
-    const getCompletionClass = (comp) => comp < 30 ? 'text-secondary' : comp < 60 ? 'text-amber-500' : 'text-primary';
-    
-    document.getElementById('lowCompletionBody').innerHTML = lowestCompletion.length > 0 
-        ? lowestCompletion.map(game => `
-            <tr class="hover:bg-primary/5 transition-colors">
-                <td class="py-4 text-white font-medium">${game.name}</td>
-                <td class="py-4 text-slate-400">${game.hours.toFixed(1)}H</td>
-                <td class="py-4 text-right ${getCompletionClass(game.completion)}">${String(game.completion).padStart(2, '0')}%</td>
-            </tr>
-        `).join('')
-        : '<tr><td colspan="3" class="py-4 text-slate-500">No low completion games</td></tr>';
-    
-    document.getElementById('nearCompleteBody').innerHTML = nearComplete.length > 0
-        ? nearComplete.map(game => `
-            <tr class="hover:bg-primary/5 transition-colors">
-                <td class="py-4 text-white font-medium">${game.name}</td>
-                <td class="py-4 text-slate-400">${game.hours.toFixed(1)}H</td>
-                <td class="py-4 text-right ${getCompletionClass(game.completion)}">${game.completion}%</td>
-            </tr>
-        `).join('')
-        : '<tr><td colspan="3" class="py-4 text-slate-500">No near-complete games</td></tr>';
-    
-    localStorage.setItem('steamai_completion', JSON.stringify({
-        timestamp: Date.now(),
-        lowestCompletion: lowestCompletion.map(g => ({ name: g.name, hours: g.hours, completion: g.completion })),
-        nearComplete: nearComplete.map(g => ({ name: g.name, hours: g.hours, completion: g.completion }))
-    }));
-}
-
-function renderGraveyard() {
-    const graveyardGames = steamData.games.filter(g => (g.playtime_forever || 0) < 120)
-        .sort((a, b) => (a.playtime_forever || 0) - (b.playtime_forever || 0)).slice(0, 10);
-    
-    if (graveyardGames.length === 0) {
-        document.getElementById('graveyard').classList.add('hidden');
-        return;
-    }
-    
-    document.getElementById('graveyardList').innerHTML = graveyardGames.map(game => `
-        <div class="border border-outline-variant/20 bg-surface overflow-hidden group hover:border-secondary transition-colors cursor-pointer">
-            <img src="https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/header.jpg" alt="${game.name}" class="w-full h-[30px] object-cover opacity-30 group-hover:opacity-50 transition-opacity" onerror="this.style.display='none'"/>
-            <div class="px-3 py-2">
-                <p class="text-[10px] text-white font-medium uppercase truncate">${game.name}</p>
-                <p class="text-[9px] text-slate-500 font-label">${Math.round((game.playtime_forever || 0) / 60)}h played</p>
-            </div>
-        </div>
-    `).join('');
-    
-    localStorage.setItem('steamai_graveyard', JSON.stringify({
-        timestamp: Date.now(),
-        games: graveyardGames.map(g => ({ appid: g.appid, name: g.name, playtime_forever: g.playtime_forever }))
-    }));
-}
-
-function reviveRandomGame() {
-    const graveyardGames = steamData.games.filter(g => (g.playtime_forever || 0) < 120)
-        .sort(() => Math.random() - 0.5).slice(0, 1);
-    
-    if (graveyardGames.length === 0) return;
-    
-    const game = graveyardGames[0];
-    document.getElementById('returnGameSelect').value = game.appid;
-    generateReentryGuide();
-    document.getElementById('returnToGame').scrollIntoView({ behavior: 'smooth' });
-}
-
-function renderTopGamesChart() {
-    const top10 = steamData.games.sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)).slice(0, 10);
-    const maxPlaytime = top10[0]?.playtime_forever || 1;
-    
-    document.getElementById('topGamesChart').innerHTML = `
-        <h5 class="font-headline font-bold text-sm text-primary tracking-widest uppercase mb-8">MAX_UTILIZATION</h5>
-        <div class="space-y-4">
-            ${top10.map((game, i) => {
-                const hours = Math.round((game.playtime_forever || 0) / 60);
-                const percentage = ((game.playtime_forever || 0) / maxPlaytime) * 100;
-                const opacity = 1 - (i * 0.08);
-                const thumbnailUrl = `https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/header.jpg`;
-                
-                return `
-                    <div class="flex items-center gap-3 group">
-                        <img src="${thumbnailUrl}" alt="${game.name}" class="w-[92px] h-[43px] object-cover border border-outline-variant/20 opacity-70 group-hover:opacity-100 transition-opacity flex-shrink-0" onerror="this.style.display='none'"/>
-                        <div class="flex-1 min-w-0 space-y-1">
-                            <div class="flex justify-between text-[10px] font-label">
-                                <span class="text-white truncate">${game.name}</span>
-                                <span class="text-primary flex-shrink-0 ml-2">${hours}H</span>
-                            </div>
-                            <div class="h-1 bg-slate-800 w-full">
-                                <div class="h-full bg-primary transition-all duration-1000" style="width: ${percentage}%; opacity: ${opacity}"></div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('')}
-        </div>
-    `;
-}
-
-async function generateLibraryDNA() {
-    const top20 = steamData.games.sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)).slice(0, 20)
-        .map(g => `${g.name}: ${Math.round((g.playtime_forever || 0) / 60)}h`).join('\n');
-    
-    const prompt = `Analyze this Steam library and return exactly 5 short, brutally honest labels (max 3 words each) that describe their gaming personality.
-
-LIBRARY DATA:
-${top20}
-
-Respond with ONLY a JSON array of 5 strings. Example: ["LABEL ONE", "LABEL TWO", "LABEL THREE", "LABEL FOUR", "LABEL FIVE"]`;
-    
-    try {
-        const response = await callAI(prompt);
-        const jsonMatch = response.match(/\[.*?\]/s);
-        const tags = jsonMatch ? JSON.parse(jsonMatch[0]) : ['PROFILE ERROR'];
-        
-        analysisState.dnaTags = tags;
-        
-        document.getElementById('libraryDNA').innerHTML = `
-            <h5 class="font-headline font-bold text-sm text-slate-400 tracking-widest uppercase mb-8">LIBRARY_DNA_TAGS</h5>
-            <div class="flex flex-wrap gap-2">
-                ${tags.map(tag => `<span class="px-3 py-1 bg-surface-container-highest text-[10px] font-label text-white">${tag}</span>`).join('')}
-            </div>
-            <button onclick="shareDNATags()" class="mt-4 flex items-center gap-2 text-primary font-headline font-bold text-sm tracking-widest">
-                SHARE DNA <span class="material-symbols-outlined text-sm">share</span>
-            </button>
-        `;
-    } catch (error) {
-        console.error('DNA generation failed:', error);
-        document.getElementById('libraryDNA').innerHTML = '<span class="px-3 py-1 bg-surface-container-highest text-[10px] font-label text-slate-500">PROFILE UNAVAILABLE</span>';
-    }
-}
-
-function shareDNATags() {
-    const tags = analysisState.dnaTags || [];
-    if (tags.length === 0) return;
-    
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = 600;
-    canvas.height = 300;
-    
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = '#00d4ff';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-    
-    ctx.fillStyle = '#00d4ff';
-    ctx.font = 'bold 28px Rajdhani, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('MY STEAM DNA', canvas.width / 2, 60);
-    
-    ctx.font = '18px IBM Plex Mono, monospace';
-    const tagY = 120;
-    tags.forEach((tag, i) => {
-        const y = tagY + (i * 45);
-        ctx.fillStyle = 'rgba(0, 212, 255, 0.2)';
-        const tagWidth = ctx.measureText(tag).width + 40;
-        ctx.fillRect((canvas.width - tagWidth) / 2, y - 15, tagWidth, 30);
-        ctx.strokeStyle = '#00d4ff';
-        ctx.strokeRect((canvas.width - tagWidth) / 2, y - 15, tagWidth, 30);
-        ctx.fillStyle = '#00d4ff';
-        ctx.fillText(tag, canvas.width / 2, y + 5);
-    });
-    
-    ctx.fillStyle = '#666';
-    ctx.font = '14px IBM Plex Mono, monospace';
-    ctx.fillText('steamai.com', canvas.width / 2, canvas.height - 30);
-    
-    canvas.toBlob(blob => {
-        if (blob) {
-            const item = new ClipboardItem({ 'image/png': blob });
-            navigator.clipboard.write([item]).then(() => alert('DNA card copied to clipboard!'));
-        }
-    });
-}
-
-function renderBrutalStats() {
-    const totalGames = steamData.games.length;
-    const topGame = steamData.games.reduce((max, game) => (game.playtime_forever || 0) > (max.playtime_forever || 0) ? game : max, steamData.games[0] || {});
-    const topGameHours = Math.round((topGame.playtime_forever || 0) / 60);
-    const neverPlayed = steamData.games.filter(game => (game.playtime_forever || 0) === 0).length;
-    const playedMoreThan10h = steamData.games.filter(game => (game.playtime_forever || 0) >= 600).length;
-    
-    document.getElementById('brutalStats').innerHTML = `
-        <h5 class="font-headline font-bold text-sm text-secondary tracking-widest uppercase mb-8">BRUTAL_METRICS</h5>
-        <div class="grid grid-cols-2 gap-8">
-            <div class="flex flex-col">
-                <span class="material-symbols-outlined text-secondary text-xl mb-1">sports_esports</span>
-                <span class="text-3xl font-headline font-bold text-white">${totalGames}</span>
-                <span class="text-[9px] font-label text-slate-500 uppercase">Total_Games</span>
-            </div>
-            <div class="flex flex-col">
-                <span class="material-symbols-outlined text-secondary text-xl mb-1">timer</span>
-                <span class="text-3xl font-headline font-bold text-white">${topGameHours}h</span>
-                <span class="text-[9px] font-label text-slate-500 uppercase">In_Top_Game</span>
-                <span class="text-[8px] font-label text-slate-600 truncate">${topGame.name || 'N/A'}</span>
-            </div>
-            <div class="flex flex-col">
-                <span class="material-symbols-outlined text-secondary text-xl mb-1">skull</span>
-                <span class="text-3xl font-headline font-bold text-white">${neverPlayed}</span>
-                <span class="text-[9px] font-label text-slate-500 uppercase">Never_Launched</span>
-            </div>
-            <div class="flex flex-col">
-                <span class="material-symbols-outlined text-secondary text-xl mb-1">show_chart</span>
-                <span class="text-3xl font-headline font-bold text-white">${playedMoreThan10h}/${totalGames}</span>
-                <span class="text-[9px] font-label text-slate-500 uppercase">Played_10h+</span>
-            </div>
-        </div>
-    `;
-}
-
-async function getRecommendations() {
-    const mood = document.querySelector('.mood-btn.selected')?.dataset.mood;
-    const time = document.getElementById('availableTime').value;
-    
-    if (!mood) {
-        alert('Please select your mood');
-        return;
-    }
-    
-    const availableGames = steamData.games.filter(game => game.playtime_forever < 120);
-    
-    const prompt = `Recommend 3 games to play tonight based on:
-
-MOOD: ${mood}
-TIME: ${time} minutes
-GAMES: ${availableGames.slice(0, 20).map(g => g.name).join(', ')}
-
-Format each as:
-**Game Name**
-Reason: [why it matches]
-Play Pattern: [how to approach]`;
-    
-    try {
-        const recommendations = await callAI(prompt);
-        document.getElementById('recommendations').innerHTML = `
-            <div class="mt-6 p-6 bg-surface-container border border-outline-variant/20">
-                <h4 class="font-headline font-bold text-lg text-primary mb-4">TONIGHT'S RECOMMENDATIONS</h4>
-                <div class="text-slate-300 text-sm font-body leading-relaxed">${recommendations}</div>
-            </div>
-        `;
-    } catch (error) {
-        console.error('Error getting recommendations:', error);
-        document.getElementById('recommendations').innerHTML = '<p class="mt-6 text-secondary">Failed to get recommendations</p>';
-    }
-}
-
-async function sendMessage() {
-    const input = document.getElementById('chatInput');
-    const message = input.value.trim();
-    
-    if (!message) return;
-    
-    if (!chatState.currentChatId) createNewChat();
-    
-    addChatMessage(message, 'user');
-    input.value = '';
-    saveMessageToChat(message, 'user');
-    
-    const prompt = createChatPrompt(message);
-    
-    try {
-        const response = await callAI(prompt);
-        addChatMessage(response, 'assistant');
-        saveMessageToChat(response, 'assistant');
-    } catch (error) {
-        console.error('Error in chat:', error);
-        addChatMessage('Error occurred. Try again.', 'assistant');
-    }
-}
-
-function createChatPrompt(message) {
-    const chat = chatState.chats[chatState.currentChatId];
-    let conversationHistory = '';
-    if (chat && chat.messages.length > 1) {
-        conversationHistory = chat.messages.slice(0, -1).map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`).join('\n\n');
-    }
-    
-    const libraryData = steamData.games.map(g => `${g.name}: ${Math.round((g.playtime_forever || 0) / 60)}h`).join('\n');
-    
-    return `You are a brutally concise gaming advisor with access to this player's Steam library:
-
-LIBRARY DATA:
-${libraryData}
-
-CONVERSATION HISTORY:
-${conversationHistory || 'No previous messages'}
-
-CURRENT MESSAGE:
-User: ${message}
-
-Rules:
-- Never restate the question
-- Max 3-4 sentences
-- Be direct and opinionated
-- If recommending, verify game exists in library`;
-}
-
-function addChatMessage(message, sender) {
-    const chatMessages = document.getElementById('chatMessages');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `flex flex-col ${sender === 'user' ? 'items-end' : 'items-start'} max-w-2xl`;
-    messageDiv.innerHTML = `
-        <div class="text-[9px] font-label ${sender === 'user' ? 'text-slate-500' : 'text-primary'} mb-2 uppercase">${sender === 'user' ? 'User_Operator' : 'System_Observer'}</div>
-        <div class="${sender === 'user' ? 'bg-primary/10 border border-primary/20 text-primary' : 'bg-surface-container-high text-slate-300'} p-4 text-sm font-body leading-relaxed">
-            ${message}
-        </div>
-    `;
-    chatMessages.appendChild(messageDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-async function callAI(prompt) {
-    const response = await fetch('/api/groq', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt })
-    });
-    
-    if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(`AI API error: ${response.status} - ${errorData}`);
-    }
-    
-    const data = await response.json();
-    return data.response;
-}
-
-// Help modal functions
-function showHelp(type) {
-    const modal = document.getElementById('helpModal');
-    const title = document.getElementById('helpTitle');
-    const content = document.getElementById('helpContent');
-    
-    const helpData = {
-        steam: {
-            title: 'Steam API Key',
-            content: `
-                <p><strong>How to get your Steam API key:</strong></p>
-                <ol>
-                    <li>Go to <a href="https://steamcommunity.com/dev/apikey" target="_blank" class="text-primary">steamcommunity.com/dev/apikey</a></li>
-                    <li>Log in with your Steam account</li>
-                    <li>Enter any domain name (e.g., localhost)</li>
-                    <li>Accept the terms and get your key</li>
-                </ol>
-                <p class="text-xs text-slate-500 mt-4">Your key starts with your Steam ID followed by characters.</p>
-            `
-        },
-        steamid: {
-            title: 'Steam ID 64',
-            content: `
-                <p><strong>How to find your Steam ID 64:</strong></p>
-                <ol>
-                    <li>Go to your Steam profile</li>
-                    <li>Look at the URL - it will show your custom profile name</li>
-                    <li>Visit <a href="https://steamid.io" target="_blank" class="text-primary">steamid.io</a></li>
-                    <li>Enter your profile URL to get your 64-bit ID</li>
-                </ol>
-                <p class="text-xs text-slate-500 mt-4">Your ID looks like: 76561198000000000</p>
-            `
-        },
-        privacy: {
-            title: 'Privacy & Security',
-            content: `
-                <p><strong>Your data is safe with Steam.AI:</strong></p>
-                <ul class="space-y-2">
-                    <li class="flex items-start gap-2"><span class="text-[#2ecc71]">&#10003;</span> Your Steam API key is only used in your browser to fetch your game data</li>
-                    <li class="flex items-start gap-2"><span class="text-[#2ecc71]">&#10003;</span> We never store, log, or transmit your API key to any server</li>
-                    <li class="flex items-start gap-2"><span class="text-[#2ecc71]">&#10003;</span> AI features use free Groq API - no personal API key needed</li>
-                    <li class="flex items-start gap-2"><span class="text-[#2ecc71]">&#10003;</span> <a href="https://github.com/Robinowitz420/SteamAi" target="_blank" class="text-primary hover:underline">Full source code on GitHub</a> - audit it yourself</li>
-                </ul>
-                <p class="text-xs text-slate-500 mt-4">The Steam API key is a read-only key that can only access your public profile data. It cannot modify your account.</p>
-            `
-        }
-    };
-    
-    const data = helpData[type];
-    if (!data) return;
-    title.textContent = data.title;
-    content.innerHTML = data.content;
-    modal.classList.remove('hidden');
-}
-
-function closeHelp() {
-    document.getElementById('helpModal').classList.add('hidden');
-}
-
-// Mood selector
-document.querySelectorAll('.mood-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-        this.classList.add('selected');
-    });
-});
-
-// Chat input enter key
-const chatInputEl = document.getElementById('chatInput');
-if (chatInputEl) {
-    chatInputEl.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') sendMessage();
-    });
-}
-
-// UI helpers
-function showSetupError(message) {
-    const errorDiv = document.getElementById('setupError');
-    errorDiv.textContent = message;
-    errorDiv.classList.remove('hidden');
-    setTimeout(() => errorDiv.classList.add('hidden'), 5000);
-}
-
-function showSetupSuccess(message) {
-    const successDiv = document.getElementById('setupSuccess');
-    successDiv.textContent = message;
-    successDiv.classList.remove('hidden');
-    setTimeout(() => successDiv.classList.add('hidden'), 5000);
-}
-
-// Load saved data on page load
-window.addEventListener('load', function() {
-    // Check for Steam login callback
-    const urlParams = new URLSearchParams(window.location.search);
-    const steamIdFromCallback = urlParams.get('steam_id');
-    const steamError = urlParams.get('steam_error');
-    
-    if (steamIdFromCallback) {
-        document.getElementById('steamId').value = steamIdFromCallback;
-        // Clean URL without reloading
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
-    
-    if (steamError) {
-        showSetupError('Steam login failed. Please try again or enter your details manually.');
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
-    
-    const savedData = localStorage.getItem('steamData');
-    if (savedData) {
-        const data = JSON.parse(savedData);
-        document.getElementById('steamApiKey').value = data.apiKey || '';
-        if (data.steamId && !steamIdFromCallback) {
-            document.getElementById('steamId').value = data.steamId || '';
-        }
-    }
-    
-    loadChatHistory();
-});
-
-// Chat Management
-function createNewChat() {
-    const chatId = 'chat_' + Date.now();
-    chatState.chats[chatId] = {
-        id: chatId,
-        title: 'New Chat',
-        messages: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    };
-    chatState.currentChatId = chatId;
-    saveChatHistory();
-    clearChatMessages();
-}
-
-function saveMessageToChat(message, role) {
-    if (!chatState.currentChatId) return;
-    const chat = chatState.chats[chatState.currentChatId];
-    if (!chat) return;
-    
-    chat.messages.push({ role, content: message, timestamp: new Date().toISOString() });
-    if (chat.title === 'New Chat' && role === 'user') {
-        chat.title = message.substring(0, 30) + (message.length > 30 ? '...' : '');
-    }
-    chat.updatedAt = new Date().toISOString();
-    saveChatHistory();
-}
-
-function saveChatHistory() {
-    localStorage.setItem('chatHistory', JSON.stringify(chatState));
-}
-
-function loadChatHistory() {
-    const saved = localStorage.getItem('chatHistory');
-    if (saved) {
-        try {
-            chatState = JSON.parse(saved);
-        } catch (error) {
-            console.error('Error loading chat history:', error);
-        }
-    }
-}
-
-function clearChatMessages() {
-    document.getElementById('chatMessages').innerHTML = '';
-}
-</script>
+<script src="badges.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
