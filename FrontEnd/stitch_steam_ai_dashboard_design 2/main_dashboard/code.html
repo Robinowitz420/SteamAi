@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>STEAM.AI // TACTICAL OVERWATCH</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-error": "#690005",
+                      "on-surface-variant": "#bdc8d0",
+                      "tertiary-container": "#aab9c8",
+                      "on-tertiary-fixed": "#0e1d28",
+                      "tertiary-fixed": "#d5e4f4",
+                      "secondary-container": "#037d50",
+                      "inverse-surface": "#dfe2eb",
+                      "error-container": "#93000a",
+                      "primary-fixed": "#c2e8ff",
+                      "on-primary-fixed-variant": "#004d67",
+                      "surface-container-lowest": "#0a0e14",
+                      "on-primary-fixed": "#001e2b",
+                      "surface-container-highest": "#31353c",
+                      "on-secondary-container": "#bdffd6",
+                      "error": "#ffb4ab",
+                      "surface-container-high": "#262a31",
+                      "primary": "#9adbff",
+                      "outline-variant": "#3e484f",
+                      "primary-fixed-dim": "#75d1ff",
+                      "primary-container": "#4fc3f7",
+                      "tertiary": "#c6d5e5",
+                      "on-tertiary-fixed-variant": "#3a4855",
+                      "secondary": "#77daa4",
+                      "on-primary-container": "#004e69",
+                      "outline": "#889299",
+                      "surface-dim": "#10141a",
+                      "surface-variant": "#31353c",
+                      "surface-container-low": "#181c22",
+                      "inverse-primary": "#006688",
+                      "on-surface": "#dfe2eb",
+                      "surface-container": "#1c2026",
+                      "on-primary": "#003548",
+                      "background": "#10141a",
+                      "surface-bright": "#353940",
+                      "inverse-on-surface": "#2d3137",
+                      "on-secondary-fixed-variant": "#005232",
+                      "tertiary-fixed-dim": "#b9c8d8",
+                      "on-secondary-fixed": "#002112",
+                      "surface": "#10141a",
+                      "on-tertiary": "#24323e",
+                      "on-tertiary-container": "#3c4a57",
+                      "on-secondary": "#003821",
+                      "secondary-fixed-dim": "#77daa4",
+                      "secondary-fixed": "#93f7bf",
+                      "on-error-container": "#ffdad6",
+                      "on-background": "#dfe2eb",
+                      "surface-tint": "#75d1ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "fontFamily": {
+                      "headline": ["Rajdhani"],
+                      "body": ["IBM Plex Mono"],
+                      "label": ["IBM Plex Mono"]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0a0e14;
+            color: #dfe2eb;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+        .hud-scanline {
+            background: linear-gradient(to bottom, transparent 50%, rgba(79, 195, 247, 0.05) 50%);
+            background-size: 100% 4px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glow-cyan { text-shadow: 0 0 10px rgba(79, 195, 247, 0.5); }
+        .border-glow { box-shadow: inset 0 0 15px rgba(79, 195, 247, 0.1); }
+    </style>
+</head>
+<body class="selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-slate-950/90 backdrop-blur-md border-b border-sky-900/30">
+<div class="flex items-center gap-8">
+<div class="text-2xl font-bold tracking-tighter text-sky-400 drop-shadow-[0_0_8px_rgba(79,195,247,0.4)] font-['Rajdhani']">STEAM.AI</div>
+<div class="hidden md:flex gap-6">
+<a class="font-['Rajdhani'] uppercase tracking-widest text-sm text-sky-400 border-b-2 border-sky-400 pb-1" href="#">INTEL</a>
+<a class="font-['Rajdhani'] uppercase tracking-widest text-sm text-slate-500 hover:text-sky-200 transition-colors" href="#">TELEMETRY</a>
+<a class="font-['Rajdhani'] uppercase tracking-widest text-sm text-slate-500 hover:text-sky-200 transition-colors" href="#">ARCHIVE</a>
+<a class="font-['Rajdhani'] uppercase tracking-widest text-sm text-slate-500 hover:text-sky-200 transition-colors" href="#">SQUAD</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-slate-500 hover:text-sky-400 cursor-pointer transition-all" data-icon="rss_feed">rss_feed</span>
+<span class="material-symbols-outlined text-slate-500 hover:text-sky-400 cursor-pointer transition-all" data-icon="settings">settings</span>
+<span class="material-symbols-outlined text-slate-500 hover:text-sky-400 cursor-pointer transition-all" data-icon="power_settings_new">power_settings_new</span>
+<div class="w-8 h-8 bg-surface-container rounded-sm border border-outline-variant overflow-hidden">
+<img alt="User Tactical Profile" class="w-full h-full object-cover" data-alt="Abstract geometric identification avatar for a technical system operator in shades of cyan and slate grey" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1gnzVxl5VdPv0fC1DizYTOW4jjVL2mArbGfb_3TWaOWLUexbpNfe266hMjU0NK8nJrAyvyY_e_UmzFUwnuEKGPb7pprEmDo7Efj6097OLzzOwJkKzLNulhDKniQH3PQAljQjGKh7K9f1oFMz3kfEPpr3HaBbX4RAXe0JrdOk-Kwz5gjdY58SThUUcBcs2mBCAamyVLok5oRI5ymcHV9vEKp75Z0WsS9wvx-qOgpwX9dCJPZcUKVd3pmW6_6fICLarJoYt7kDaRiL-"/>
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 z-40 flex flex-col bg-slate-950 border-r border-sky-900/20 hidden md:flex">
+<div class="p-6 border-b border-sky-900/10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-sky-900/30 border border-sky-500/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-sky-400" data-icon="person">person</span>
+</div>
+<div>
+<div class="font-['IBM_Plex_Mono'] text-xs font-bold text-sky-400">OPERATOR_01</div>
+<div class="font-['IBM_Plex_Mono'] text-[10px] text-slate-500">STATUS: ENCRYPTED</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 py-4">
+<div class="bg-sky-500/10 text-sky-400 border-l-4 border-sky-400 flex items-center gap-3 px-4 py-3 font-['IBM_Plex_Mono'] text-xs uppercase tracking-widest cursor-pointer">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span> DASHBOARD
+            </div>
+<div class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-900/50 hover:text-sky-300 transition-all font-['IBM_Plex_Mono'] text-xs uppercase tracking-widest cursor-pointer">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span> LIVE_LOGS
+            </div>
+<div class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-900/50 hover:text-sky-300 transition-all font-['IBM_Plex_Mono'] text-xs uppercase tracking-widest cursor-pointer">
+<span class="material-symbols-outlined" data-icon="key">key</span> API_CONFIG
+            </div>
+<div class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-900/50 hover:text-sky-300 transition-all font-['IBM_Plex_Mono'] text-xs uppercase tracking-widest cursor-pointer">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span> AI_ANALYST
+            </div>
+<div class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-900/50 hover:text-sky-300 transition-all font-['IBM_Plex_Mono'] text-xs uppercase tracking-widest cursor-pointer">
+<span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span> DEPLOY
+            </div>
+</nav>
+<div class="p-4 bg-sky-900/10 m-4 border border-sky-500/20">
+<button class="w-full py-2 bg-primary-container text-on-primary-container font-bold text-[10px] tracking-tighter uppercase hover:shadow-[0_0_15px_rgba(79,195,247,0.3)] transition-all">INITIATE_SCAN</button>
+</div>
+<div class="mt-auto border-t border-sky-900/10 pb-4">
+<div class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-sky-300 transition-all font-['IBM_Plex_Mono'] text-xs uppercase tracking-widest cursor-pointer">
+<span class="material-symbols-outlined" data-icon="help_center">help_center</span> SUPPORT
+            </div>
+<div class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-sky-300 transition-all font-['IBM_Plex_Mono'] text-xs uppercase tracking-widest cursor-pointer">
+<span class="material-symbols-outlined" data-icon="logout">logout</span> SIGNOUT
+            </div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-24 p-6 min-h-screen">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+<div>
+<h1 class="text-3xl font-bold tracking-widest font-['Rajdhani'] text-primary glow-cyan">STEAM.AI // OPERATOR_01</h1>
+<p class="text-[10px] text-slate-500 tracking-[0.3em] font-['IBM_Plex_Mono']">SYSTEM_STATUS: NOMINAL // DATA_PRECISION: 99.8%</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-1 border border-primary/30 text-primary text-[10px] uppercase font-bold tracking-widest hover:bg-primary/10 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="refresh">refresh</span> REGENERATE PROFILE
+                </button>
+<button class="px-4 py-1 border border-error/30 text-error text-[10px] uppercase font-bold tracking-widest hover:bg-error/10 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="logout">logout</span> LOGOUT
+                </button>
+</div>
+</header>
+<!-- Top Section: AI GAMING ANALYST -->
+<section class="grid grid-cols-1 xl:grid-cols-2 gap-px bg-sky-900/20 border border-sky-900/30 mb-8 overflow-hidden rounded-lg">
+<!-- Behavioral Profile -->
+<div class="p-6 bg-surface-container relative">
+<div class="absolute top-0 right-0 p-2 opacity-10">
+<span class="material-symbols-outlined text-6xl" data-icon="psychology">psychology</span>
+</div>
+<div class="flex items-center gap-2 mb-4">
+<span class="w-1 h-4 bg-primary"></span>
+<h2 class="font-['Rajdhani'] font-bold tracking-widest text-lg">AI GAMING ANALYST // BEHAVIORAL PROFILE</h2>
+</div>
+<div class="font-['IBM_Plex_Mono'] text-sm leading-relaxed text-on-surface-variant/80 border-l border-primary/20 pl-4 py-2">
+<p class="mb-4">SUBJECT_ID: OPERATOR_01 EXHIBITS HIGH COMMITMENT TO <span class="text-secondary">TACTICAL SHOOTERS</span> WITH A SECONDARY PREFERENCE FOR NARRATIVE RPGS. DATA SUGGESTS A PATTERN OF <span class="text-primary">ACHIEVEMENT-FOCUSED PLAY</span> DURING LATE-NIGHT CYCLES.</p>
+<p>CORE COMPETENCY IN MECHANICAL PRECISION IS OFFSET BY A LOW TOLERANCE FOR GRIND-HEAVY LOOT SYSTEMS. RECOMMENDATION: PRIORITIZE COMPETITIVE LADDER OPTIMIZATION AND HIGH-FIDELITY STORY ARCS.</p>
+</div>
+</div>
+<!-- Analyst Chat -->
+<div class="p-6 bg-surface-container-high border-l border-sky-900/30 flex flex-col h-[300px]">
+<div class="flex items-center gap-2 mb-4">
+<span class="w-1 h-4 bg-secondary"></span>
+<h2 class="font-['Rajdhani'] font-bold tracking-widest text-lg text-secondary">ANALYST_CHAT</h2>
+</div>
+<div class="flex-1 overflow-y-auto font-['IBM_Plex_Mono'] text-[11px] space-y-4 pr-2 hud-scanline p-4 bg-surface-container-lowest border border-outline-variant/10">
+<div class="flex gap-3">
+<span class="text-secondary font-bold">[AI]:</span>
+<span class="text-on-surface-variant">Your recent performance in tactical arenas shows a 12% increase in headshot accuracy. Are you ready for Rank A placement?</span>
+</div>
+<div class="flex gap-3 justify-end">
+<span class="text-primary text-right">Confirmed. System ready for data injection.</span>
+<span class="text-primary font-bold">:[USER]</span>
+</div>
+<div class="flex gap-3">
+<span class="text-secondary font-bold">[AI]:</span>
+<span class="text-on-surface-variant">Initiating tactical matching protocols. Monitoring heart rate telemetry.</span>
+</div>
+</div>
+<div class="mt-4 flex gap-2">
+<input class="flex-1 bg-surface-container-low border border-outline-variant/20 rounded-none focus:border-primary focus:ring-0 text-xs font-['IBM_Plex_Mono'] px-4 py-2" placeholder="ENTER_COMMAND..." type="text"/>
+<button class="bg-secondary text-on-secondary px-6 font-bold text-xs uppercase tracking-widest hover:brightness-110">SEND</button>
+</div>
+</div>
+</section>
+<!-- Row 1: High Density Metrics -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+<!-- 1. Commitment Level -->
+<div class="bg-surface-container p-6 rounded-lg border-b border-sky-500/10">
+<h3 class="font-['Rajdhani'] font-bold tracking-widest text-sm mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="pie_chart">pie_chart</span> COMMITMENT LEVEL
+                </h3>
+<div class="relative w-48 h-48 mx-auto flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<path class="text-surface-container-high" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="transparent" stroke="currentColor" stroke-width="3"></path>
+<path class="text-primary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831" fill="transparent" stroke="currentColor" stroke-dasharray="45, 100" stroke-linecap="butt" stroke-width="3"></path>
+<path class="text-secondary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831" fill="transparent" stroke="currentColor" stroke-dasharray="25, 100" stroke-dashoffset="-45" stroke-linecap="butt" stroke-width="3"></path>
+<path class="text-error" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831" fill="transparent" stroke="currentColor" stroke-dasharray="15, 100" stroke-dashoffset="-70" stroke-linecap="butt" stroke-width="3"></path>
+</svg>
+<div class="absolute text-center">
+<div class="text-2xl font-bold text-primary">84%</div>
+<div class="text-[9px] uppercase tracking-tighter text-slate-500">ENGAGEMENT</div>
+</div>
+</div>
+<div class="mt-6 grid grid-cols-2 gap-2">
+<div class="flex items-center gap-2 text-[10px] text-slate-400">
+<span class="w-2 h-2 rounded-full bg-primary"></span> COMMITTED (45%)
+                    </div>
+<div class="flex items-center gap-2 text-[10px] text-slate-400">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> CASUAL (25%)
+                    </div>
+<div class="flex items-center gap-2 text-[10px] text-slate-400">
+<span class="w-2 h-2 rounded-full bg-error"></span> BARELY TRIED (15%)
+                    </div>
+<div class="flex items-center gap-2 text-[10px] text-slate-400">
+<span class="w-2 h-2 rounded-full bg-surface-container-high"></span> NEVER PLAYED (15%)
+                    </div>
+</div>
+</div>
+<!-- 2. Where Your Time Went -->
+<div class="bg-surface-container p-6 rounded-lg border-b border-sky-500/10">
+<h3 class="font-['Rajdhani'] font-bold tracking-widest text-sm mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="bar_chart">bar_chart</span> WHERE YOUR TIME WENT
+                </h3>
+<div class="space-y-3">
+<div class="flex items-center gap-3">
+<div class="text-[9px] w-24 text-slate-500 truncate uppercase">Cyberpunk 2077</div>
+<div class="flex-1 h-2 bg-surface-container-high overflow-hidden">
+<div class="h-full bg-primary w-[90%]"></div>
+</div>
+<div class="text-[9px] text-primary">240H</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-[9px] w-24 text-slate-500 truncate uppercase">CS: GO 2</div>
+<div class="flex-1 h-2 bg-surface-container-high overflow-hidden">
+<div class="h-full bg-primary w-[85%]"></div>
+</div>
+<div class="text-[9px] text-primary">212H</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-[9px] w-24 text-slate-500 truncate uppercase">Baldur's Gate 3</div>
+<div class="flex-1 h-2 bg-surface-container-high overflow-hidden">
+<div class="h-full bg-primary w-[75%]"></div>
+</div>
+<div class="text-[9px] text-primary">188H</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-[9px] w-24 text-slate-500 truncate uppercase">Elden Ring</div>
+<div class="flex-1 h-2 bg-surface-container-high overflow-hidden">
+<div class="h-full bg-primary w-[60%]"></div>
+</div>
+<div class="text-[9px] text-primary">145H</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-[9px] w-24 text-slate-500 truncate uppercase">Starfield</div>
+<div class="flex-1 h-2 bg-surface-container-high overflow-hidden">
+<div class="h-full bg-primary w-[45%]"></div>
+</div>
+<div class="text-[9px] text-primary">98H</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-[9px] w-24 text-slate-500 truncate uppercase">Alan Wake 2</div>
+<div class="flex-1 h-2 bg-surface-container-high overflow-hidden">
+<div class="h-full bg-primary w-[35%]"></div>
+</div>
+<div class="text-[9px] text-primary">64H</div>
+</div>
+<div class="flex items-center justify-center pt-2">
+<span class="text-[9px] text-slate-600 uppercase tracking-widest">+9 ADDITIONAL TITLES</span>
+</div>
+</div>
+</div>
+<!-- 3. Last 2 Weeks -->
+<div class="bg-surface-container p-6 rounded-lg border-b border-sky-500/10">
+<h3 class="font-['Rajdhani'] font-bold tracking-widest text-sm mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-lg" data-icon="history">history</span> LAST 2 WEEKS
+                </h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-2 bg-surface-container-low border border-outline-variant/10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-slate-800 rounded-sm overflow-hidden">
+<img alt="Game Thumbnail" class="w-full h-full object-cover opacity-80" data-alt="Abstract minimalist game cover art with neon lines and dark shapes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7SVgrQbkG0KpiFydO64UNre-Sjv3TeAFUuGCUzDXiOiCYeGjjfQp-93u12_n8UHqhUS2y0zQ0gcVu1oGa3DS_CzVnrWWwk2QrOt7Clqq3yBKA6GaLLmSm7VDf2DPSWAAxxKKOGwCADt1Q4_bs5sUPgAiplUU7_xvgFw-RpKdDn-mK9cRIz-262rFCbEHM0B8esSFoIFPtirU3IylfQi1HeqG3jhzqMeZjosj6CpXV75uYnnxBkZztzIycalXnqmgGiHaFFkFRe2o8"/>
+</div>
+<div>
+<div class="text-[10px] font-bold uppercase">Ready or Not</div>
+<div class="text-[9px] text-slate-500">14.2 HOURS TOTAL</div>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+<span class="text-[8px] text-secondary font-bold uppercase">LIVE</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-2 bg-surface-container-low border border-outline-variant/10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-slate-800 rounded-sm overflow-hidden">
+<img alt="Game Thumbnail" class="w-full h-full object-cover opacity-80" data-alt="Abstract minimalist game cover art with orange and deep red geometric shapes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC74sQXEuAY5NrxMQI_itNwotQgIpkUfId4dv274v8BE4kEjCKtuslEW7nMa1LrJ6s6xomuMhGZ6c7r7SGxg8NtbM5Ljv38L0oLbp10wiS7W--lHYpbzL6rEElT2xMHayR7FInqPN41JcoGroCvdJ_-iEO8rbOIZH8-wYsrTsIIK-iaxxcteZ0YtXu1ExBtlx5-7jHp1YLgfwyqXqVOaL1v-C1ynPFnjNkzpQW3IFJNHB3DHRMTWYiz_K4L2Z5JEA9nolku7weYVVBO"/>
+</div>
+<div>
+<div class="text-[10px] font-bold uppercase">Apex Legends</div>
+<div class="text-[9px] text-slate-500">8.5 HOURS TOTAL</div>
+</div>
+</div>
+<div class="text-[8px] text-slate-500 font-bold uppercase">2D AGO</div>
+</div>
+<div class="flex items-center justify-between p-2 bg-surface-container-low border border-outline-variant/10 opacity-70">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-slate-800 rounded-sm overflow-hidden">
+<img alt="Game Thumbnail" class="w-full h-full object-cover opacity-80" data-alt="Abstract minimalist game cover art with blue and purple flowing lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNON0VujW1p6CWwLiFZbksIiufbYCvR4Aaj6rY9i4F8jS9l10oRi4L_LX4ntSm02wu_BqrVniXeO87s3fW22KbJHmEWiKFoTotGYR20o7fkraPbeOOvH1wGiedBK69isOrgZlPk3zaATwsp--O7Er0PlS-0VsuZUe_MDOCGvpk3Hc0fi4NUPICB_ERHbgBeyucl0IruAkjZvheBEBYpc3nv4m34ZzSkE0Y3NxNj01WEyun2Ohl2Sa8UJ52XlFhS2xAWId8sE5bjy2j"/>
+</div>
+<div>
+<div class="text-[10px] font-bold uppercase">Dota 2</div>
+<div class="text-[9px] text-slate-500">4.1 HOURS TOTAL</div>
+</div>
+</div>
+<div class="text-[8px] text-slate-500 font-bold uppercase">1W AGO</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 2: Analytics Panels -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+<!-- 4. Playtime vs Critical Reception -->
+<div class="bg-surface-container p-6 rounded-lg border-b border-sky-500/10 h-[350px] flex flex-col">
+<h3 class="font-['Rajdhani'] font-bold tracking-widest text-sm mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="scatter_plot">scatter_plot</span> PLAYTIME VS CRITICAL RECEPTION
+                </h3>
+<div class="flex-1 relative border-l border-b border-outline-variant/20 mb-2">
+<!-- Scatter plot simulation -->
+<div class="absolute bottom-[80%] left-[90%] w-3 h-3 bg-primary rounded-full blur-[2px] opacity-80" title="High Reception, High Time"></div>
+<div class="absolute bottom-[40%] left-[60%] w-2 h-2 bg-secondary rounded-full blur-[1px]" title="Mid Reception, Mid Time"></div>
+<div class="absolute bottom-[20%] left-[20%] w-2 h-2 bg-error rounded-full blur-[1px]" title="Low Reception, Low Time"></div>
+<div class="absolute bottom-[70%] left-[30%] w-3 h-3 bg-primary/40 rounded-full border border-primary/60"></div>
+<div class="absolute bottom-[15%] left-[85%] w-3 h-3 bg-secondary/40 rounded-full border border-secondary/60"></div>
+<div class="absolute bottom-[55%] left-[55%] w-2 h-2 bg-primary"></div>
+<div class="absolute bottom-[90%] left-[45%] w-2 h-2 bg-secondary/60 rounded-full"></div>
+<!-- Axis Labels -->
+<div class="absolute -left-10 top-1/2 -rotate-90 text-[8px] uppercase text-slate-500 tracking-[0.2em]">METACRITIC_SCORE</div>
+<div class="absolute left-1/2 -bottom-6 text-[8px] uppercase text-slate-500 tracking-[0.2em]">TOTAL_HOURS_LOGGED</div>
+</div>
+</div>
+<!-- 5. Your Gaming Genres -->
+<div class="bg-surface-container p-6 rounded-lg border-b border-sky-500/10 h-[350px] flex flex-col">
+<h3 class="font-['Rajdhani'] font-bold tracking-widest text-sm mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="category">category</span> YOUR GAMING GENRES
+                </h3>
+<div class="flex-1 flex flex-col justify-between">
+<div class="space-y-4">
+<div class="flex items-center gap-4">
+<span class="text-[9px] w-24 text-slate-400 font-bold uppercase">RPG</span>
+<div class="flex-1 bg-surface-container-high h-4 relative">
+<div class="h-full bg-secondary/40 w-[85%] border-r-2 border-secondary"></div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[9px] w-24 text-slate-400 font-bold uppercase">SHOOTER</span>
+<div class="flex-1 bg-surface-container-high h-4 relative">
+<div class="h-full bg-secondary/40 w-[72%] border-r-2 border-secondary"></div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[9px] w-24 text-slate-400 font-bold uppercase">ACTION</span>
+<div class="flex-1 bg-surface-container-high h-4 relative">
+<div class="h-full bg-secondary/40 w-[60%] border-r-2 border-secondary"></div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[9px] w-24 text-slate-400 font-bold uppercase">STRATEGY</span>
+<div class="flex-1 bg-surface-container-high h-4 relative">
+<div class="h-full bg-secondary/40 w-[45%] border-r-2 border-secondary"></div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[9px] w-24 text-slate-400 font-bold uppercase">SIMULATION</span>
+<div class="flex-1 bg-surface-container-high h-4 relative">
+<div class="h-full bg-secondary/40 w-[30%] border-r-2 border-secondary"></div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[9px] w-24 text-slate-400 font-bold uppercase">INDIE</span>
+<div class="flex-1 bg-surface-container-high h-4 relative">
+<div class="h-full bg-secondary/40 w-[25%] border-r-2 border-secondary"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 3: Grid Details -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- 6. Achievement Progress -->
+<div class="bg-surface-container p-6 rounded-lg border-b border-sky-500/10">
+<h3 class="font-['Rajdhani'] font-bold tracking-widest text-sm mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="trophy">trophy</span> ACHIEVEMENT PROGRESS
+                </h3>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-[9px] uppercase font-bold mb-1">
+<span>Witcher 3: Wild Hunt</span>
+<span class="text-primary">92%</span>
+</div>
+<div class="w-full h-1 bg-surface-container-high flex">
+<div class="h-full bg-primary w-[92%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[9px] uppercase font-bold mb-1">
+<span>Red Dead Redemption 2</span>
+<span class="text-primary">84%</span>
+</div>
+<div class="w-full h-1 bg-surface-container-high flex">
+<div class="h-full bg-primary w-[84%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[9px] uppercase font-bold mb-1 opacity-60">
+<span>Skyrim</span>
+<span class="text-primary">65%</span>
+</div>
+<div class="w-full h-1 bg-surface-container-high flex">
+<div class="h-full bg-primary w-[65%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[9px] uppercase font-bold mb-1 opacity-60">
+<span>God of War</span>
+<span class="text-primary">42%</span>
+</div>
+<div class="w-full h-1 bg-surface-container-high flex">
+<div class="h-full bg-primary w-[42%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[9px] uppercase font-bold mb-1 opacity-40">
+<span>DOOM Eternal</span>
+<span class="text-primary">12%</span>
+</div>
+<div class="w-full h-1 bg-surface-container-high flex">
+<div class="h-full bg-primary w-[12%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- 7. Money vs Time -->
+<div class="bg-surface-container p-6 rounded-lg border-b border-sky-500/10">
+<h3 class="font-['Rajdhani'] font-bold tracking-widest text-sm mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="payments">payments</span> MONEY VS TIME
+                </h3>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-3 border border-outline-variant/10 bg-surface-container-low">
+<div class="text-[8px] text-slate-500 tracking-widest uppercase mb-1">Total Games</div>
+<div class="text-xl font-bold font-['Rajdhani'] text-primary">1,248</div>
+</div>
+<div class="p-3 border border-outline-variant/10 bg-surface-container-low">
+<div class="text-[8px] text-slate-500 tracking-widest uppercase mb-1">Total Value</div>
+<div class="text-xl font-bold font-['Rajdhani'] text-primary">$4,850</div>
+</div>
+<div class="p-3 border border-outline-variant/10 bg-surface-container-low">
+<div class="text-[8px] text-slate-500 tracking-widest uppercase mb-1">Cost Per Hour</div>
+<div class="text-xl font-bold font-['Rajdhani'] text-secondary">$0.85</div>
+</div>
+<div class="p-3 border border-outline-variant/10 bg-surface-container-low">
+<div class="text-[8px] text-slate-500 tracking-widest uppercase mb-1">Hours Logged</div>
+<div class="text-xl font-bold font-['Rajdhani'] text-secondary">5,705</div>
+</div>
+<div class="p-3 border border-outline-variant/10 bg-surface-container-low">
+<div class="text-[8px] text-slate-500 tracking-widest uppercase mb-1">Account Age</div>
+<div class="text-xl font-bold font-['Rajdhani'] text-on-surface">12.4 Y</div>
+</div>
+<div class="p-3 border border-outline-variant/10 bg-surface-container-low">
+<div class="text-[8px] text-slate-500 tracking-widest uppercase mb-1">Avg Rating</div>
+<div class="text-xl font-bold font-['Rajdhani'] text-on-surface">4.8</div>
+</div>
+</div>
+</div>
+<!-- 8. Library Fingerprint (Heatmap) -->
+<div class="bg-surface-container p-6 rounded-lg border-b border-sky-500/10">
+<h3 class="font-['Rajdhani'] font-bold tracking-widest text-sm mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-lg" data-icon="fingerprint">fingerprint</span> LIBRARY FINGERPRINT
+                </h3>
+<div class="flex flex-col h-full">
+<div class="flex-1 grid grid-cols-24 gap-px bg-slate-900 border border-slate-800">
+<!-- Heatmap Grid 7x24 -->
+<div class="flex gap-px mb-1" style="height: 12px;">
+<!-- M -->
+<div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/80"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/100 shadow-[0_0_8px_rgba(119,218,164,0.4)]"></div><div class="flex-1 bg-secondary/80"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-surface-container-highest"></div>
+</div>
+<div class="flex gap-px mb-1" style="height: 12px;">
+<!-- T -->
+<div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div>
+</div>
+<div class="flex gap-px mb-1" style="height: 12px;">
+<!-- W -->
+<div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/80"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-surface-container-highest"></div>
+</div>
+<div class="flex gap-px mb-1" style="height: 12px;">
+<!-- T -->
+<div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div>
+</div>
+<div class="flex gap-px mb-1" style="height: 12px;">
+<!-- F -->
+<div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-secondary/60"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/60"></div><div class="flex-1 bg-secondary/100 shadow-[0_0_8px_rgba(119,218,164,0.4)]"></div><div class="flex-1 bg-secondary/100"></div><div class="flex-1 bg-secondary/80"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-surface-container-highest"></div>
+</div>
+<div class="flex gap-px mb-1" style="height: 12px;">
+<!-- S -->
+<div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/80"></div><div class="flex-1 bg-secondary/100"></div><div class="flex-1 bg-secondary/80"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/60"></div><div class="flex-1 bg-secondary/80"></div><div class="flex-1 bg-secondary/100 shadow-[0_0_12px_rgba(119,218,164,0.6)]"></div><div class="flex-1 bg-secondary/100"></div><div class="flex-1 bg-secondary/100"></div><div class="flex-1 bg-secondary/80"></div><div class="flex-1 bg-secondary/60"></div><div class="flex-1 bg-secondary/40"></div>
+</div>
+<div class="flex gap-px" style="height: 12px;">
+<!-- S -->
+<div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/80"></div><div class="flex-1 bg-secondary/100"></div><div class="flex-1 bg-secondary/100 shadow-[0_0_12px_rgba(119,218,164,0.6)]"></div><div class="flex-1 bg-secondary/80"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-surface-container-highest"></div><div class="flex-1 bg-secondary/20"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/80"></div><div class="flex-1 bg-secondary/100 shadow-[0_0_12px_rgba(119,218,164,0.6)]"></div><div class="flex-1 bg-secondary/100"></div><div class="flex-1 bg-secondary/100"></div><div class="flex-1 bg-secondary/80"></div><div class="flex-1 bg-secondary/60"></div><div class="flex-1 bg-secondary/40"></div><div class="flex-1 bg-secondary/20"></div>
+</div>
+</div>
+<div class="mt-4 flex justify-between items-center text-[8px] text-slate-500 uppercase tracking-widest">
+<div class="flex gap-4">
+<span>MON</span>
+<span>WED</span>
+<span>FRI</span>
+<span>SUN</span>
+</div>
+<div class="flex items-center gap-1">
+<span>LESS</span>
+<div class="flex gap-px">
+<div class="w-2 h-2 bg-surface-container-highest"></div>
+<div class="w-2 h-2 bg-secondary/20"></div>
+<div class="w-2 h-2 bg-secondary/60"></div>
+<div class="w-2 h-2 bg-secondary/100"></div>
+</div>
+<span>MORE</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer System Info -->
+<footer class="mt-12 py-8 border-t border-sky-900/10 flex flex-col md:flex-row justify-between items-center opacity-50 gap-4">
+<div class="text-[10px] tracking-widest font-['IBM_Plex_Mono']">
+                ENCRYPTED_STREAM_SESSION_ID: 88-XF-0012-ALPHA-ZERO
+            </div>
+<div class="flex gap-6 text-[10px] tracking-widest font-['IBM_Plex_Mono']">
+<span>LATENCY: 14MS</span>
+<span>PACKET_LOSS: 0.00%</span>
+<span>LOCAL_TIME: 02:14:45 GMT+1</span>
+</div>
+</footer>
+</main>
+</body></html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GALACTIC_HUD | STRATOS-1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#00e1ab",
+                    "surface-variant": "#30353a",
+                    "inverse-on-surface": "#2c3135",
+                    "on-surface-variant": "#bbc9cf",
+                    "secondary-fixed-dim": "#ffb77d",
+                    "error": "#ffb4ab",
+                    "on-background": "#dfe3e9",
+                    "on-secondary-fixed": "#2f1500",
+                    "tertiary": "#00fcc0",
+                    "on-primary-fixed": "#001f27",
+                    "primary-container": "#00d4ff",
+                    "secondary-fixed": "#ffdcc3",
+                    "primary": "#a8e8ff",
+                    "surface-bright": "#353a3e",
+                    "outline": "#859398",
+                    "inverse-primary": "#00677e",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary": "#4d2600",
+                    "on-primary": "#003642",
+                    "error-container": "#93000a",
+                    "surface-container-lowest": "#0a0f13",
+                    "tertiary-container": "#00dda8",
+                    "surface-dim": "#0f1418",
+                    "surface-container-highest": "#30353a",
+                    "background": "#0f1418",
+                    "on-secondary-container": "#603100",
+                    "outline-variant": "#3c494e",
+                    "on-error": "#690005",
+                    "on-secondary-fixed-variant": "#6e3900",
+                    "on-primary-fixed-variant": "#004e5f",
+                    "on-surface": "#dfe3e9",
+                    "secondary-container": "#fd8b00",
+                    "surface-container-low": "#171c20",
+                    "inverse-surface": "#dfe3e9",
+                    "on-tertiary-container": "#005c44",
+                    "tertiary-fixed": "#36ffc4",
+                    "primary-fixed": "#b4ebff",
+                    "surface-container": "#1b2024",
+                    "surface-container-high": "#262b2f",
+                    "on-tertiary": "#003828",
+                    "primary-fixed-dim": "#3cd7ff",
+                    "on-tertiary-fixed-variant": "#00513c",
+                    "surface": "#0f1418",
+                    "on-tertiary-fixed": "#002116",
+                    "secondary": "#ffb77d",
+                    "on-primary-container": "#00586b",
+                    "surface-tint": "#3cd7ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Space Grotesk"],
+                    "body": ["Inter"],
+                    "label": ["Space Grotesk"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .glass-panel {
+        background: rgba(27, 32, 36, 0.6);
+        backdrop-filter: blur(12px);
+        box-shadow: inset 0 0 2px rgba(168, 232, 255, 0.1);
+      }
+      .radar-line {
+        background: linear-gradient(90deg, transparent, #00fcc0 50%, transparent);
+        height: 1px;
+        width: 100%;
+        opacity: 0.3;
+      }
+      .scan-effect {
+        background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.05) 0px, rgba(0, 0, 0, 0.05) 1px, transparent 1px, transparent 2px);
+      }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30 min-h-screen overflow-hidden">
+<!-- Background Nebula through curved window -->
+<div class="fixed inset-0 z-0 opacity-40">
+<img class="w-full h-full object-cover" data-alt="Stunning deep space nebula with vibrant pink, violet, and deep blue clouds of interstellar dust against a star-studded black void" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBskMeFk1kOZYCzc_I3Nl2wvKSYrrkm_8FC6pvcfQBXoIFt0V5WonvHg54J4tBu-w5S_PJbse8z85LP5zypHNDjyQb_RJbZYkULi7Q4QV91bvqcJ0o9uTspeHvvEMbJr5fifoLSG5N40UvBSFKIObp1Gmd8OsUOvwOyXPWDtwvRLF7n9S8dWMbqFe010EyR5WtlSv3_75oLNP49OQqQvd7-Ow6VpoeSM__k-jLALM7SUy1ikPJuv41-oFNpDSm--k2VSoX717XS8pSF"/>
+<div class="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background"></div>
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#0f1418_90%)]"></div>
+</div>
+<!-- Layout Container -->
+<div class="relative z-10 flex h-screen overflow-hidden scan-effect">
+<!-- SideNavBar (JSON Component) -->
+<aside class="hidden md:flex flex-col h-full bg-slate-900/40 backdrop-blur-2xl border-r border-cyan-500/10 w-64 shadow-[20px_0_40px_rgba(0,212,255,0.05)] transition-all duration-300">
+<div class="p-6 border-b border-white/5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center bg-primary/10">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">rocket</span>
+</div>
+<div>
+<h2 class="text-cyan-400 font-bold font-headline tracking-tighter">STRATOS-1</h2>
+<p class="font-headline text-[10px] tracking-widest uppercase text-slate-500">Steam Analytics Core</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 py-4">
+<a class="flex items-center gap-3 bg-cyan-500/20 text-cyan-200 border-r-4 border-cyan-400 p-4 font-headline text-xs tracking-widest uppercase transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">space_dashboard</span>
+<span>Bridge</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 p-4 hover:bg-cyan-500/10 hover:text-cyan-300 font-headline text-xs tracking-widest uppercase transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span>Logbook</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 p-4 hover:bg-cyan-500/10 hover:text-cyan-300 font-headline text-xs tracking-widest uppercase transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings_input_antenna</span>
+<span>Comms</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 p-4 hover:bg-cyan-500/10 hover:text-cyan-300 font-headline text-xs tracking-widest uppercase transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span>AI Officer</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 p-4 hover:bg-cyan-500/10 hover:text-cyan-300 font-headline text-xs tracking-widest uppercase transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">rocket_launch</span>
+<span>Launch</span>
+</a>
+</nav>
+<div class="p-4 space-y-2">
+<button class="w-full py-3 bg-primary text-on-primary font-headline font-bold text-[10px] tracking-widest rounded-xl shadow-[0_0_15px_rgba(168,232,255,0.3)] hover:brightness-110 transition-all">
+                    INITIATE SCAN
+                </button>
+</div>
+<div class="mt-auto border-t border-white/5 py-4">
+<a class="flex items-center gap-3 text-slate-500 p-4 hover:bg-cyan-500/10 hover:text-cyan-300 font-headline text-xs tracking-widest uppercase" href="#">
+<span class="material-symbols-outlined">biotech</span>
+<span>Diagnostics</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 p-4 hover:bg-cyan-500/10 hover:text-cyan-300 font-headline text-xs tracking-widest uppercase" href="#">
+<span class="material-symbols-outlined">support_agent</span>
+<span>Help</span>
+</a>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="flex-1 flex flex-col relative overflow-hidden">
+<!-- TopNavBar (JSON Component) -->
+<header class="flex justify-between items-center w-full px-6 h-16 bg-slate-900/60 backdrop-blur-xl border-b border-cyan-500/20 shadow-[0_0_15px_rgba(168,232,255,0.1)] z-20">
+<div class="text-2xl font-black text-cyan-300 tracking-tighter font-headline uppercase">GALACTIC_HUD</div>
+<div class="hidden lg:flex items-center gap-8">
+<a class="text-cyan-300 border-b-2 border-cyan-400 pb-1 font-space-grotesk tracking-tight uppercase text-sm" href="#">Mission Control</a>
+<a class="text-slate-400 hover:text-cyan-200 hover:bg-white/5 px-2 py-1 rounded transition-all duration-300 font-space-grotesk tracking-tight uppercase text-sm" href="#">Telemetry</a>
+<a class="text-slate-400 hover:text-cyan-200 hover:bg-white/5 px-2 py-1 rounded transition-all duration-300 font-space-grotesk tracking-tight uppercase text-sm" href="#">Archives</a>
+<a class="text-slate-400 hover:text-cyan-200 hover:bg-white/5 px-2 py-1 rounded transition-all duration-300 font-space-grotesk tracking-tight uppercase text-sm" href="#">Crew</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant/30">
+<span class="material-symbols-outlined text-primary text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-[10px] font-headline tracking-widest p-0 w-32 placeholder:text-slate-600" placeholder="QUERY DATABASE..." type="text"/>
+</div>
+<span class="material-symbols-outlined text-slate-400 hover:text-primary cursor-pointer">settings</span>
+<span class="material-symbols-outlined text-slate-400 hover:text-error cursor-pointer">power_settings_new</span>
+<div class="w-8 h-8 rounded-full border border-cyan-400/40 overflow-hidden">
+<img alt="Commander Profile" class="w-full h-full object-cover" data-alt="Portrait of a professional starship commander in a sleek dark uniform with subtle glowing insignias" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMUy0PRnl75Yiaok857DUUnBvM-2euZ9PvWC8Nvwj-6704glW9Q2ixKSBtmzVzGNHfwtJRnLb141VMNdltYY5OUslKf9E3u74X_cHy9UNcGd2zo9W7ijvXrfleVUfLRSqqMeLMo2yz2Qmj8DvLy_d6dvvWrXPcM7SaFbG8BPDVFBoRMDWMnodAW3xtiKqZ7WwT2QmvaXjOglRRHJ20_nmCz4_Ueld-jmBNkHBgsOj7dxQDPn_BDWXxkXkhf-5xJXK7gETQc1MxFloS"/>
+</div>
+</div>
+</header>
+<!-- Dashboard Content: Bento Grid Layout -->
+<div class="flex-1 p-6 grid grid-cols-12 grid-rows-6 gap-6 overflow-y-auto">
+<!-- Status Bar Top -->
+<div class="col-span-12 row-span-1 flex items-center justify-between px-6 glass-panel rounded-xl border border-primary/10">
+<div class="flex gap-12">
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-full bg-tertiary shadow-[0_0_10px_#00fcc0]"></div>
+<div>
+<p class="font-label text-[10px] text-slate-500 tracking-[0.2em]">LIFE SUPPORT</p>
+<p class="font-headline text-tertiary text-xs font-bold">OPTIMAL</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-full bg-primary shadow-[0_0_10px_#a8e8ff]"></div>
+<div>
+<p class="font-label text-[10px] text-slate-500 tracking-[0.2em]">SHIELDS</p>
+<p class="font-headline text-primary text-xs font-bold">100%</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-full bg-secondary animate-pulse shadow-[0_0_10px_#ffb77d]"></div>
+<div>
+<p class="font-label text-[10px] text-slate-500 tracking-[0.2em]">REACTOR CORE</p>
+<p class="font-headline text-secondary text-xs font-bold">STABLE</p>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-6 font-headline text-[10px] tracking-widest text-slate-400">
+<span>LAT: 42.3601° N</span>
+<span>LNG: 71.0589° W</span>
+<span class="text-primary">SECTOR: 7-G</span>
+</div>
+</div>
+<!-- AI Analyst Box: Holographic AI Officer -->
+<div class="col-span-12 lg:col-span-4 row-span-5 glass-panel rounded-xl p-6 relative overflow-hidden flex flex-col border border-primary/5">
+<div class="absolute top-0 left-0 w-full h-1 radar-line"></div>
+<div class="flex items-center gap-4 mb-6">
+<div class="relative">
+<div class="w-16 h-16 rounded-full border-2 border-primary p-1">
+<img alt="AI Officer Avatar" class="w-full h-full rounded-full object-cover brightness-125 saturate-150" data-alt="A stylized digital human face with glowing cyan circuitry patterns on skin, presented as a holographic projection" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPPfQfOEcZ2hhVo779Ym_KwZm66gmpn8ouvLmHt1oZxyD4iuHlnJ3ioycRpjRMTIxqesJtr-ZzpdaG7CJfIXZrrtvyBuIjUBst6e_3Zii6kx2xKNaodPumICjhePup5Ta7rIXdFjk5EuUdNswpMYBikiX2wqhXdfMnTMdegPstKycm9msTyL_oxesdsnsx3d7btFFw-U2GrQ8Be0IxJ8a3qds-NSPa7gJYz1sufswoPSSLXuicbotqYfJBiQQhITomtwfbl_MX6twM"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-tertiary rounded-full border-2 border-background"></div>
+</div>
+<div>
+<h3 class="font-headline text-lg font-bold text-primary tracking-tight">AI OFFICER KAI</h3>
+<p class="font-label text-[10px] text-slate-500 tracking-[0.2em]">STRATEGIC ADVISOR</p>
+</div>
+</div>
+<div class="flex-1 space-y-4 overflow-y-auto mb-4 pr-2">
+<div class="bg-primary/5 border-l-2 border-primary p-4 rounded-r-lg">
+<p class="font-label text-[9px] text-primary mb-1">T-MINUS 04:22:15</p>
+<p class="text-sm text-on-surface leading-relaxed">Commander, your <span class="text-primary font-bold">Commitment Level</span> has surged by 12% following the recent library expansion. Tactical efficiency is at peak levels.</p>
+</div>
+<div class="bg-slate-800/20 p-4 rounded-lg">
+<p class="font-label text-[9px] text-slate-500 mb-1">T-MINUS 04:18:02</p>
+<p class="text-sm text-on-surface leading-relaxed italic opacity-80">"Analyzing time allocation patterns... Detection of high-density focus in 'Cyberpunk 2077' simulation."</p>
+</div>
+<div class="bg-tertiary/5 border-l-2 border-tertiary p-4 rounded-r-lg">
+<p class="font-label text-[9px] text-tertiary mb-1">T-MINUS 04:05:44</p>
+<p class="text-sm text-on-surface leading-relaxed">Recommended action: Divert resources to 'Archives' to maintain library equilibrium. Library Fingerprint is drifting towards Action/RPG heavy.</p>
+</div>
+</div>
+<div class="relative">
+<input class="w-full bg-surface-container-high border-b border-outline text-sm font-body px-4 py-3 rounded-t-lg focus:outline-none focus:border-primary transition-all placeholder:text-slate-600" placeholder="INSTRUCT KAI..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-primary">send</span>
+</div>
+</div>
+<!-- Main Data Grid -->
+<div class="col-span-12 lg:col-span-8 row-span-5 grid grid-cols-2 grid-rows-2 gap-6">
+<!-- Commitment Level: Circular Power Core -->
+<div class="glass-panel rounded-xl p-6 border border-secondary/10 flex flex-col items-center justify-center relative overflow-hidden">
+<div class="absolute top-4 left-6">
+<h4 class="font-headline text-sm font-bold text-secondary-fixed-dim tracking-widest uppercase">COMMITMENT CORE</h4>
+</div>
+<div class="relative w-48 h-48 flex items-center justify-center">
+<!-- SVG Circular Progress -->
+<svg class="w-full h-full -rotate-90">
+<circle class="text-secondary/10" cx="50%" cy="50%" fill="transparent" r="80" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-secondary shadow-[0_0_20px_#ffb77d]" cx="50%" cy="50%" fill="transparent" r="80" stroke="currentColor" stroke-dasharray="502" stroke-dashoffset="120" stroke-width="12"></circle>
+</svg>
+<div class="absolute flex flex-col items-center">
+<span class="font-headline text-5xl font-black text-secondary">76<span class="text-xl">%</span></span>
+<span class="font-label text-[9px] text-slate-500 tracking-[0.3em] uppercase">Output</span>
+</div>
+<!-- Core Pulsing Glow -->
+<div class="absolute w-24 h-24 bg-secondary/10 rounded-full animate-pulse"></div>
+</div>
+<div class="mt-4 flex gap-4 w-full">
+<div class="flex-1 bg-surface-container-lowest p-3 rounded-lg border border-white/5">
+<p class="font-label text-[8px] text-slate-500">PLAY TIME</p>
+<p class="font-headline text-lg text-on-surface">1,248H</p>
+</div>
+<div class="flex-1 bg-surface-container-lowest p-3 rounded-lg border border-white/5">
+<p class="font-label text-[8px] text-slate-500">COMPLETION</p>
+<p class="font-headline text-lg text-on-surface">42%</p>
+</div>
+</div>
+</div>
+<!-- Where Your Time Went: Vertical Fuel Cells -->
+<div class="glass-panel rounded-xl p-6 border border-primary/10 flex flex-col">
+<h4 class="font-headline text-sm font-bold text-primary tracking-widest uppercase mb-8">TIME ALLOCATION CELLS</h4>
+<div class="flex-1 flex items-end justify-between px-4">
+<!-- Fuel Cell 1 -->
+<div class="flex flex-col items-center gap-3">
+<div class="w-10 h-32 bg-slate-800/40 rounded-sm relative flex flex-col-reverse overflow-hidden border border-white/5">
+<div class="h-4/5 bg-primary/40 border-t-2 border-primary"></div>
+<div class="absolute inset-0 flex flex-col justify-between p-1 opacity-20">
+<div class="h-px bg-white"></div><div class="h-px bg-white"></div><div class="h-px bg-white"></div><div class="h-px bg-white"></div><div class="h-px bg-white"></div>
+</div>
+</div>
+<span class="font-label text-[9px] text-slate-400 rotate-45 mt-4">ACTION</span>
+</div>
+<!-- Fuel Cell 2 -->
+<div class="flex flex-col items-center gap-3">
+<div class="w-10 h-32 bg-slate-800/40 rounded-sm relative flex flex-col-reverse overflow-hidden border border-white/5">
+<div class="h-2/3 bg-primary/40 border-t-2 border-primary"></div>
+<div class="absolute inset-0 flex flex-col justify-between p-1 opacity-20">
+<div class="h-px bg-white"></div><div class="h-px bg-white"></div><div class="h-px bg-white"></div><div class="h-px bg-white"></div><div class="h-px bg-white"></div>
+</div>
+</div>
+<span class="font-label text-[9px] text-slate-400 rotate-45 mt-4">RPG</span>
+</div>
+<!-- Fuel Cell 3 -->
+<div class="flex flex-col items-center gap-3">
+<div class="w-10 h-32 bg-slate-800/40 rounded-sm relative flex flex-col-reverse overflow-hidden border border-white/5">
+<div class="h-1/2 bg-primary/40 border-t-2 border-primary"></div>
+<div class="absolute inset-0 flex flex-col justify-between p-1 opacity-20">
+<div class="h-px bg-white"></div><div class="h-px bg-white"></div><div class="h-px bg-white"></div><div class="h-px bg-white"></div><div class="h-px bg-white"></div>
+</div>
+</div>
+<span class="font-label text-[9px] text-slate-400 rotate-45 mt-4">STRATEGY</span>
+</div>
+<!-- Fuel Cell 4 -->
+<div class="flex flex-col items-center gap-3">
+<div class="w-10 h-32 bg-slate-800/40 rounded-sm relative flex flex-col-reverse overflow-hidden border border-white/5">
+<div class="h-1/4 bg-primary/40 border-t-2 border-primary"></div>
+<div class="absolute inset-0 flex flex-col justify-between p-1 opacity-20">
+<div class="h-px bg-white"></div><div class="h-px bg-white"></div><div class="h-px bg-white"></div><div class="h-px bg-white"></div><div class="h-px bg-white"></div>
+</div>
+</div>
+<span class="font-label text-[9px] text-slate-400 rotate-45 mt-4">SIM</span>
+</div>
+</div>
+</div>
+<!-- Library Fingerprint: Tactical Radar Grid -->
+<div class="glass-panel rounded-xl col-span-2 p-6 border border-tertiary/10 relative flex gap-8">
+<div class="flex-1 flex flex-col">
+<h4 class="font-headline text-sm font-bold text-tertiary tracking-widest uppercase mb-4">LIBRARY FINGERPRINT</h4>
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<span class="text-xs text-slate-400">Total Simulations</span>
+<span class="font-headline text-sm text-on-surface">342</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full w-[85%]"></div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-slate-400">Uncharted Worlds</span>
+<span class="font-headline text-sm text-on-surface">118</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary/40 h-full w-[40%]"></div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-slate-400">Data Integrity</span>
+<span class="font-headline text-sm text-on-surface">99.8%</span>
+</div>
+</div>
+</div>
+<!-- Radar HUD Element -->
+<div class="w-48 h-48 relative border border-tertiary/20 rounded-full flex items-center justify-center">
+<div class="absolute inset-0 border border-tertiary/10 rounded-full scale-75"></div>
+<div class="absolute inset-0 border border-tertiary/10 rounded-full scale-50"></div>
+<!-- Crosshair -->
+<div class="absolute w-full h-px bg-tertiary/20"></div>
+<div class="absolute h-full w-px bg-tertiary/20"></div>
+<!-- Random Data Points -->
+<div class="absolute top-1/4 left-1/3 w-2 h-2 bg-tertiary rounded-full shadow-[0_0_8px_#00fcc0]"></div>
+<div class="absolute bottom-1/3 right-1/4 w-1.5 h-1.5 bg-tertiary rounded-full shadow-[0_0_8px_#00fcc0]"></div>
+<div class="absolute top-1/2 right-1/2 w-1 h-1 bg-secondary rounded-full shadow-[0_0_8px_#ffb77d]"></div>
+<!-- Radar Sweep Animation simulation (Static for now) -->
+<div class="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,_rgba(0,252,192,0.1)_0deg,_transparent_90deg)] opacity-40"></div>
+</div>
+<div class="absolute bottom-4 right-6 text-right">
+<p class="font-label text-[8px] text-slate-500">SCAN FREQUENCY</p>
+<p class="font-headline text-xs text-tertiary">42.8 GHZ</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Taskbar: Visual Polish -->
+<footer class="h-8 glass-panel border-t border-primary/10 flex items-center px-6 justify-between overflow-hidden">
+<div class="flex gap-4">
+<div class="h-1 w-24 bg-primary/20 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-2/3"></div>
+</div>
+<span class="font-label text-[8px] text-primary tracking-widest">ENCRYPTED LINK ACTIVE</span>
+</div>
+<div class="flex items-center gap-6">
+<span class="font-label text-[8px] text-slate-500">SYSTEM CLOCK: 23:44:02 GST</span>
+<div class="flex gap-1">
+<div class="w-1 h-2 bg-tertiary"></div>
+<div class="w-1 h-2 bg-tertiary"></div>
+<div class="w-1 h-2 bg-slate-700"></div>
+</div>
+</div>
+</footer>
+</main>
+</div>
+<!-- Floating UI Decoration: Corner Blueprints -->
+<div class="fixed top-20 right-4 pointer-events-none opacity-20">
+<div class="border-t border-r border-primary/40 w-16 h-16 rounded-tr-lg"></div>
+<p class="font-label text-[8px] text-primary absolute top-2 right-2 rotate-90 origin-right">STRATOS_V1.4</p>
+</div>
+<div class="fixed bottom-12 left-72 pointer-events-none opacity-20">
+<div class="border-b border-l border-primary/40 w-16 h-16 rounded-bl-lg"></div>
+<p class="font-label text-[8px] text-primary absolute bottom-2 left-2">HUD_CALIBRATION: OK</p>
+</div>
+</body></html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>STEAM.AI | DATA_SYNC</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@300;400;500;600&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-error": "#690005",
+                "on-surface-variant": "#bdc8d0",
+                "tertiary-container": "#aab9c8",
+                "on-tertiary-fixed": "#0e1d28",
+                "tertiary-fixed": "#d5e4f4",
+                "secondary-container": "#037d50",
+                "inverse-surface": "#dfe2eb",
+                "error-container": "#93000a",
+                "primary-fixed": "#c2e8ff",
+                "on-primary-fixed-variant": "#004d67",
+                "surface-container-lowest": "#0a0e14",
+                "on-primary-fixed": "#001e2b",
+                "surface-container-highest": "#31353c",
+                "on-secondary-container": "#bdffd6",
+                "error": "#ffb4ab",
+                "surface-container-high": "#262a31",
+                "primary": "#9adbff",
+                "outline-variant": "#3e484f",
+                "primary-fixed-dim": "#75d1ff",
+                "primary-container": "#4fc3f7",
+                "tertiary": "#c6d5e5",
+                "on-tertiary-fixed-variant": "#3a4855",
+                "secondary": "#77daa4",
+                "on-primary-container": "#004e69",
+                "outline": "#889299",
+                "surface-dim": "#10141a",
+                "surface-variant": "#31353c",
+                "surface-container-low": "#181c22",
+                "inverse-primary": "#006688",
+                "on-surface": "#dfe2eb",
+                "surface-container": "#1c2026",
+                "on-primary": "#003548",
+                "background": "#10141a",
+                "surface-bright": "#353940",
+                "inverse-on-surface": "#2d3137",
+                "on-secondary-fixed-variant": "#005232",
+                "tertiary-fixed-dim": "#b9c8d8",
+                "on-secondary-fixed": "#002112",
+                "surface": "#10141a",
+                "on-tertiary": "#24323e",
+                "on-tertiary-container": "#3c4a57",
+                "on-secondary": "#003821",
+                "secondary-fixed-dim": "#77daa4",
+                "secondary-fixed": "#93f7bf",
+                "on-error-container": "#ffdad6",
+                "on-background": "#dfe2eb",
+                "surface-tint": "#75d1ff"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "fontFamily": {
+                "headline": ["Space Grotesk", "sans-serif"],
+                "body": ["Work Sans", "sans-serif"],
+                "label": ["Space Grotesk", "sans-serif"],
+                "technical": ["Rajdhani", "sans-serif"],
+                "mono": ["IBM Plex Mono", "monospace"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .data-grid-overlay {
+            background-image: linear-gradient(rgba(18, 102, 123, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(18, 102, 123, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .scanline {
+            background: linear-gradient(to bottom, transparent 50%, rgba(10, 14, 20, 0.5) 50%);
+            background-size: 100% 4px;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface font-body overflow-hidden">
+<!-- Background Layering -->
+<div class="fixed inset-0 data-grid-overlay z-0"></div>
+<div class="fixed inset-0 scanline opacity-20 pointer-events-none z-10"></div>
+<div class="fixed inset-0 bg-radial-gradient from-primary/5 via-transparent to-transparent pointer-events-none z-0"></div>
+<!-- Main Loading Canvas -->
+<main class="relative z-20 flex flex-col items-center justify-center min-h-screen p-6">
+<!-- Header Brand Anchor -->
+<div class="absolute top-12 flex flex-col items-center gap-2">
+<h1 class="font-technical text-3xl font-bold tracking-tighter text-primary drop-shadow-[0_0_12px_rgba(154,219,255,0.4)]">
+                STEAM.AI
+            </h1>
+<div class="h-px w-24 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+</div>
+<!-- Central Loading Hub -->
+<div class="w-full max-w-2xl flex flex-col items-center">
+<!-- Technical Spinner -->
+<div class="relative w-64 h-64 mb-12">
+<!-- Outer Ring -->
+<div class="absolute inset-0 border-2 border-primary/20 border-t-primary rounded-full animate-[spin_3s_linear_infinite]"></div>
+<!-- Middle Ring -->
+<div class="absolute inset-4 border-2 border-dashed border-secondary/30 rounded-full animate-[spin_8s_linear_infinite_reverse]"></div>
+<!-- Inner Hexagon Geometry -->
+<div class="absolute inset-12 flex items-center justify-center opacity-80">
+<span class="material-symbols-outlined text-8xl text-primary animate-pulse" data-icon="hub">hub</span>
+</div>
+<!-- Orbiting Nodes -->
+<div class="absolute inset-0 animate-[spin_5s_linear_infinite]">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-primary rounded-full shadow-[0_0_10px_rgba(154,219,255,1)]"></div>
+</div>
+</div>
+<!-- Status Messaging -->
+<div class="text-center mb-8">
+<h2 class="font-technical text-xl tracking-[0.2em] text-on-surface mb-2">SYNCHRONIZING STEAM LIBRARY...</h2>
+<div class="flex items-center justify-center gap-4 text-primary/60 font-mono text-xs">
+<span>LATENCY: 12ms</span>
+<span class="w-1 h-1 bg-primary/40 rounded-full"></span>
+<span>ENCRYPTION: AES-256</span>
+<span class="w-1 h-1 bg-primary/40 rounded-full"></span>
+<span>THREAD: ALPHA_01</span>
+</div>
+</div>
+<!-- Segmented Progress Bar -->
+<div class="w-full bg-surface-container h-8 p-1 flex gap-1 border border-outline-variant/20 mb-8">
+<!-- Segmented Progress Logic: 65% is approx 13 segments out of 20 -->
+<div class="h-full w-[5%] bg-secondary shadow-[0_0_8px_rgba(119,218,164,0.6)]"></div>
+<div class="h-full w-[5%] bg-secondary shadow-[0_0_8px_rgba(119,218,164,0.6)]"></div>
+<div class="h-full w-[5%] bg-secondary shadow-[0_0_8px_rgba(119,218,164,0.6)]"></div>
+<div class="h-full w-[5%] bg-secondary shadow-[0_0_8px_rgba(119,218,164,0.6)]"></div>
+<div class="h-full w-[5%] bg-secondary shadow-[0_0_8px_rgba(119,218,164,0.6)]"></div>
+<div class="h-full w-[5%] bg-secondary shadow-[0_0_8px_rgba(119,218,164,0.6)]"></div>
+<div class="h-full w-[5%] bg-secondary shadow-[0_0_8px_rgba(119,218,164,0.6)]"></div>
+<div class="h-full w-[5%] bg-secondary shadow-[0_0_8px_rgba(119,218,164,0.6)]"></div>
+<div class="h-full w-[5%] bg-secondary shadow-[0_0_8px_rgba(119,218,164,0.6)]"></div>
+<div class="h-full w-[5%] bg-secondary shadow-[0_0_8px_rgba(119,218,164,0.6)]"></div>
+<div class="h-full w-[5%] bg-secondary shadow-[0_0_8px_rgba(119,218,164,0.6)]"></div>
+<div class="h-full w-[5%] bg-secondary shadow-[0_0_8px_rgba(119,218,164,0.6)]"></div>
+<div class="h-full w-[5%] bg-secondary shadow-[0_0_8px_rgba(119,218,164,0.6)]"></div>
+<div class="h-full w-[5%] bg-secondary/20 border border-secondary/30"></div>
+<div class="h-full w-[5%] bg-secondary/10"></div>
+<div class="h-full w-[5%] bg-secondary/10"></div>
+<div class="h-full w-[5%] bg-secondary/10"></div>
+<div class="h-full w-[5%] bg-secondary/10"></div>
+<div class="h-full w-[5%] bg-secondary/10"></div>
+<div class="h-full w-[5%] bg-secondary/10"></div>
+</div>
+<!-- Terminal Log Window -->
+<div class="w-full bg-surface-container-lowest border border-outline-variant/10 rounded-lg overflow-hidden shadow-2xl">
+<div class="bg-surface-container flex items-center justify-between px-4 py-2 border-b border-outline-variant/20">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-error"></div>
+<div class="w-2 h-2 rounded-full bg-primary/40"></div>
+<div class="w-2 h-2 rounded-full bg-secondary/40"></div>
+<span class="ml-2 font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">System_Logs_Stdout</span>
+</div>
+<span class="font-mono text-[10px] text-primary">65.0% SYNC</span>
+</div>
+<div class="p-4 font-mono text-xs space-y-1 h-32 overflow-y-auto">
+<div class="flex gap-3">
+<span class="text-primary/60">[09:12:01]</span>
+<span class="text-on-surface-variant">INITIATING STEAM_API HANDSHAKE... <span class="text-secondary">SUCCESS</span></span>
+</div>
+<div class="flex gap-3">
+<span class="text-primary/60">[09:12:03]</span>
+<span class="text-on-surface-variant">FETCHING OWNED_GAMES (COUNT: 412)...</span>
+</div>
+<div class="flex gap-3">
+<span class="text-primary/60">[09:12:05]</span>
+<span class="text-on-surface-variant">RETRIEVING STORE_METADATA: <span class="text-primary/80">[APPID: 730, 570, 440]...</span></span>
+</div>
+<div class="flex gap-3">
+<span class="text-primary/60">[09:12:08]</span>
+<span class="text-on-surface-variant">CALCULATING BEHAVIORAL_METRICS...</span>
+</div>
+<div class="flex gap-3 animate-pulse">
+<span class="text-primary/60">[09:12:10]</span>
+<span class="text-primary">PROCESSING TACTICAL_INSIGHTS_ENGINE... _</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Coordinates -->
+<div class="absolute bottom-8 left-8 right-8 flex justify-between items-end font-mono text-[10px] text-on-surface-variant/40">
+<div class="flex flex-col gap-1">
+<span>COORD_X: 47.6062 N</span>
+<span>COORD_Y: 122.3321 W</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<span>BUILD_ID: V4.0.2-STABLE</span><br/>
+<span>SECURITY: LEVEL_4_CLEARANCE_REQUIRED</span>
+</div>
+<div class="w-12 h-12 border border-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary/40 text-xl" data-icon="qr_code_2">qr_code_2</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Aesthetic Decorative Elements -->
+<div class="fixed top-0 left-0 w-32 h-32 border-t-2 border-l-2 border-primary/20 m-4 z-30"></div>
+<div class="fixed top-0 right-0 w-32 h-32 border-t-2 border-r-2 border-primary/20 m-4 z-30"></div>
+<div class="fixed bottom-0 left-0 w-32 h-32 border-b-2 border-l-2 border-primary/20 m-4 z-30"></div>
+<div class="fixed bottom-0 right-0 w-32 h-32 border-b-2 border-r-2 border-primary/20 m-4 z-30"></div>
+<!-- Decorative Image Asset -->
+<div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-64 z-10 opacity-10 blur-3xl pointer-events-none">
+<img alt="Tactical Data Viz" class="w-full h-full object-cover" data-alt="abstract digital waves and data particles in deep blue and cyan glowing on a dark charcoal background with high tech aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARDjBPYiG1rY-DC481YIpl4mUH0o3tk5IWYqTowqJVs9gw6k16nRv-unjFYe1DsorBlAvSnbG0QtUe9D-4MruQtsQDElYaDaDumtI8mvmg9vJYKMHTlaPbtVAQ5YOLgx4TofLbE2It1cr-mKt6pircc-yUb9YHGiR5FTvAN60DCs2SYV33aDfhOUaV6kzqsnyWFxt3PqfKeL97P_yHgTsGdTI6XWkB_gsFOBOyZ3dDHYlHp5D2kE-zYSknGdJoBO13FuFBeza1Men5"/>
+</div>
+</body></html>

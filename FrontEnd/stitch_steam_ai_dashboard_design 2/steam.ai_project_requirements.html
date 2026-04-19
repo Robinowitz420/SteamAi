@@ -1,0 +1,81 @@
+# Steam.AI Dashboard - Frontend Handoff Package
+
+## Project Overview
+**Steam.AI** is a Steam library analytics dashboard that provides insights into a user's gaming habits, patterns, and library composition. It fetches data from Steam's API and uses Claude AI for behavioral analysis.
+
+**Live App:** https://steamaiapp.vercel.app  
+**GitHub:** https://github.com/Robinowitz420/SteamAi
+
+---
+
+## Tech Stack
+- **Frontend:** Vanilla JavaScript, Pure CSS (no frameworks)
+- **Backend:** Vercel Edge Functions (serverless)
+- **APIs:** Steam Web API, Steam Store API, Anthropic Claude API
+- **Deployment:** Vercel
+
+---
+
+## Application Flow
+1. **Setup Phase (p0)** - User enters API keys and Steam ID
+2. **Loading Phase (p1)** - Fetches library data with progress logs
+3. **Dashboard Phase (p2)** - Displays all analytics and AI chat
+
+---
+
+## UI Components Needed
+
+### Phase 0: Setup Screen
+**Current Elements:**
+- Header with title "STEAM.AI"
+- Input fields: Steam API Key, Steam ID, Proxy URL, Anthropic API Key
+- "ANALYZE MY LIBRARY" button
+- "Saved credentials" indicator
+
+### Phase 1: Loading Screen
+**Current Elements:**
+- Spinner animation
+- "FETCHING YOUR STEAM LIBRARY..." text
+- Log output showing progress
+
+### Phase 2: Dashboard
+#### Top Section: AI Gaming Analyst Box
+- Title: "AI GAMING ANALYST"
+- "REGENERATE PROFILE" button
+- AI analysis text area (scrollable)
+- Chat log (scrollable)
+- Chat input field with SEND button
+
+#### Chart Row 1 (3 columns):
+1. **COMMITMENT LEVEL (Donut Chart)**: Distribution by playtime.
+2. **WHERE YOUR TIME WENT (Horizontal Bar Chart)**: Top 15 games.
+3. **LAST 2 WEEKS (Live Activity List)**: Games played in last 2 weeks.
+
+#### Chart Row 2 (2 columns):
+4. **PLAYTIME VS CRITICAL RECEPTION (Scatter Plot)**: Playtime (log) vs Metacritic score.
+5. **YOUR GAMING GENRES (Horizontal Bar Chart)**: Top 8 genres.
+
+#### Chart Row 3 (3 columns):
+6. **ACHIEVEMENT PROGRESS (Progress Bars)**: Top 8 games by completion.
+7. **YOUR MONEY VS YOUR TIME (Stats Grid)**: Financial and time-based stats.
+8. **YOUR LIBRARY FINGERPRINT (Heatmap Grid)**: Playtime intensity by time of week.
+
+---
+
+## Current Color Scheme (CSS Variables)
+```css
+--bg: #0a0e14;
+--panel: #0d1117;
+--border: #1e2d40;
+--text: #c5d1de;
+--muted: #5c6370;
+--accent: #4fc3f7;
+--success: #4caf7d;
+--error: #f44336;
+```
+
+---
+
+## Current Fonts
+- **Headers:** Rajdhani (Google Fonts)
+- **Body/Data:** IBM Plex Mono (Google Fonts)

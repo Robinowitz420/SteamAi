@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>STEAM.AI // INITIALIZATION</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#690005",
+                    "on-surface-variant": "#bdc8d0",
+                    "tertiary-container": "#aab9c8",
+                    "on-tertiary-fixed": "#0e1d28",
+                    "tertiary-fixed": "#d5e4f4",
+                    "secondary-container": "#037d50",
+                    "inverse-surface": "#dfe2eb",
+                    "error-container": "#93000a",
+                    "primary-fixed": "#c2e8ff",
+                    "on-primary-fixed-variant": "#004d67",
+                    "surface-container-lowest": "#0a0e14",
+                    "on-primary-fixed": "#001e2b",
+                    "surface-container-highest": "#31353c",
+                    "on-secondary-container": "#bdffd6",
+                    "error": "#ffb4ab",
+                    "surface-container-high": "#262a31",
+                    "primary": "#9adbff",
+                    "outline-variant": "#3e484f",
+                    "primary-fixed-dim": "#75d1ff",
+                    "primary-container": "#4fc3f7",
+                    "tertiary": "#c6d5e5",
+                    "on-tertiary-fixed-variant": "#3a4855",
+                    "secondary": "#77daa4",
+                    "on-primary-container": "#004e69",
+                    "outline": "#889299",
+                    "surface-dim": "#10141a",
+                    "surface-variant": "#31353c",
+                    "surface-container-low": "#181c22",
+                    "inverse-primary": "#006688",
+                    "on-surface": "#dfe2eb",
+                    "surface-container": "#1c2026",
+                    "on-primary": "#003548",
+                    "background": "#10141a",
+                    "surface-bright": "#353940",
+                    "inverse-on-surface": "#2d3137",
+                    "on-secondary-fixed-variant": "#005232",
+                    "tertiary-fixed-dim": "#b9c8d8",
+                    "on-secondary-fixed": "#002112",
+                    "surface": "#10141a",
+                    "on-tertiary": "#24323e",
+                    "on-tertiary-container": "#3c4a57",
+                    "on-secondary": "#003821",
+                    "secondary-fixed-dim": "#77daa4",
+                    "secondary-fixed": "#93f7bf",
+                    "on-error-container": "#ffdad6",
+                    "on-background": "#dfe2eb",
+                    "surface-tint": "#75d1ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Rajdhani", "sans-serif"],
+                    "body": ["IBM Plex Mono", "monospace"],
+                    "label": ["IBM Plex Mono", "monospace"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .cyber-bg {
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(79, 195, 247, 0.05) 0%, transparent 50%),
+                linear-gradient(rgba(10, 14, 20, 0.8) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(10, 14, 20, 0.8) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 10;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(79, 195, 247, 0.05) 50%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0.1;
+            position: absolute;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface font-body selection:bg-primary/30 min-h-screen overflow-hidden flex items-center justify-center cyber-bg">
+<!-- Ambient HUD elements -->
+<div class="fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-20">
+<div class="absolute top-4 left-6 font-headline text-xs tracking-widest text-primary opacity-40">COORDINATES: 47.6062° N, 122.3321° W</div>
+<div class="absolute bottom-4 right-6 font-headline text-xs tracking-widest text-primary opacity-40">UPLINK_STABLE: 99.8%</div>
+<div class="absolute top-0 left-1/4 w-[1px] h-full bg-primary/10"></div>
+<div class="absolute top-0 right-1/4 w-[1px] h-full bg-primary/10"></div>
+</div>
+<main class="relative z-20 w-full max-w-xl px-4">
+<!-- Main Setup Panel -->
+<div class="bg-surface-container border border-outline-variant/30 shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-md relative overflow-hidden">
+<!-- Glitch decorative corner -->
+<div class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-primary"></div>
+<div class="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-primary"></div>
+<div class="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-primary"></div>
+<div class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-primary"></div>
+<div class="p-8">
+<!-- Header -->
+<header class="mb-10 space-y-2">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="terminal">terminal</span>
+<span class="text-primary font-headline text-xs tracking-[0.3em]">SECURE_ENTRY_NODE</span>
+</div>
+<h1 class="text-4xl font-headline font-bold text-on-surface tracking-tighter leading-none">
+                        STEAM.AI <span class="text-primary">//</span> INITIALIZATION
+                    </h1>
+<div class="h-[1px] w-full bg-gradient-to-r from-primary/50 to-transparent"></div>
+</header>
+<!-- Configuration Form -->
+<div class="space-y-6">
+<div class="flex items-center gap-4 mb-4">
+<span class="text-on-surface-variant font-headline text-xs tracking-widest uppercase">CONNECTION PARAMETERS</span>
+<div class="flex-grow h-[1px] bg-outline-variant/20"></div>
+</div>
+<div class="grid gap-5">
+<!-- Steam API Key -->
+<div class="space-y-1">
+<label class="block text-[10px] text-primary/70 font-label tracking-widest uppercase">01_STEAM_API_KEY</label>
+<div class="relative group">
+<input class="w-full bg-surface-container-low border border-outline-variant/50 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200 px-4 py-3 text-sm font-body text-primary placeholder:text-outline/30 outline-none" placeholder="••••••••••••••••••••••••••••" type="password"/>
+<span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline/40 group-hover:text-primary transition-colors cursor-pointer" data-icon="visibility">visibility</span>
+</div>
+</div>
+<!-- Steam ID -->
+<div class="space-y-1">
+<label class="block text-[10px] text-primary/70 font-label tracking-widest uppercase">02_STEAM_ID_64</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/50 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200 px-4 py-3 text-sm font-body text-primary placeholder:text-outline/30 outline-none" placeholder="76561198000000000" type="text"/>
+</div>
+<!-- Proxy URL -->
+<div class="space-y-1">
+<label class="block text-[10px] text-primary/70 font-label tracking-widest uppercase">03_PROXY_ENDPOINT</label>
+<input class="w-full bg-surface-container-low/50 border border-outline-variant/30 cursor-not-allowed px-4 py-3 text-sm font-body text-on-surface-variant/60 outline-none" readonly="" type="text" value="https://steamaiapp.vercel.app/api/proxy"/>
+</div>
+<!-- Anthropic API Key -->
+<div class="space-y-1">
+<label class="block text-[10px] text-primary/70 font-label tracking-widest uppercase">04_ANTHROPIC_API_KEY</label>
+<div class="relative group">
+<input class="w-full bg-surface-container-low border border-outline-variant/50 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200 px-4 py-3 text-sm font-body text-primary placeholder:text-outline/30 outline-none" placeholder="sk-ant-api03-••••••••" type="password"/>
+<span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline/40 group-hover:text-primary transition-colors cursor-pointer" data-icon="key">key</span>
+</div>
+</div>
+</div>
+<!-- Action Button -->
+<div class="pt-6">
+<button class="w-full group relative overflow-hidden bg-primary-container text-on-primary-container font-headline font-bold text-lg py-4 transition-all duration-300 hover:shadow-[0_0_25px_rgba(79,195,247,0.4)] active:scale-[0.98]">
+<div class="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+<div class="flex items-center justify-center gap-3">
+<span class="material-symbols-outlined text-2xl" data-icon="analytics" data-weight="fill">analytics</span>
+<span class="tracking-widest">ANALYZE MY LIBRARY</span>
+</div>
+</button>
+</div>
+</div>
+<!-- Footer Status -->
+<footer class="mt-8 pt-4 border-t border-outline-variant/10 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-secondary animate-pulse shadow-[0_0_8px_#77daa4]"></div>
+<span class="font-label text-[10px] tracking-widest text-secondary uppercase">SYSTEM STATUS: READY FOR SYNC</span>
+</div>
+<div class="font-label text-[10px] tracking-widest text-outline/50 uppercase">
+                        V_4.2.0-STABLE
+                    </div>
+</footer>
+</div>
+</div>
+<!-- Decorative Info Cards (Bento style hint) -->
+<div class="grid grid-cols-2 gap-4 mt-4">
+<div class="bg-surface-container-low/50 border border-outline-variant/20 p-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="memory">memory</span>
+<span class="text-[10px] font-headline tracking-widest text-primary/80">COMPUTE_STATUS</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+<div class="bg-primary w-2/3 h-full"></div>
+</div>
+<div class="mt-2 text-[9px] font-label text-on-surface-variant flex justify-between">
+<span>NEURAL_ENGINE</span>
+<span>ACTIVE</span>
+</div>
+</div>
+<div class="bg-surface-container-low/50 border border-outline-variant/20 p-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="database">database</span>
+<span class="text-[10px] font-headline tracking-widest text-secondary/80">LOCAL_CACHE</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-lg font-headline text-on-surface font-bold">128</span>
+<span class="text-[10px] font-label text-on-surface-variant">CREDENTIALS_DETECTED</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Scanline Overlay -->
+<div class="fixed inset-0 pointer-events-none scanline"></div>
+<script>
+        // Placeholder for structural logic - CSS handled by classes
+    </script>
+</body></html>

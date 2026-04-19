@@ -81,6 +81,8 @@ async function fetchSteamData() {
 
 function updateStats() {
     calculateShameScore();
+    renderHeroBanner();
+    renderDNATags();
     renderTopGamesChart();
     renderBrutalStats();
     renderReturnToGame();
@@ -92,6 +94,70 @@ function updateStats() {
     checkAndRenderBadges();
     saveCurrentSession();
     loadChatHistory();
+}
+
+// ==================== HERO BANNER ====================
+function renderHeroBanner() {
+    if (!steamData.profile) return;
+    const banner = document.getElementById('heroBanner');
+    if (!banner) return;
+    
+    const profile = steamData.profile;
+    const totalHours = Math.round(steamData.games.reduce((a,g) => a + (g.playtime_forever||0), 0) / 60);
+    const memberSince = profile.timecreated ? new Date(profile.timecreated * 1000).getFullYear() : 'Unknown';
+    const analyzedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    
+    document.getElementById('heroAvatar').src = profile.avatarfull || '';
+    document.getElementById('heroUsername').textContent = profile.personaname || 'Unknown';
+    document.getElementById('heroUsername').href = profile.profileurl || '#';
+    document.getElementById('heroTotalGames').textContent = steamData.games.length;
+    document.getElementById('heroTotalHours').textContent = totalHours;
+    document.getElementById('heroMemberSince').textContent = memberSince;
+    document.getElementById('heroAnalyzedDate').textContent = analyzedDate;
+    
+    banner.classList.remove('hidden');
+}
+
+// ==================== DNA TAGS ====================
+const DNA_EMOJIS = {
+    'STRATEGY BRAIN': 'BRAIN', 'SALE HOARDER': 'CART', 'GRAND STRATEGIST': 'CHESS', 'SURVIVAL ADDICT': 'AXE',
+    'RPG FANATIC': 'SWORD', 'ROGUE LOVER': 'SKULL', 'SOULSBORNE VETERAN': 'FLAME', 'DUNGEON CRAWLER': 'DUNGEON',
+    'WORLD BUILDER': 'CITY', 'COLONY MANAGER': 'COLONY', 'DARK FANTASY': 'MOON', 'SPACE CADET': 'ROCKET',
+    'LORE GOBLIN': 'BOOK', 'TACTICIAN': 'PIECE', 'MILSIM DEVOTEE': 'GUN', 'PIXEL PILGRIM': 'PIXEL',
+    'WARLORD': 'CROWN', 'MERCENARY CAPTAIN': 'SWORD', 'CHICKEN DINNER': 'CHICKEN', 'ETERNAL EXILE': 'CASTLE',
+    'SPACE EMPEROR': 'GALAXY', 'DRAGONBORN': 'DRAGON', 'WITCHER': 'WOLF', 'VAULT DWELLER': 'VAULT',
+    'COMMANDER': 'STAR', 'ARCHITECT OF RUIN': 'RUINS', 'DUNGEON MASTER': 'DICE', 'MERCHANT PRINCE': 'COIN',
+    'BUNDLE VICTIM': 'BOX', 'THE CURATOR': 'MUSEUM', 'COMPLETIONIST': 'TICK', 'ACHIEVEMENT HUNTER': 'TROPHY',
+    'ACHIEVEMENT IGNORER': 'IGNORE', 'THE PURIST': 'DIAMOND', 'DIGITAL HOARDER': 'HARD', 'EARLY ADOPTER': 'EARLY',
+    'FRANCHISE COLLECTOR': 'SERIES', 'HIDDEN GEM HUNTER': 'GEM', 'CONTRARIAN': 'THUMB', 'PARALLEL PLAYER': 'PARALLEL',
+    'FALSE STARTER': 'START', 'TUTORIAL DROPOUT': 'EXIT', 'NEVER FINISHES': 'UNFINISHED', 'GENRE TOURIST': 'MAP',
+    'THE ARCHAEOLOGIST': 'OLD', 'NICHE LORD': 'NICHE', 'WISHLIST WARRIOR': 'LIST', 'IMPULSE BUYER': 'IMPULSE',
+    'HUMBLE ADDICT': 'HUMBLE', 'OBSESSIVE': 'OBSESS', 'ONE TRICK PONY': 'ONE', 'DEEP DIVER': 'DEEP',
+    'BUTTERFLY': 'BUTTERFLY', 'BINGE MACHINE': 'BINGE', 'THE LOYALIST': 'LOYAL', 'SPEED RUNNER': 'SPEED',
+    'THE GHOST': 'GHOST', 'RUBBER BAND PLAYER': 'RUBBER', 'THE MONOGAMIST': 'MONO', 'CHRONIC RETURNER': 'RETURN'
+};
+
+function renderDNATags() {
+    const tags = badgeState.earned.map(id => BADGES.find(b => b.id === id)).filter(b => b && b.category === 'trait' || b.category === 'genre' || b.category === 'behavioral').slice(0, 8);
+    if (tags.length === 0) return;
+    
+    const container = document.getElementById('dnaTags');
+    const section = document.getElementById('dnaTagsSection');
+    if (!container || !section) return;
+    
+    container.innerHTML = tags.map((tag, i) => {
+        const emoji = DNA_EMOJIS[tag.name] || 'GAME';
+        const colorClass = `dna-tag-${(i % 5) + 1}`;
+        return `<div class="dna-tag ${colorClass}">${emoji} ${tag.name}</div>`;
+    }).join('');
+    
+    section.classList.remove('hidden');
+}
+
+function shareDNA() {
+    const tags = [...document.querySelectorAll('.dna-tag')].map(el => el.textContent.trim()).join(', ');
+    const text = `My Steam.AI Gaming DNA: ${tags} - steamai.com`;
+    navigator.clipboard.writeText(text).then(() => showToast('DNA tags copied to clipboard!'));
 }
 
 // ==================== SHAME SCORE ====================
@@ -113,7 +179,27 @@ function renderShameScore(score) {
     let verdict = score >= 80 ? 'RESPECTABLE' : score >= 60 ? 'AVERAGE HOARDER' : score >= 40 ? 'CHRONIC HOARDER' : 'FULL SHAME';
     document.getElementById('shameScore').textContent = score;
     document.getElementById('shameVerdict').textContent = verdict;
-    document.getElementById('shameBar').style.width = score + '%';
+    
+    // Trend indicator
+    const trendEl = document.getElementById('shameTrend');
+    if (analysisState.lastSession && analysisState.lastSession.shameScore) {
+        const prevScore = analysisState.lastSession.shameScore;
+        if (score > prevScore) {
+            trendEl.textContent = 'IMPROVED';
+            trendEl.className = 'shame-trend improved';
+        } else if (score < prevScore) {
+            trendEl.textContent = 'DECLINED';
+            trendEl.className = 'shame-trend declined';
+        } else {
+            trendEl.textContent = 'UNCHANGED';
+            trendEl.className = 'shame-trend';
+        }
+    }
+    
+    // Animated progress bar
+    const bar = document.getElementById('shameBar');
+    setTimeout(() => bar.style.width = score + '%', 100);
+    
     generateShameExplanation(score);
 }
 
@@ -299,8 +385,34 @@ function renderBacklogBreakdown() {
     const lowest = gamesWithComp.filter(g => g.hours > 0 && g.completion < 60).sort((a, b) => a.completion - b.completion).slice(0, 10);
     const near = gamesWithComp.filter(g => g.completion >= 60 && g.completion < 100).sort((a, b) => b.completion - a.completion).slice(0, 5);
     const cls = c => c < 30 ? 'text-secondary' : c < 60 ? 'text-amber-500' : 'text-primary';
-    document.getElementById('lowCompletionBody').innerHTML = lowest.length > 0 ? lowest.map(g => `<tr class="hover:bg-primary/5"><td class="py-4 text-white font-medium">${g.name}</td><td class="py-4 text-slate-400">${g.hours.toFixed(1)}H</td><td class="py-4 text-right ${cls(g.completion)}">${String(g.completion).padStart(2,'0')}%</td></tr>`).join('') : '<tr><td colspan="3" class="py-4 text-slate-500">No low completion games</td></tr>';
-    document.getElementById('nearCompleteBody').innerHTML = near.length > 0 ? near.map(g => `<tr class="hover:bg-primary/5"><td class="py-4 text-white font-medium">${g.name}</td><td class="py-4 text-slate-400">${g.hours.toFixed(1)}H</td><td class="py-4 text-right ${cls(g.completion)}">${g.completion}%</td></tr>`).join('') : '<tr><td colspan="3" class="py-4 text-slate-500">No near-complete games</td></tr>';
+    const maxLowHours = Math.max(...lowest.map(g => g.hours), 1);
+    const maxNearHours = Math.max(...near.map(g => g.hours), 1);
+    document.getElementById('lowCompletionBody').innerHTML = lowest.length > 0 ? lowest.map(g => {
+        const rowClass = getTableRowClass(g.completion);
+        const sparkWidth = (g.hours / maxLowHours) * 100;
+        return `<tr class="${rowClass}"><td class="py-4 text-white font-medium"><span class="table-dot" style="background:${getBorderColor(g.completion)}"></span>${g.name}</td><td class="py-4 text-slate-400">${g.hours.toFixed(1)}H <div class="sparkline"><div class="sparkline-fill" style="width:${sparkWidth}%"></div></div></td><td class="py-4 text-right ${cls(g.completion)}">${String(g.completion).padStart(2,'0')}%</td></tr>`;
+    }).join('') : '<tr><td colspan="3" class="py-4 text-slate-500">No low completion games</td></tr>';
+    document.getElementById('nearCompleteBody').innerHTML = near.length > 0 ? near.map(g => {
+        const rowClass = getTableRowClass(g.completion);
+        const sparkWidth = (g.hours / maxNearHours) * 100;
+        return `<tr class="${rowClass}"><td class="py-4 text-white font-medium"><span class="table-dot" style="background:${getBorderColor(g.completion)}"></span>${g.name}</td><td class="py-4 text-slate-400">${g.hours.toFixed(1)}H <div class="sparkline"><div class="sparkline-fill" style="width:${sparkWidth}%"></div></div></td><td class="py-4 text-right ${cls(g.completion)}">${g.completion}%</td></tr>`;
+    }).join('') : '<tr><td colspan="3" class="py-4 text-slate-500">No near-complete games</td></tr>';
+}
+
+function getTableRowClass(completion) {
+    if (completion === 0) return 'table-row table-row-0';
+    if (completion <= 50) return 'table-row table-row-1';
+    if (completion <= 85) return 'table-row table-row-2';
+    if (completion <= 99) return 'table-row table-row-3';
+    return 'table-row table-row-4';
+}
+
+function getBorderColor(completion) {
+    if (completion === 0) return 'var(--accent2)';
+    if (completion <= 50) return '#e67e22';
+    if (completion <= 85) return '#f1c40f';
+    if (completion <= 99) return 'var(--green)';
+    return '#9b59b6';
 }
 
 function calculateCompletionScore(hours) {
