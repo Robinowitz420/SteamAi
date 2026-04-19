@@ -207,13 +207,14 @@
     </a>
 </nav>
 <div class="mt-auto pt-8 border-t border-outline-variant/10">
-    <div class="px-8 mb-6 flex items-center gap-3">
-        <div class="w-8 h-8 bg-surface-container-high border border-outline-variant/30 flex items-center justify-center">
-            <span class="material-symbols-outlined text-primary text-lg" data-icon="account_circle">account_circle</span>
+    <div id="sidebarProfile" class="px-8 mb-6 flex items-center gap-3">
+        <div class="w-8 h-8 bg-surface-container-high border border-outline-variant/30 flex items-center justify-center overflow-hidden">
+            <img id="sidebarAvatar" class="w-full h-full object-cover hidden" alt="Avatar"/>
+            <span id="sidebarAvatarPlaceholder" class="material-symbols-outlined text-primary text-lg" data-icon="account_circle">account_circle</span>
         </div>
         <div>
-            <p class="text-[10px] font-label text-white/90">OPERATOR_01</p>
-            <p class="text-[9px] font-label text-primary uppercase">Sync: Active</p>
+            <p id="sidebarUsername" class="text-[10px] font-label text-white/90">OPERATOR_01</p>
+            <p id="sidebarStatus" class="text-[9px] font-label text-primary uppercase">Sync: Active</p>
         </div>
     </div>
 </div>
@@ -227,6 +228,10 @@
     <a class="text-slate-500 hover:text-primary font-headline text-xs tracking-[0.2em] transition-colors" href="#">ARCHIVE</a>
 </div>
 <div class="flex items-center gap-6">
+    <button onclick="showHelp('privacy')" class="flex items-center gap-1 text-[9px] font-label text-[#2ecc71]/70 hover:text-[#2ecc71] transition-colors" title="Privacy Info">
+        <span class="material-symbols-outlined text-sm">shield</span>
+        SECURE
+    </button>
     <span class="material-symbols-outlined text-slate-500 hover:text-primary cursor-pointer transition-colors" data-icon="refresh">refresh</span>
     <div class="relative">
         <span class="material-symbols-outlined text-slate-500 hover:text-primary cursor-pointer transition-colors" data-icon="notifications">notifications</span>
@@ -516,9 +521,17 @@
         <h2 class="text-6xl font-headline font-bold text-white tracking-tighter">STEAM.AI</h2>
         <p class="font-label text-[10px] text-primary tracking-[0.5em]">SYSTEM_INITIALIZATION_PHASE</p>
     </div>
+    <!-- Steam Login Button -->
+    <div class="space-y-4">
+        <button onclick="loginWithSteam()" class="w-full py-4 bg-[#1b2838] border border-[#2a475e]/50 text-white font-headline font-bold text-lg tracking-widest hover:bg-[#2a475e] transition-all flex items-center justify-center gap-3">
+            <svg class="w-6 h-6" viewBox="0 0 256 259" fill="currentColor"><path d="M127.779 0C57.268 0 .039 56.983 0 127.779c0 69.996 56.278 126.943 126.363 127.779L95.323 208.37c-3.232-1.705-5.313-5.067-5.313-8.749v-40.479c0-3.529 1.914-6.768 5.013-8.478l32.756-18.042V0z"/><path d="M252.589 98.065c-16.494-39.632-55.498-67.398-100.849-67.398-1.322 0-2.641.021-3.958.055v132.533l32.757 18.042c3.099 1.71 5.013 4.949 5.013 8.478v40.479c0 3.682-2.081 7.044-5.313 8.749l-31.04 47.188C185.923 253.063 256 196.778 256 127.779c0-10.421-1.254-20.549-3.619-30.258l.208.544z"/></svg>
+            SIGN IN THROUGH STEAM
+        </button>
+        <p class="text-center text-[10px] text-slate-500 font-label">OR ENTER YOUR STEAM API KEY MANUALLY</p>
+    </div>
     <div class="space-y-8">
         <div class="space-y-2">
-            <label class="block font-label text-[10px] text-slate-500 uppercase">STEAM_API_KEY</label>
+            <label class="block font-label text-[10px] text-slate-500 uppercase flex items-center gap-2">STEAM_API_KEY <span class="material-symbols-outlined text-[#2ecc71] text-xs" title="Your key never leaves your browser">lock</span></label>
             <div class="relative">
                 <input id="steamApiKey" class="w-full bg-background border border-outline-variant/30 px-4 py-3 text-primary font-body text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all pr-10" placeholder="Get from steamcommunity.com/dev/apikey" type="password"/>
                 <button onclick="showHelp('steam')" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors">
@@ -529,21 +542,25 @@
         <div class="space-y-2">
             <label class="block font-label text-[10px] text-slate-500 uppercase">STEAM_ID_64</label>
             <div class="relative">
-                <input id="steamId" class="w-full bg-background border border-outline-variant/30 px-4 py-3 text-primary font-body text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all pr-10" placeholder="76561198000000000" type="text"/>
+                <input id="steamId" class="w-full bg-background border border-outline-variant/30 px-4 py-3 text-primary font-body text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all pr-10" placeholder="Auto-filled after Steam login" type="text" readonly/>
                 <button onclick="showHelp('steamid')" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors">
                     <span class="material-symbols-outlined text-sm">help</span>
                 </button>
             </div>
         </div>
-        <div class="space-y-2">
-            <label class="block font-label text-[10px] text-slate-500 uppercase">CLAUDE_API_KEY</label>
-            <div class="relative">
-                <input id="claudeApiKey" class="w-full bg-background border border-outline-variant/30 px-4 py-3 text-primary font-body text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all pr-10" placeholder="sk-ant-api03-****************" type="password"/>
-                <button onclick="showHelp('claude')" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors">
-                    <span class="material-symbols-outlined text-sm">help</span>
-                </button>
-            </div>
+    </div>
+    <!-- Privacy Notice -->
+    <div class="bg-[#2ecc71]/5 border border-[#2ecc71]/20 p-4 space-y-2">
+        <div class="flex items-center gap-2 text-[#2ecc71] font-headline font-bold text-xs tracking-widest">
+            <span class="material-symbols-outlined text-sm">shield</span>
+            YOUR DATA STAYS PRIVATE
         </div>
+        <ul class="text-[10px] text-slate-400 font-label space-y-1">
+            <li class="flex items-center gap-2"><span class="text-[#2ecc71]">&#10003;</span> Your Steam API key is processed locally in your browser</li>
+            <li class="flex items-center gap-2"><span class="text-[#2ecc71]">&#10003;</span> We never store, log, or share your credentials</li>
+            <li class="flex items-center gap-2"><span class="text-[#2ecc71]">&#10003;</span> AI features powered by free Groq API - no key needed</li>
+            <li class="flex items-center gap-2"><span class="text-[#2ecc71]">&#10003;</span> <a href="https://github.com/Robinowitz420/SteamAi" target="_blank" class="text-primary hover:underline">Open source - verify for yourself</a></li>
+        </ul>
     </div>
     <div id="setupError" class="hidden bg-error/20 border border-error text-error px-4 py-3 text-xs font-label"></div>
     <div id="setupSuccess" class="hidden bg-success/20 border border-success text-success px-4 py-3 text-xs font-label"></div>
@@ -574,8 +591,7 @@ let steamData = {
     wishlist: [],
     profile: null,
     apiKey: '',
-    steamId: '',
-    claudeApiKey: ''
+    steamId: ''
 };
 
 let chatState = {
@@ -591,38 +607,40 @@ let analysisState = {
     dnaTags: []
 };
 
+// Login with Steam (OpenID)
+function loginWithSteam() {
+    window.location.href = '/api/steam-login';
+}
+
 // Initialize app
 async function initializeApp() {
     console.log('initializeApp called');
     
     const steamApiKey = document.getElementById('steamApiKey').value.trim();
     const steamId = document.getElementById('steamId').value.trim();
-    const claudeApiKey = document.getElementById('claudeApiKey').value.trim();
 
     console.log('Form values:', {
         steamApiKey: !!steamApiKey,
-        steamId: !!steamId,
-        claudeApiKey: !!claudeApiKey
+        steamId: !!steamId
     });
 
-    if (!steamApiKey || !steamId || !claudeApiKey) {
-        showSetupError('Please fill in all required fields');
+    if (!steamApiKey || !steamId) {
+        showSetupError('Please login with Steam or fill in both fields');
         return;
     }
 
     try {
         steamData.apiKey = steamApiKey;
         steamData.steamId = steamId;
-        steamData.claudeApiKey = claudeApiKey;
         
         localStorage.setItem('steamData', JSON.stringify({
             apiKey: steamApiKey,
-            steamId: steamId,
-            claudeApiKey: claudeApiKey
+            steamId: steamId
         }));
 
         console.log('Fetching Steam data...');
         loadLastSession();
+        await fetchSteamProfile();
         await fetchSteamData();
         console.log('Steam data fetched successfully');
         
@@ -634,6 +652,43 @@ async function initializeApp() {
         console.error('Initialization error:', error);
         showSetupError(`Failed to load Steam data: ${error.message}`);
     }
+}
+
+async function fetchSteamProfile() {
+    try {
+        const profileUrl = `/api/steam-profile?apikey=${steamData.apiKey}&steamid=${steamData.steamId}`;
+        const response = await fetch(profileUrl);
+        
+        if (response.ok) {
+            const profile = await response.json();
+            steamData.profile = profile;
+            updateSidebarProfile(profile);
+        }
+    } catch (error) {
+        console.error('Error fetching profile:', error);
+    }
+}
+
+function updateSidebarProfile(profile) {
+    if (!profile) return;
+    
+    const avatar = document.getElementById('sidebarAvatar');
+    const placeholder = document.getElementById('sidebarAvatarPlaceholder');
+    const username = document.getElementById('sidebarUsername');
+    const status = document.getElementById('sidebarStatus');
+    
+    if (profile.avatar) {
+        avatar.src = profile.avatar;
+        avatar.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+    }
+    
+    if (profile.personaname) {
+        username.textContent = profile.personaname;
+    }
+    
+    const stateMap = {0: 'Offline', 1: 'Online', 2: 'Busy', 3: 'Away', 4: 'Snooze', 5: 'Looking to Trade', 6: 'Looking to Play'};
+    status.textContent = stateMap[profile.personastate] || 'Sync: Active';
 }
 
 async function fetchSteamData() {
@@ -768,7 +823,7 @@ Shame Score: ${analysisState.shameScore}/100
 Respond with ONLY one sentence. No quotes. Max 15 words.`;
     
     try {
-        const headline = await callClaude(prompt);
+        const headline = await callAI(prompt);
         analysisState.heroHeadline = headline.trim();
         document.getElementById('heroHeadline').textContent = headline.trim().toUpperCase();
     } catch (error) {
@@ -815,7 +870,7 @@ WHY: [one sentence]
 FIRST_10: [one sentence]`;
     
     try {
-        const response = await callClaude(prompt);
+        const response = await callAI(prompt);
         const gameMatch = response.match(/GAME:\s*(.+)/i);
         const whyMatch = response.match(/WHY:\s*(.+)/i);
         const first10Match = response.match(/FIRST_10:\s*(.+)/i);
@@ -898,7 +953,7 @@ Be specific and actionable.`;
     document.getElementById('reentryGuide').innerHTML = '<div class="reentry-guide"><p style="color: #666;">Generating re-entry guide...</p></div>';
     
     try {
-        const response = await callClaude(prompt);
+        const response = await callAI(prompt);
         
         const leftOffMatch = response.match(/YOU LEFT OFF:\s*([\s\S]*?)(?=REMEMBER THIS:|$)/i);
         const rememberMatch = response.match(/REMEMBER THIS:\s*([\s\S]*?)(?=DO THIS FIRST:|$)/i);
@@ -1070,9 +1125,12 @@ function renderGraveyard() {
     }
     
     document.getElementById('graveyardList').innerHTML = graveyardGames.map(game => `
-        <div class="border border-outline-variant/20 bg-surface px-4 py-3 group hover:border-secondary transition-colors cursor-pointer">
-            <p class="text-[10px] text-white font-medium uppercase truncate">${game.name}</p>
-            <p class="text-[9px] text-slate-500 font-label">${Math.round((game.playtime_forever || 0) / 60)}h played</p>
+        <div class="border border-outline-variant/20 bg-surface overflow-hidden group hover:border-secondary transition-colors cursor-pointer">
+            <img src="https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/header.jpg" alt="${game.name}" class="w-full h-[30px] object-cover opacity-30 group-hover:opacity-50 transition-opacity" onerror="this.style.display='none'"/>
+            <div class="px-3 py-2">
+                <p class="text-[10px] text-white font-medium uppercase truncate">${game.name}</p>
+                <p class="text-[9px] text-slate-500 font-label">${Math.round((game.playtime_forever || 0) / 60)}h played</p>
+            </div>
         </div>
     `).join('');
     
@@ -1100,20 +1158,24 @@ function renderTopGamesChart() {
     
     document.getElementById('topGamesChart').innerHTML = `
         <h5 class="font-headline font-bold text-sm text-primary tracking-widest uppercase mb-8">MAX_UTILIZATION</h5>
-        <div class="space-y-6">
+        <div class="space-y-4">
             ${top10.map((game, i) => {
                 const hours = Math.round((game.playtime_forever || 0) / 60);
                 const percentage = ((game.playtime_forever || 0) / maxPlaytime) * 100;
                 const opacity = 1 - (i * 0.08);
+                const thumbnailUrl = `https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/header.jpg`;
                 
                 return `
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-[10px] font-label">
-                            <span class="text-white">${game.name}</span>
-                            <span class="text-primary">${hours}H</span>
-                        </div>
-                        <div class="h-1 bg-slate-800 w-full">
-                            <div class="h-full bg-primary transition-all duration-1000" style="width: ${percentage}%; opacity: ${opacity}"></div>
+                    <div class="flex items-center gap-3 group">
+                        <img src="${thumbnailUrl}" alt="${game.name}" class="w-[92px] h-[43px] object-cover border border-outline-variant/20 opacity-70 group-hover:opacity-100 transition-opacity flex-shrink-0" onerror="this.style.display='none'"/>
+                        <div class="flex-1 min-w-0 space-y-1">
+                            <div class="flex justify-between text-[10px] font-label">
+                                <span class="text-white truncate">${game.name}</span>
+                                <span class="text-primary flex-shrink-0 ml-2">${hours}H</span>
+                            </div>
+                            <div class="h-1 bg-slate-800 w-full">
+                                <div class="h-full bg-primary transition-all duration-1000" style="width: ${percentage}%; opacity: ${opacity}"></div>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1134,7 +1196,7 @@ ${top20}
 Respond with ONLY a JSON array of 5 strings. Example: ["LABEL ONE", "LABEL TWO", "LABEL THREE", "LABEL FOUR", "LABEL FIVE"]`;
     
     try {
-        const response = await callClaude(prompt);
+        const response = await callAI(prompt);
         const jsonMatch = response.match(/\[.*?\]/s);
         const tags = jsonMatch ? JSON.parse(jsonMatch[0]) : ['PROFILE ERROR'];
         
@@ -1258,7 +1320,7 @@ Reason: [why it matches]
 Play Pattern: [how to approach]`;
     
     try {
-        const recommendations = await callClaude(prompt);
+        const recommendations = await callAI(prompt);
         document.getElementById('recommendations').innerHTML = `
             <div class="mt-6 p-6 bg-surface-container border border-outline-variant/20">
                 <h4 class="font-headline font-bold text-lg text-primary mb-4">TONIGHT'S RECOMMENDATIONS</h4>
@@ -1286,7 +1348,7 @@ async function sendMessage() {
     const prompt = createChatPrompt(message);
     
     try {
-        const response = await callClaude(prompt);
+        const response = await callAI(prompt);
         addChatMessage(response, 'assistant');
         saveMessageToChat(response, 'assistant');
     } catch (error) {
@@ -1336,16 +1398,16 @@ function addChatMessage(message, sender) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-async function callClaude(prompt) {
-    const response = await fetch('/api/claude', {
+async function callAI(prompt) {
+    const response = await fetch('/api/groq', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ apiKey: steamData.claudeApiKey, prompt: prompt })
+        body: JSON.stringify({ prompt: prompt })
     });
     
     if (!response.ok) {
         const errorData = await response.text();
-        throw new Error(`Claude API error: ${response.status} - ${errorData}`);
+        throw new Error(`AI API error: ${response.status} - ${errorData}`);
     }
     
     const data = await response.json();
@@ -1385,23 +1447,23 @@ function showHelp(type) {
                 <p class="text-xs text-slate-500 mt-4">Your ID looks like: 76561198000000000</p>
             `
         },
-        claude: {
-            title: 'Claude API Key',
+        privacy: {
+            title: 'Privacy & Security',
             content: `
-                <p><strong>How to get your Claude API key:</strong></p>
-                <ol>
-                    <li>Go to <a href="https://console.anthropic.com" target="_blank" class="text-primary">console.anthropic.com</a></li>
-                    <li>Sign up or log in</li>
-                    <li>Go to API Keys section</li>
-                    <li>Create a new key</li>
-                    <li>Copy the key (starts with sk-ant-api03)</li>
-                </ol>
-                <p class="text-xs text-slate-500 mt-4">Keep your key secure - never share it publicly!</p>
+                <p><strong>Your data is safe with Steam.AI:</strong></p>
+                <ul class="space-y-2">
+                    <li class="flex items-start gap-2"><span class="text-[#2ecc71]">&#10003;</span> Your Steam API key is only used in your browser to fetch your game data</li>
+                    <li class="flex items-start gap-2"><span class="text-[#2ecc71]">&#10003;</span> We never store, log, or transmit your API key to any server</li>
+                    <li class="flex items-start gap-2"><span class="text-[#2ecc71]">&#10003;</span> AI features use free Groq API - no personal API key needed</li>
+                    <li class="flex items-start gap-2"><span class="text-[#2ecc71]">&#10003;</span> <a href="https://github.com/Robinowitz420/SteamAi" target="_blank" class="text-primary hover:underline">Full source code on GitHub</a> - audit it yourself</li>
+                </ul>
+                <p class="text-xs text-slate-500 mt-4">The Steam API key is a read-only key that can only access your public profile data. It cannot modify your account.</p>
             `
         }
     };
     
     const data = helpData[type];
+    if (!data) return;
     title.textContent = data.title;
     content.innerHTML = data.content;
     modal.classList.remove('hidden');
@@ -1444,12 +1506,29 @@ function showSetupSuccess(message) {
 
 // Load saved data on page load
 window.addEventListener('load', function() {
+    // Check for Steam login callback
+    const urlParams = new URLSearchParams(window.location.search);
+    const steamIdFromCallback = urlParams.get('steam_id');
+    const steamError = urlParams.get('steam_error');
+    
+    if (steamIdFromCallback) {
+        document.getElementById('steamId').value = steamIdFromCallback;
+        // Clean URL without reloading
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
+    if (steamError) {
+        showSetupError('Steam login failed. Please try again or enter your details manually.');
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
     const savedData = localStorage.getItem('steamData');
     if (savedData) {
         const data = JSON.parse(savedData);
         document.getElementById('steamApiKey').value = data.apiKey || '';
-        document.getElementById('steamId').value = data.steamId || '';
-        document.getElementById('claudeApiKey').value = data.claudeApiKey || '';
+        if (data.steamId && !steamIdFromCallback) {
+            document.getElementById('steamId').value = data.steamId || '';
+        }
     }
     
     loadChatHistory();
