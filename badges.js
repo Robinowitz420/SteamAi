@@ -389,7 +389,7 @@ function renderBadges() {
     document.getElementById('featuredBadges').innerHTML = featured.length > 0 ? featured.map(b => {
         const imgSrc = BADGE_IMAGES[b.id];
         return `
-        <div class="bg-surface-container border border-[${TIER_COLORS[b.tier]}]/40 p-6 space-y-3">
+        <div class="border border-[${TIER_COLORS[b.tier]}]/40 p-6 space-y-3">
             <div class="flex items-center gap-3">
                 ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="w-12 h-12 object-contain"/>` : `<span class="text-4xl">${b.icon}</span>`}
                 <div>
@@ -408,7 +408,7 @@ function renderBadges() {
         const imgSrc = BADGE_IMAGES[b.id];
         return `
         <div class="badge-${b.tier} ${isEarned ? 'earned' : ''} group relative" title="${isEarned ? b.description : '???'}">
-            <div class="w-full aspect-square bg-surface-container border ${isEarned ? `border-[${TIER_COLORS[b.tier]}]/60` : 'border-outline-variant/10'} flex flex-col items-center justify-center ${isEarned ? '' : 'opacity-20 grayscale'} transition-all hover:opacity-100 hover:grayscale-0">
+            <div class="w-full aspect-square border ${isEarned ? `border-[${TIER_COLORS[b.tier]}]/60` : 'border-outline-variant/10'} flex flex-col items-center justify-center ${isEarned ? '' : 'opacity-20 grayscale'} transition-all hover:opacity-100 hover:grayscale-0">
                 ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="w-10 h-10 object-contain"/>` : `<span class="text-2xl">${b.icon}</span>`}
                 <p class="text-[7px] font-label text-slate-400 mt-1 tracking-wider text-center leading-tight px-1">${b.name}</p>
                 <span class="w-1.5 h-1.5 rounded-full mt-0.5" style="background:${TIER_COLORS[b.tier]}"></span>
