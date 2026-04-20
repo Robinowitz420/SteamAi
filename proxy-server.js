@@ -9,6 +9,9 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
+// Serve static files from current directory
+app.use(express.static(__dirname));
+
 // Steam API proxy
 app.get('/api/steam', async (req, res) => {
   try {
