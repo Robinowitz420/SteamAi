@@ -4,89 +4,84 @@ const TIER_COLORS = { bronze: '#cd7f32', silver: '#c0c0c0', gold: '#ffd700', pla
 const TIER_ORDER = { platinum: 0, gold: 1, silver: 2, bronze: 3 };
 
 const BADGE_IMAGES = {
-    // Row 1 (c1-c15)
-    first_step: 'FrontEnd/Badges2/badges1-Photoroom_r1_c1.png',
-    sale_hoarder: 'FrontEnd/Badges2/badges1-Photoroom_r1_c2.png',
-    grand_strategist: 'FrontEnd/Badges2/badges1-Photoroom_r1_c3.png',
-    survival_addict: 'FrontEnd/Badges2/badges1-Photoroom_r1_c4.png',
-    rpg_fanatic: 'FrontEnd/Badges2/badges1-Photoroom_r1_c5.png',
-    rogue_lover: 'FrontEnd/Badges2/badges1-Photoroom_r1_c6.png',
-    soulsborne_veteran: 'FrontEnd/Badges2/badges1-Photoroom_r1_c7.png',
-    dungeon_crawler: 'FrontEnd/Badges2/badges1-Photoroom_r1_c8.png',
-    world_builder: 'FrontEnd/Badges2/badges1-Photoroom_r1_c9.png',
-    colony_manager: 'FrontEnd/Badges2/badges1-Photoroom_r1_c10.png',
-    dark_fantasy: 'FrontEnd/Badges2/badges1-Photoroom_r1_c11.png',
-    space_cadet: 'FrontEnd/Badges2/badges1-Photoroom_r1_c12.png',
-    lore_goblin: 'FrontEnd/Badges2/badges1-Photoroom_r1_c13.png',
-    tactician: 'FrontEnd/Badges2/badges1-Photoroom_r1_c14.png',
-    milsim_devotee: 'FrontEnd/Badges2/badges1-Photoroom_r1_c15.png',
-    // Row 2 (c1-c15)
-    pixel_pilgrim: 'FrontEnd/Badges2/badges1-Photoroom_r2_c1.png',
-    bundle_victim: 'FrontEnd/Badges2/badges1-Photoroom_r2_c2.png',
-    hidden_gem_hunter: 'FrontEnd/Badges2/badges1-Photoroom_r2_c3.png',
-    contrarian: 'FrontEnd/Badges2/badges1-Photoroom_r2_c4.png',
-    parallel_player: 'FrontEnd/Badges2/badges1-Photoroom_r2_c5.png',
-    false_starter: 'FrontEnd/Badges2/badges1-Photoroom_r2_c6.png',
-    tutorial_dropout: 'FrontEnd/Badges2/badges1-Photoroom_r2_c7.png',
-    never_finishes: 'FrontEnd/Badges2/badges1-Photoroom_r2_c8.png',
-    genre_tourist: 'FrontEnd/Badges2/badges1-Photoroom_r2_c9.png',
-    the_archaeologist: 'FrontEnd/Badges2/badges1-Photoroom_r2_c10.png',
-    niche_lord: 'FrontEnd/Badges2/badges1-Photoroom_r2_c11.png',
-    wishlist_warrior: 'FrontEnd/Badges2/badges1-Photoroom_r2_c12.png',
-    impulse_buyer: 'FrontEnd/Badges2/badges1-Photoroom_r2_c13.png',
-    humble_addict: 'FrontEnd/Badges2/badges1-Photoroom_r2_c14.png',
-    obsessive: 'FrontEnd/Badges2/badges1-Photoroom_r2_c15.png',
-    // Row 3 (c1-c15)
-    one_trick_pony: 'FrontEnd/Badges2/badges1-Photoroom_r3_c1.png',
-    deep_diver: 'FrontEnd/Badges2/badges1-Photoroom_r3_c2.png',
-    butterfly: 'FrontEnd/Badges2/badges1-Photoroom_r3_c3.png',
-    binge_machine: 'FrontEnd/Badges2/badges1-Photoroom_r3_c4.png',
-    the_loyalist: 'FrontEnd/Badges2/badges1-Photoroom_r3_c5.png',
-    speed_runner: 'FrontEnd/Badges2/badges1-Photoroom_r3_c6.png',
-    the_ghost: 'FrontEnd/Badges2/badges1-Photoroom_r3_c7.png',
-    rubber_band: 'FrontEnd/Badges2/badges1-Photoroom_r3_c8.png',
-    the_monogamist: 'FrontEnd/Badges2/badges1-Photoroom_r3_c9.png',
-    chronic_returner: 'FrontEnd/Badges2/badges1-Photoroom_r3_c10.png',
-    // Row 4 (c1-c15)
-    strategy_brain: 'FrontEnd/Badges2/badges1-Photoroom_r4_c1.png',
-    warlord: 'FrontEnd/Badges2/badges1-Photoroom_r4_c10.png',
-    mercenary_captain: 'FrontEnd/Badges2/badges1-Photoroom_r4_c11.png',
-    chicken_dinner: 'FrontEnd/Badges2/badges1-Photoroom_r4_c12.png',
-    eternal_exile: 'FrontEnd/Badges2/badges1-Photoroom_r4_c13.png',
-    space_emperor: 'FrontEnd/Badges2/badges1-Photoroom_r4_c14.png',
-    dragonborn: 'FrontEnd/Badges2/badges1-Photoroom_r4_c15.png',
-    // Badges without images in new set - fallback to emoji or missing
-    witcher_badge: null, // 'WITCHER' - not found in new set
-    vault_dweller: null, // 'VAULT DWELLER' - not found in new set  
-    commander_badge: null, // 'COMMANDER' - not found in new set
-    architect_of_ruin: null, // 'ARCHITECT OF RUIN' - not found in new set
-    dungeon_master: null, // 'DUNGEON MASTER' - not found in new set
-    merchant_prince: null, // 'MERCHANT PRINCE' - not found in new set
-    completionist: null, // 'COMPLETIONIST' - not found in new set
-    achievement_hunter: null, // 'ACHIEVEMENT HUNTER' - not found in new set
-    achievement_ignorer: null, // 'ACHIEVEMENT IGNORER' - not found in new set
-    the_purist: null, // 'THE PURIST' - not found in new set
-    digital_hoarder: null, // 'DIGITAL HOARDER' - not found in new set
-    early_adopter: null, // 'EARLY ADOPTER' - not found in new set
-    franchise_collector: null, // 'FRANCHISE COLLECTOR' - not found in new set
-    tactician: 'FrontEnd/Badges2/badges1-Photoroom_r3_c2.png', // Found in row 3
-    milsim_devotee: 'FrontEnd/Badges2/badges1-Photoroom_r3_c3.png', // Found in row 3
-    // Challenge badges - none have images, will use emoji fallbacks
-    going_deeper: null,
-    committed: null,
-    no_going_back: null,
-    five_alive: null,
-    backlog_buster: null,
-    shame_eraser: null,
-    pile_shrinker: null,
-    zero_week: null,
-    shame_reducer: null,
-    shame_free: null,
-    efficiency_expert: null,
-    trophy_hunter: null,
-    perfectionist: null,
-    variety_week: null,
-    binge_breaker: null
+    // Row 2
+    bundle_victim: 'FrontEnd/Badges2/Badges1-Photoroom_r2_c2.png',
+    hidden_gem_hunter: 'FrontEnd/Badges2/Badges1-Photoroom_r2_c3.png',
+    contrarian: 'FrontEnd/Badges2/Badges1-Photoroom_r2_c4.png',
+    parallel_player: 'FrontEnd/Badges2/Badges1-Photoroom_r2_c5.png',
+    false_starter: 'FrontEnd/Badges2/Badges1-Photoroom_r2_c6.png',
+    tutorial_dropout: 'FrontEnd/Badges2/Badges1-Photoroom_r2_c7.png',
+    genre_tourist: 'FrontEnd/Badges2/Badges1-Photoroom_r2_c9.png',
+    the_archaeologist: 'FrontEnd/Badges2/Badges1-Photoroom_r2_c10.png',
+    niche_lord: 'FrontEnd/Badges2/Badges1-Photoroom_r2_c11.png',
+    wishlist_warrior: 'FrontEnd/Badges2/Badges1-Photoroom_r2_c12.png',
+    impulse_buyer: 'FrontEnd/Badges2/Badges1-Photoroom_r2_c13.png',
+    humble_addict: 'FrontEnd/Badges2/Badges1-Photoroom_r2_c14.png',
+    // Row 3
+    deep_diver: 'FrontEnd/Badges2/Badges1-Photoroom_r3_c2.png',
+    butterfly: 'FrontEnd/Badges2/Badges1-Photoroom_r3_c3.png',
+    binge_machine: 'FrontEnd/Badges2/Badges1-Photoroom_r3_c4.png',
+    the_loyalist: 'FrontEnd/Badges2/Badges1-Photoroom_r3_c5.png',
+    speed_runner: 'FrontEnd/Badges2/Badges1-Photoroom_r3_c6.png',
+    the_ghost: 'FrontEnd/Badges2/Badges1-Photoroom_r3_c7.png',
+    the_monogamist: 'FrontEnd/Badges2/Badges1-Photoroom_r3_c9.png',
+    chronic_returner: 'FrontEnd/Badges2/Badges1-Photoroom_r3_c10.png',
+    obsessive: 'FrontEnd/Badges2/Badges1-Photoroom_r3_c11.png',
+    one_trick_pony: 'FrontEnd/Badges2/Badges1-Photoroom_r3_c12.png',
+    sale_hoarder: 'FrontEnd/Badges2/Badges1-Photoroom_r3_c13.png',
+    grand_strategist: 'FrontEnd/Badges2/Badges1-Photoroom_r3_c14.png',
+    // Row 4
+    the_curator: 'FrontEnd/Badges2/Badges1-Photoroom_r4_c2.png',
+    completionist: 'FrontEnd/Badges2/Badges1-Photoroom_r4_c3.png',
+    achievement_hunter: 'FrontEnd/Badges2/Badges1-Photoroom_r4_c4.png',
+    achievement_ignorer: 'FrontEnd/Badges2/Badges1-Photoroom_r4_c5.png',
+    the_purist: 'FrontEnd/Badges2/Badges1-Photoroom_r4_c6.png',
+    digital_hoarder: 'FrontEnd/Badges2/Badges1-Photoroom_r4_c7.png',
+    early_adopter: 'FrontEnd/Badges2/Badges1-Photoroom_r4_c9.png',
+    warlord: 'FrontEnd/Badges2/Badges1-Photoroom_r4_c10.png',
+    mercenary_captain: 'FrontEnd/Badges2/Badges1-Photoroom_r4_c11.png',
+    chicken_dinner: 'FrontEnd/Badges2/Badges1-Photoroom_r4_c12.png',
+    eternal_exile: 'FrontEnd/Badges2/Badges1-Photoroom_r4_c13.png',
+    space_emperor: 'FrontEnd/Badges2/Badges1-Photoroom_r4_c14.png',
+    // Row 6
+    survival_addict: 'FrontEnd/Badges2/Badges1-Photoroom_r6_c2.png',
+    rpg_fanatic: 'FrontEnd/Badges2/Badges1-Photoroom_r6_c3.png',
+    rogue_lover: 'FrontEnd/Badges2/Badges1-Photoroom_r6_c4.png',
+    soulsborne_veteran: 'FrontEnd/Badges2/Badges1-Photoroom_r6_c5.png',
+    dungeon_crawler: 'FrontEnd/Badges2/Badges1-Photoroom_r6_c6.png',
+    world_builder: 'FrontEnd/Badges2/Badges1-Photoroom_r6_c7.png',
+    colony_manager: 'FrontEnd/Badges2/Badges1-Photoroom_r6_c9.png',
+    dark_fantasy: 'FrontEnd/Badges2/Badges1-Photoroom_r6_c10.png',
+    space_cadet: 'FrontEnd/Badges2/Badges1-Photoroom_r6_c11.png',
+    lore_goblin: 'FrontEnd/Badges2/Badges1-Photoroom_r6_c12.png',
+    tactician: 'FrontEnd/Badges2/Badges1-Photoroom_r6_c13.png',
+    milsim_devotee: 'FrontEnd/Badges2/Badges1-Photoroom_r6_c14.png',
+    // Row 7
+    pixel_pilgrim: 'FrontEnd/Badges2/Badges1-Photoroom_r7_c2.png',
+    strategy_brain: 'FrontEnd/Badges2/Badges1-Photoroom_r7_c3.png',
+    witcher_badge: 'FrontEnd/Badges2/Badges1-Photoroom_r7_c4.png',
+    vault_dweller: 'FrontEnd/Badges2/Badges1-Photoroom_r7_c5.png',
+    commander_badge: 'FrontEnd/Badges2/Badges1-Photoroom_r7_c6.png',
+    architect_of_ruin: 'FrontEnd/Badges2/Badges1-Photoroom_r7_c7.png',
+    dungeon_master: 'FrontEnd/Badges2/Badges1-Photoroom_r7_c9.png',
+    merchant_prince: 'FrontEnd/Badges2/Badges1-Photoroom_r7_c10.png',
+    franchise_collector: 'FrontEnd/Badges2/Badges1-Photoroom_r7_c11.png',
+    never_finishes: 'FrontEnd/Badges2/Badges1-Photoroom_r7_c12.png',
+    dragonborn: 'FrontEnd/Badges2/Badges1-Photoroom_r7_c13.png',
+    first_step: 'FrontEnd/Badges2/Badges1-Photoroom_r7_c14.png',
+    // Row 8
+    going_deeper: 'FrontEnd/Badges2/Badges1-Photoroom_r8_c2.png',
+    committed: 'FrontEnd/Badges2/Badges1-Photoroom_r8_c3.png',
+    no_going_back: 'FrontEnd/Badges2/Badges1-Photoroom_r8_c4.png',
+    five_alive: 'FrontEnd/Badges2/Badges1-Photoroom_r8_c5.png',
+    backlog_buster: 'FrontEnd/Badges2/Badges1-Photoroom_r8_c6.png',
+    shame_eraser: 'FrontEnd/Badges2/Badges1-Photoroom_r8_c7.png',
+    pile_shrinker: 'FrontEnd/Badges2/Badges1-Photoroom_r8_c9.png',
+    zero_week: 'FrontEnd/Badges2/Badges1-Photoroom_r8_c10.png',
+    shame_reducer: 'FrontEnd/Badges2/Badges1-Photoroom_r8_c11.png',
+    shame_free: 'FrontEnd/Badges2/Badges1-Photoroom_r8_c12.png',
+    efficiency_expert: 'FrontEnd/Badges2/Badges1-Photoroom_r8_c13.png',
+    trophy_hunter: 'FrontEnd/Badges2/Badges1-Photoroom_r8_c14.png'
 };
 
 const BADGES = [
@@ -107,8 +102,7 @@ const BADGES = [
       check:(g,s)=> s.totalGames > 100 && s.avgHoursPerGame < 10 },
     { id:'the_ghost', name:'THE GHOST', description:"Your library waits. Patiently.", icon:'👻', tier:'silver', category:'trait',
       check:(g,s)=> s.recentlyActive === 0 && s.totalGames > 50 },
-    { id:'rubber_band', name:'RUBBER BAND PLAYER', description:"You disappear for months then return like nothing happened.", icon:'🔄', tier:'silver', category:'trait',
-      check:(g,s)=> s.recentlyActive > 0 && s.neverPlayedPercent > 40 },
+
     { id:'the_monogamist', name:'THE MONOGAMIST', description:"When you love something you really love it.", icon:'💍', tier:'gold', category:'trait',
       check:(g,s)=> { const top2w = g.reduce((m,x)=>(x.playtime_2weeks||0)>(m.playtime_2weeks||0)?x:m,g[0]||{}); const total2w = g.reduce((a,x)=>a+(x.playtime_2weeks||0),0); return total2w > 0 && (top2w.playtime_2weeks||0)/total2w >= 0.8; }},
     { id:'chronic_returner', name:'CHRONIC RETURNER', description:"You keep coming back. Every time.", icon:'🔁', tier:'silver', category:'trait',
@@ -243,12 +237,7 @@ const BADGES = [
       check:(g,s,ch)=> s.costPerHour !== null && s.costPerHour < 0.15 },
     { id:'trophy_hunter', name:'TROPHY HUNTER', description:"The hunt is real.", icon:'🏅', tier:'silver', category:'challenge',
       check:(g,s,ch)=> s.achievementPercent !== null && s.achievementPercent >= 40 },
-    { id:'perfectionist', name:'PERFECTIONIST', description:"Done. Completely done.", icon:'💯', tier:'platinum', category:'challenge',
-      check:(g,s,ch)=> s.achievementPercent !== null && s.achievementPercent >= 95 },
-    { id:'variety_week', name:'VARIETY WEEK', description:"Eclectic.", icon:'🎨', tier:'silver', category:'challenge',
-      check:(g,s,ch)=> s.recentlyActive >= 5 },
-    { id:'binge_breaker', name:'BINGE BREAKER', description:"Moderation achieved.", icon:'⚖️', tier:'gold', category:'challenge',
-      check:(g,s,ch)=> { const active = g.filter(x=>(x.playtime_2weeks||0)>0).sort((a,b)=>(b.playtime_2weeks||0)-(a.playtime_2weeks||0)); if(active.length<4) return false; const top = active[0].playtime_2weeks||0; const rest = active.slice(1,4).reduce((a,x)=>a+(x.playtime_2weeks||0),0); return top/(rest||1) < 2; }},
+
 ];
 
 // ==================== BADGE HELPERS ====================
@@ -361,6 +350,92 @@ function updateChallengeData(games, stats) {
     return ch;
 }
 
+// ==================== BADGE EXPLANATION ====================
+function getBadgeExplanation(badge, games, stats) {
+    const fmt = (mins) => mins >= 6000 ? `${(mins/60).toFixed(0)}h` : mins >= 60 ? `${(mins/60).toFixed(1)}h` : `${mins}m`;
+    const sorted = [...games].sort((a,b) => (b.playtime_forever||0) - (a.playtime_forever||0));
+    const top5 = sorted.slice(0, 5);
+    const recent = games.filter(g => (g.playtime_2weeks||0) > 0).sort((a,b) => (b.playtime_2weeks||0) - (a.playtime_2weeks||0));
+    const recent5 = recent.slice(0, 5);
+    const unplayed = games.filter(g => (g.playtime_forever||0) === 0).length;
+
+    switch(badge.id) {
+        case 'obsessive': { const g = sorted.filter(g=>(g.playtime_forever||0)>=60000); return g.length ? `Earned for 1000+ hours in: ${g.map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'one_trick_pony': { const t = sorted[0]; return t ? `${((t.playtime_forever||0)/(stats.totalMinutes||1)*100).toFixed(0)}% of your playtime is ${t.name} (${fmt(t.playtime_forever)})` : badge.description; }
+        case 'deep_diver': return `Average ${stats.avgHoursPerPlayed.toFixed(0)}h per played game. Top: ${top5.map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}`;
+        case 'butterfly': return `${stats.totalGames} games, none over 20h. You flit between worlds.`;
+        case 'binge_machine': { const t = sorted[0]; return t ? `${t.name}: ${fmt(t.playtime_2weeks)} in last 2 weeks (${((t.playtime_2weeks||0)/(t.playtime_forever||1)*100).toFixed(0)}% of total)` : badge.description; }
+        case 'the_loyalist': { const g = games.filter(x=>(x.playtime_forever||0)>1200&&(x.playtime_2weeks||0)>0); return g.length ? `Still playing after 20h+: ${g.map(x=>`${x.name} (${fmt(x.playtime_forever)}, ${fmt(x.playtime_2weeks)} recent)`).join(', ')}` : badge.description; }
+        case 'speed_runner': return `${stats.totalGames} games, avg ${stats.avgHoursPerGame.toFixed(1)}h each. Breadth over depth.`;
+        case 'the_ghost': return `${stats.totalGames} games, 0 played recently. The library waits.`;
+        case 'the_monogamist': { const t = recent[0]; const tot2w = games.reduce((a,x)=>a+(x.playtime_2weeks||0),0); return t ? `${t.name}: ${((t.playtime_2weeks||0)/tot2w*100).toFixed(0)}% of recent playtime` : badge.description; }
+        case 'chronic_returner': { const g = games.filter(x=>(x.playtime_forever||0)>600&&(x.playtime_2weeks||0)>0); return g.length ? `Returned to: ${g.map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'strategy_brain': { const m = games.filter(g=>['strategy','tactics','total war','civilization','xcom','age of empires','starcraft','warcraft','command'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Strategy games: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'survival_addict': { const m = games.filter(g=>['survival','rust','ark','the forest','dont starve','subnautica','7 days','valheim'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Survival games: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'rpg_fanatic': { const m = games.filter(g=>['rpg','role','elder scrolls','witcher','dragon age','mass effect','final fantasy','diablo','skyrim'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `RPG games: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'grand_strategist': { const m = games.filter(g=>['stellaris','crusader kings','europa universalis','hearts of iron','victoria','paradox'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Grand strategy: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'rogue_lover': { const m = games.filter(g=>['rogue','roguelike','roguelite','hades','slay the spire','dead cells','binding of isaac','enter the gungeon','spelunky'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Roguelikes: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'soulsborne_veteran': { const m = games.filter(g=>['dark souls','elden ring','bloodborne','sekiro','demon souls'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Souls games: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'dungeon_crawler': { const m = games.filter(g=>['dungeon','crawler','darkest dungeon','pathfinder','grimrock','diablo'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Dungeon games: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'world_builder': { const m = games.filter(g=>['city','builder','sim','skylines','simcity','planet coaster','frostpunk','banished','anno'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Builder games: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'colony_manager': { const m = games.filter(g=>['colony','rimworld','oxygen','factorio','prison architect','dwarf fortress'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Colony games: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'dark_fantasy': { const m = games.filter(g=>['dark fantasy','dark souls','elden ring','diablo','pathologic','blasphemous'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Dark fantasy: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'space_cadet': { const m = games.filter(g=>['space','stellaris','elite dangerous','no mans sky','eve','star citizen','kerbal','everspace'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Space games: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'lore_goblin': { const m = games.filter(g=>['rpg','elder scrolls','witcher','mass effect','dragon age','divinity','pathfinder'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Lore-heavy RPGs: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'tactician': { const m = games.filter(g=>['turn-based','tactics','xcom','fire emblem','into the breach','civilization','advance wars'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Tactical games: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'milsim_devotee': { const m = games.filter(g=>['milsim','arma','squad','post scriptum','dcs','il-2','war thunder'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Milsim games: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'pixel_pilgrim': { const m = games.filter(g=>['indie','hollow knight','celeste','undertale','shovel knight','terraria','stardew','dead cells'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Indie games: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'warlord': { const m = games.filter(g=>['total war','crusader kings','hearts of iron','civilization','stellaris'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `War games: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'mercenary_captain': { const m = games.filter(g=>(g.name||'').toLowerCase().includes('battle brothers')).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Battle Brothers: ${m.map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'chicken_dinner': { const m = games.filter(g=>(g.name||'').toLowerCase().includes('pubg')).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `PUBG: ${m.map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'eternal_exile': { const m = games.filter(g=>(g.name||'').toLowerCase().includes('bannerlord')||(g.name||'').toLowerCase().includes('warband')).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Mount & Blade: ${m.map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'space_emperor': { const m = games.filter(g=>(g.name||'').toLowerCase().includes('stellaris')).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Stellaris: ${m.map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'dragonborn': { const m = games.filter(g=>(g.name||'').toLowerCase().includes('skyrim')||(g.name||'').toLowerCase().includes('elder scrolls')).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Elder Scrolls: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'witcher_badge': { const m = games.filter(g=>(g.name||'').toLowerCase().includes('witcher')).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `The Witcher: ${m.map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'vault_dweller': { const m = games.filter(g=>(g.name||'').toLowerCase().includes('fallout')).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Fallout: ${m.map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'commander_badge': { const m = games.filter(g=>(g.name||'').toLowerCase().includes('total war')).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Total War: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'architect_of_ruin': { const m = games.filter(g=>['city','builder','sim','skylines','frostpunk','survival','horror'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Builder+Survival: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'dungeon_master': { const m = games.filter(g=>['rpg','dungeon','pathfinder','divinity','strategy','tactics'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `RPG+Strategy: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'merchant_prince': { const m = games.filter(g=>['trading','economy','patrician','offworld','victoria','merchant'].some(k=>(g.name||'').toLowerCase().includes(k))).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Economy games: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'sale_hoarder': return `${unplayed} unplayed games (${stats.neverPlayedPercent.toFixed(0)}%). You buy, but don't play.`;
+        case 'bundle_victim': return `${stats.totalGames} games, avg ${stats.avgHoursPerGame.toFixed(1)}h each. The bundles own you.`;
+        case 'the_curator': return `${stats.totalGames} games, ${stats.playedPercent.toFixed(0)}% played. Intentional collection.`;
+        case 'completionist': return badge.description;
+        case 'achievement_hunter': return badge.description;
+        case 'achievement_ignorer': return `${stats.totalHours.toFixed(0)}h played, <10% achievements. The game is the game.`;
+        case 'the_purist': return `${stats.totalGames} games, ${stats.playedPercent.toFixed(0)}% played. Quality over quantity.`;
+        case 'digital_hoarder': return `${stats.totalGames} games and counting. The hard drive weeps.`;
+        case 'early_adopter': return `${stats.totalGames} games in your library. Early and often.`;
+        case 'franchise_collector': { const f = detectFranchise(games); return `${f} franchises with 3+ entries. All in.`; }
+        case 'hidden_gem_hunter': { const m = games.filter(x=>(x.playtime_forever||0)>600).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Deep plays: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'contrarian': return badge.description;
+        case 'parallel_player': return `${stats.recentlyActive} games active in last 2 weeks. Why choose?`;
+        case 'false_starter': return `${stats.gamesBetween1and3h} games between 1-3h. The beginning is the best part.`;
+        case 'tutorial_dropout': return `${stats.gamesUnder1h} games under 1h. You know enough.`;
+        case 'never_finishes': return `${stats.gamesBetween1and3h} started, ${stats.gamesOver20h} finished. So close.`;
+        case 'genre_tourist': return `${stats.uniqueGenres} genres explored. Why specialize?`;
+        case 'the_archaeologist': { const m = games.filter(x=>(x.playtime_forever||0)>300&&(x.playtime_2weeks||0)>0).sort((a,b)=>(b.playtime_forever||0)-(a.playtime_forever||0)); return m.length ? `Classic returns: ${m.slice(0,3).map(x=>`${x.name} (${fmt(x.playtime_forever)})`).join(', ')}` : badge.description; }
+        case 'niche_lord': return `${stats.uniqueGenres} genres across ${stats.totalGames} games. Found your corner.`;
+        case 'wishlist_warrior': return `${stats.totalGames} games, ${stats.neverPlayedPercent.toFixed(0)}% unplayed. The wishlist grows.`;
+        case 'impulse_buyer': return `${stats.neverPlayedPercent.toFixed(0)}% unplayed of ${stats.totalGames} games. Buy now, think later.`;
+        case 'humble_addict': return `${stats.totalGames} games, avg ${stats.avgHoursPerGame.toFixed(1)}h each. Bundle after bundle.`;
+        case 'first_step': return badge.description;
+        case 'going_deeper': return badge.description;
+        case 'committed': return badge.description;
+        case 'no_going_back': return badge.description;
+        case 'five_alive': return badge.description;
+        case 'backlog_buster': return badge.description;
+        case 'shame_eraser': return badge.description;
+        case 'pile_shrinker': return badge.description;
+        case 'zero_week': return badge.description;
+        case 'shame_reducer': return badge.description;
+        case 'shame_free': return badge.description;
+        case 'efficiency_expert': return badge.description;
+        case 'trophy_hunter': return badge.description;
+        default: return badge.description;
+    }
+}
+
 // ==================== BADGE CHECKING & RENDERING ====================
 function checkAndRenderBadges() {
     const stats = calculateBadgeStats(steamData.games);
@@ -393,28 +468,35 @@ function filterBadges(category) {
 function renderBadges() {
     const earned = badgeState.earned;
     const filter = badgeState.filter;
+    const stats = calculateBadgeStats(steamData.games);
     const filtered = filter === 'all' ? BADGES : BADGES.filter(b => b.category === filter);
 
+    // Only show badges that have images
+    const visible = filtered.filter(b => BADGE_IMAGES[b.id]);
+
     // Sort: earned first, then by tier rarity
-    const sorted = [...filtered].sort((a, b) => {
+    const sorted = [...visible].sort((a, b) => {
         const aEarned = earned.includes(a.id) ? 0 : 1;
         const bEarned = earned.includes(b.id) ? 0 : 1;
         if (aEarned !== bEarned) return aEarned - bEarned;
         return (TIER_ORDER[a.tier]||3) - (TIER_ORDER[b.tier]||3);
     });
 
-    // Badge count
-    document.getElementById('badgeCount').textContent = `${earned.length} / ${BADGES.length} EARNED`;
+    // Badge count (only count badges with images)
+    const totalWithImages = BADGES.filter(b => BADGE_IMAGES[b.id]).length;
+    const earnedWithImages = earned.filter(id => BADGE_IMAGES[id]).length;
+    document.getElementById('badgeCount').textContent = `${earnedWithImages} / ${totalWithImages} EARNED`;
 
     // Featured badges - top 3 rarest earned
-    const earnedBadges = BADGES.filter(b => earned.includes(b.id)).sort((a,b) => (TIER_ORDER[a.tier]||3) - (TIER_ORDER[b.tier]||3));
+    const earnedBadges = BADGES.filter(b => earned.includes(b.id) && BADGE_IMAGES[b.id]).sort((a,b) => (TIER_ORDER[a.tier]||3) - (TIER_ORDER[b.tier]||3));
     const featured = earnedBadges.slice(0, 3);
     document.getElementById('featuredBadges').innerHTML = featured.length > 0 ? featured.map(b => {
         const imgSrc = BADGE_IMAGES[b.id];
+        const explanation = getBadgeExplanation(b, steamData.games, stats);
         return `
-        <div class="border border-[${TIER_COLORS[b.tier]}]/40 p-6 space-y-3">
-            <div class="flex items-center gap-3">
-                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="w-12 h-12 object-contain"/>` : `<span class="text-4xl">${b.icon}</span>`}
+        <div class="border border-[${TIER_COLORS[b.tier]}]/40 p-6 space-y-3 relative group/feat">
+            <div class="flex items-center gap-4">
+                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="w-[75px] h-[75px] object-contain"/>` : ''}
                 <div>
                     <p class="font-headline font-bold text-white text-sm tracking-widest">${b.name}</p>
                     <span class="inline-block w-2 h-2 rounded-full" style="background:${TIER_COLORS[b.tier]}"></span>
@@ -422,19 +504,28 @@ function renderBadges() {
                 </div>
             </div>
             <p class="text-[11px] font-body text-slate-400 italic">${b.description}</p>
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 bg-black/95 border border-[${TIER_COLORS[b.tier]}]/40 rounded-lg text-[11px] font-body text-slate-300 max-w-[300px] opacity-0 group-hover/feat:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
+                <p class="font-headline text-white text-xs mb-1">${b.name}</p>
+                <p>${explanation}</p>
+            </div>
         </div>`;
     }).join('') : '<p class="text-slate-500 font-label text-xs col-span-3">Play some games to earn your first badges!</p>';
 
-    // Badge grid
+    // Badge grid - 2.5x larger
     document.getElementById('badgeGrid').innerHTML = sorted.map(b => {
         const isEarned = earned.includes(b.id);
         const imgSrc = BADGE_IMAGES[b.id];
+        const explanation = isEarned ? getBadgeExplanation(b, steamData.games, stats) : '???';
         return `
-        <div class="badge-${b.tier} ${isEarned ? 'earned' : ''} group relative" title="${isEarned ? b.description : '???'}">
+        <div class="badge-${b.tier} ${isEarned ? 'earned' : ''} group relative">
             <div class="w-full aspect-square border ${isEarned ? `border-[${TIER_COLORS[b.tier]}]/60` : 'border-outline-variant/10'} flex flex-col items-center justify-center ${isEarned ? '' : 'opacity-20 grayscale'} transition-all hover:opacity-100 hover:grayscale-0">
-                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="w-10 h-10 object-contain"/>` : `<span class="text-2xl">${b.icon}</span>`}
-                <p class="text-[7px] font-label text-slate-400 mt-1 tracking-wider text-center leading-tight px-1">${b.name}</p>
-                <span class="w-1.5 h-1.5 rounded-full mt-0.5" style="background:${TIER_COLORS[b.tier]}"></span>
+                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="w-[60px] h-[60px] object-contain"/>` : ''}
+                <p class="text-[8px] font-label text-slate-400 mt-1 tracking-wider text-center leading-tight px-1">${b.name}</p>
+                <span class="w-2 h-2 rounded-full mt-0.5" style="background:${TIER_COLORS[b.tier]}"></span>
+            </div>
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 bg-black/95 border border-[${TIER_COLORS[b.tier]}]/40 rounded-lg text-[11px] font-body text-slate-300 max-w-[280px] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
+                <p class="font-headline text-white text-xs mb-1">${b.name}</p>
+                <p>${explanation}</p>
             </div>
         </div>`;
     }).join('');
