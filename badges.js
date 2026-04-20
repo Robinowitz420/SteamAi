@@ -601,7 +601,7 @@ function renderBadges() {
         return `
         <div class="trophy-card ${b.tier} p-6 space-y-3 relative group/feat" style="--tier-color:${tierColor}">
             <div class="flex flex-col items-center text-center">
-                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" style="width:96px;height:96px;object-fit:contain"/>` : ''}
+                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" style="width:192px;height:192px;object-fit:contain"/>` : ''}
                 <p class="font-headline font-bold text-white text-base tracking-widest mt-3">${b.name}</p>
                 <div class="flex items-center gap-1 mt-1">
                     <span class="inline-block w-3 h-3 rounded-sm" style="background:${tierColor}"></span>
@@ -631,7 +631,7 @@ function renderBadges() {
             const tierColor = TIER_COLORS[b.tier];
             return `
             <div class="badge-card earned-card relative p-3" style="--tier-color:${tierColor}">
-                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="badge-img" style="width:64px;height:64px;object-fit:contain;display:block;margin:0 auto"/>` : ''}
+                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="badge-img" style="width:128px;height:128px;object-fit:contain;display:block;margin:0 auto"/>` : ''}
                 <p class="font-headline text-[10px] tracking-[1px] uppercase text-center mt-2 text-white">${b.name}</p>
                 <span class="block w-[6px] h-[6px] rounded-full mx-auto mt-1" style="background:${tierColor}"></span>
                 <div class="badge-tooltip">
@@ -661,7 +661,7 @@ function renderBadges() {
             const descText = isChallenge ? '???' : b.description;
             return `
             <div class="badge-card locked-card relative p-2" style="--tier-color:${tierColor}">
-                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="badge-img" style="width:48px;height:48px;object-fit:contain;display:block;margin:0 auto"/>` : ''}
+                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="badge-img" style="width:96px;height:96px;object-fit:contain;display:block;margin:0 auto"/>` : ''}
                 <p class="font-headline text-[9px] tracking-[1px] uppercase text-center mt-1.5" style="color:var(--muted)">${b.name}</p>
                 <span class="block w-[4px] h-[4px] rounded-full mx-auto mt-1" style="background:${tierColor};opacity:0.4"></span>
                 <div class="badge-tooltip">

@@ -251,6 +251,13 @@
             <label class="block font-label text-[10px] text-primary uppercase">Available_Window</label>
             <select id="availableTime" class="w-full bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary"><option value="30">30 MINUTES</option><option value="60">1 HOUR</option><option value="120">2 HOURS</option><option value="240">4+ HOURS</option></select>
         </div>
+        <div class="space-y-4">
+            <label class="block font-label text-[10px] text-primary uppercase">Modal_Chat</label>
+            <div class="relative">
+                <input id="recChatInput" class="w-full bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary pr-12" placeholder="Tell the engine what you're in the mood for..." type="text"/>
+                <button onclick="getRecommendations()" class="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-white transition-colors"><span class="material-symbols-outlined">send</span></button>
+            </div>
+        </div>
         <button onclick="getRecommendations()" class="w-full bg-white text-black font-headline font-bold py-4 tracking-[0.4em] hover:bg-primary transition-all glitch-hover">EXECUTE_RECOMMENDATION</button>
         <div id="recommendations"></div>
     </div>
@@ -291,7 +298,7 @@
     <!-- Earned Badges -->
     <div>
         <p id="earnedLabel" class="text-[13px] font-headline tracking-[2px] uppercase" style="color:var(--muted);border-left:2px solid var(--green);padding-left:8px;margin-bottom:16px">EARNED — 0 BADGES</p>
-        <div id="earnedBadgeGrid" class="grid gap-3" style="grid-template-columns:repeat(auto-fill,minmax(100px,1fr))"></div>
+        <div id="earnedBadgeGrid" class="grid gap-3" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))"></div>
     </div>
 
     <!-- Section Divider -->
@@ -304,7 +311,7 @@
     <!-- Locked Badges -->
     <div>
         <p id="lockedLabel" class="text-[13px] font-headline tracking-[2px] uppercase" style="color:var(--muted);border-left:2px solid var(--accent2);padding-left:8px;margin-bottom:16px">LOCKED — 0 BADGES</p>
-        <div id="lockedBadgeGrid" class="grid gap-2" style="grid-template-columns:repeat(auto-fill,minmax(80px,1fr))"></div>
+        <div id="lockedBadgeGrid" class="grid gap-2" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr))"></div>
     </div>
 </section>
 </div>

@@ -280,7 +280,17 @@ async function loadOrGenerateWeeklyPick() {
 
 async function generateWeeklyPick() {
     const unplayedOrLow = steamData.games.filter(g => (g.playtime_forever || 0) < 300 && (g.playtime_forever || 0) > 0).sort((a, b) => (a.playtime_forever || 0) - (b.playtime_forever || 0)).slice(0, 20);
-    if (unplayedOrLow.length === 0) return;
+    if (unplayedOrLow.length === 0) {
+        // No low-play games — pick any unplayed or random game as fallback
+        const anyGame = steamData.games[Math.floor(Math.random() * steamData.games.length)];
+        if (anyGame) {
+            const fallback = { game: anyGame.name, why: 'A game waiting in your library.', first10: 'Just launch it and see what happens.', timestamp: Date.now() };
+            analysisState.weeklyPick = fallback;
+            localStorage.setItem('steamai_weekly_pick', JSON.stringify(fallback));
+            renderWeeklyPick(fallback);
+        }
+        return;
+    }
     const gamesList = unplayedOrLow.map(g => `${g.name}: ${Math.round((g.playtime_forever || 0) / 60)}h`).join('\n');
     const prompt = `Pick ONE game for this player to play this week.\n\nGAMES:\n${gamesList}\n\nFormat:\nGAME: [name]\nWHY: [one sentence]\nFIRST_10: [one sentence]`;
     try {
@@ -294,7 +304,15 @@ async function generateWeeklyPick() {
         analysisState.weeklyPick = pickData;
         localStorage.setItem('steamai_weekly_pick', JSON.stringify(pickData));
         renderWeeklyPick(pickData);
-    } catch (e) { console.error('Weekly pick error:', e); }
+    } catch (e) {
+        console.error('Weekly pick error:', e);
+        // Fallback: pick a random low-play game without AI
+        const randomGame = unplayedOrLow[Math.floor(Math.random() * unplayedOrLow.length)];
+        const fallback = { game: randomGame.name, why: `Only ${Math.round((randomGame.playtime_forever||0)/60)}h played — time to give it a real chance.`, first10: 'Launch it and play for 10 minutes. You might be surprised.', timestamp: Date.now() };
+        analysisState.weeklyPick = fallback;
+        localStorage.setItem('steamai_weekly_pick', JSON.stringify(fallback));
+        renderWeeklyPick(fallback);
+    }
 }
 
 function renderWeeklyPick(pickData) {
@@ -475,16 +493,18 @@ document.addEventListener('click', e => {
 });
 
 function getSelectedMoods() {
-    return [...document.querySelectorAll('.mood-btn.selected')].map(b => b.dataset.mood);
+    const chatInput = document.getElementById('recChatInput');
+    const chatText = chatInput ? chatInput.value.trim() : '';
+    return chatText || '';
 }
 
 async function getRecommendations() {
-    const moods = getSelectedMoods();
+    const moodText = getSelectedMoods();
     const time = document.getElementById('availableTime').value;
-    if (moods.length === 0) { showToast('Select at least one mood'); return; }
+    if (!moodText) { showToast('Tell the engine what you\'re in the mood for'); return; }
     const top30 = [...steamData.games].sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)).slice(0, 30).map(g => `${g.name}: ${Math.round((g.playtime_forever || 0) / 60)}h`).join('\n');
-    const prompt = `Recommend 3 games from this player's Steam library based on their current mood.\n\nMOODS: ${moods.join(', ')}\nTIME AVAILABLE: ${time} minutes\n\nLIBRARY:\n${top30}\n\nFor each game, provide:\nGAME: [name]\nWHY: [one sentence matching mood]\nQUICK_START: [one sentence]\n\nList 3 recommendations.`;
-    document.getElementById('recommendations').innerHTML = '<div class="p-6 text-center"><div class="loading mx-auto"></div><p class="text-slate-500 font-label text-xs mt-4">Analyzing library against your moods...</p></div>';
+    const prompt = `Recommend 3 games from this player's Steam library based on their current mood.\n\nMOOD/PREFERENCES: ${moodText}\nTIME AVAILABLE: ${time} minutes\n\nLIBRARY:\n${top30}\n\nFor each game, provide:\nGAME: [name]\nWHY: [one sentence matching mood]\nQUICK_START: [one sentence]\n\nList 3 recommendations.`;
+    document.getElementById('recommendations').innerHTML = '<div class="p-6 text-center"><div class="loading mx-auto"></div><p class="text-slate-500 font-label text-xs mt-4">Analyzing library against your preferences...</p></div>';
     try {
         const response = await callAI(prompt);
         const recs = response.split(/GAME:/i).filter(s => s.trim()).map(s => {
