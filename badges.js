@@ -87,155 +87,226 @@ const BADGE_IMAGES = {
 const BADGES = [
     // ===== TRAIT BADGES =====
     { id:'obsessive', name:'OBSESSIVE', description:"You don't play games. You inhabit them.", icon:'🔥', tier:'gold', category:'trait',
+      unlockHint:'Have one game over 1,000 hours',
       check:(g,s)=> s.gamesOver1000h >= 1 },
     { id:'one_trick_pony', name:'ONE TRICK PONY', description:"One game. All the hours. No regrets.", icon:'🐴', tier:'silver', category:'trait',
+      unlockHint:'Have your most played game be 60%+ of total playtime',
       check:(g,s)=> s.topGamePercent >= 60 },
     { id:'deep_diver', name:'DEEP DIVER', description:"You don't sample. You commit.", icon:'🤿', tier:'silver', category:'trait',
+      unlockHint:'Average 50+ hours per played game',
       check:(g,s)=> s.avgHoursPerPlayed >= 50 },
     { id:'butterfly', name:'BUTTERFLY', description:"Everything is interesting. Nothing holds you.", icon:'🦋', tier:'bronze', category:'trait',
+      unlockHint:'Own 50+ games with none over 20 hours',
       check:(g,s)=> s.gamesOver20h === 0 && s.totalGames > 50 },
     { id:'binge_machine', name:'BINGE MACHINE', description:"You found something. The world outside can wait.", icon:'📺', tier:'gold', category:'trait',
+      unlockHint:'Play 30%+ of a game\'s total hours in the last 2 weeks',
       check:(g,s)=> { const top = g.reduce((m,x)=>(x.playtime_forever||0)>(m.playtime_forever||0)?x:m,g[0]||{}); return top && (top.playtime_2weeks||0) > 0 && (top.playtime_2weeks) / (top.playtime_forever||1) >= 0.3; }},
     { id:'the_loyalist', name:'THE LOYALIST', description:"Some games never leave you.", icon:'❤️', tier:'gold', category:'trait',
+      unlockHint:'Still playing a game with 20+ hours after 1,200+ total hours',
       check:(g,s)=> g.some(x=>(x.playtime_forever||0)>1200 && (x.playtime_2weeks||0)>0) },
     { id:'speed_runner', name:'SPEED RUNNER', description:"Quantity over depth. Always.", icon:'⚡', tier:'bronze', category:'trait',
+      unlockHint:'Own 100+ games with under 10h average each',
       check:(g,s)=> s.totalGames > 100 && s.avgHoursPerGame < 10 },
     { id:'the_ghost', name:'THE GHOST', description:"Your library waits. Patiently.", icon:'👻', tier:'silver', category:'trait',
+      unlockHint:'Own 50+ games with zero played recently',
       check:(g,s)=> s.recentlyActive === 0 && s.totalGames > 50 },
-
     { id:'the_monogamist', name:'THE MONOGAMIST', description:"When you love something you really love it.", icon:'💍', tier:'gold', category:'trait',
+      unlockHint:'Spend 80%+ of recent playtime on a single game',
       check:(g,s)=> { const top2w = g.reduce((m,x)=>(x.playtime_2weeks||0)>(m.playtime_2weeks||0)?x:m,g[0]||{}); const total2w = g.reduce((a,x)=>a+(x.playtime_2weeks||0),0); return total2w > 0 && (top2w.playtime_2weeks||0)/total2w >= 0.8; }},
     { id:'chronic_returner', name:'CHRONIC RETURNER', description:"You keep coming back. Every time.", icon:'🔁', tier:'silver', category:'trait',
+      unlockHint:'Recently play 3+ games with 10+ hours each',
       check:(g,s)=> g.filter(x=>(x.playtime_forever||0)>600 && (x.playtime_2weeks||0)>0).length >= 3 },
 
     // ===== GENRE BADGES =====
     { id:'strategy_brain', name:'STRATEGY BRAIN', description:"Every problem is a resource allocation problem.", icon:'🧠', tier:'silver', category:'genre',
+      unlockHint:'Play 15%+ of your time in strategy games',
       check:(g,s)=> genreMatch(g,['strategy','tactics','total war','civilization','xcom','age of empires','starcraft','warcraft','command']) },
     { id:'survival_addict', name:'SURVIVAL ADDICT', description:"You thrive under artificial scarcity.", icon:'🏕️', tier:'silver', category:'genre',
+      unlockHint:'Play 15%+ of your time in survival games',
       check:(g,s)=> genreMatch(g,['survival','rust','ark','the forest','dont starve','subnautica','7 days','valheim']) },
     { id:'rpg_fanatic', name:'RPG FANATIC', description:"You are whoever the game lets you be.", icon:'⚔️', tier:'silver', category:'genre',
+      unlockHint:'Play 15%+ of your time in RPG games',
       check:(g,s)=> genreMatch(g,['rpg','role','elder scrolls','witcher','dragon age','mass effect','final fantasy','diablo','skyrim']) },
     { id:'grand_strategist', name:'GRAND STRATEGIST', description:"You think in decades. You plan in centuries.", icon:'👑', tier:'gold', category:'genre',
+      unlockHint:'Play 15%+ of your time in Paradox grand strategy games',
       check:(g,s)=> genreMatch(g,['stellaris','crusader kings','europa universalis','hearts of iron','victoria','paradox']) },
     { id:'rogue_lover', name:'ROGUE LOVER', description:"Death is just another run.", icon:'💀', tier:'silver', category:'genre',
+      unlockHint:'Play 15%+ of your time in roguelike games',
       check:(g,s)=> genreMatch(g,['rogue','roguelike','roguelite','hades','slay the spire','dead cells','binding of isaac','enter the gungeon','spelunky']) },
     { id:'soulsborne_veteran', name:'SOULSBORNE VETERAN', description:"You read attack patterns like words on a page.", icon:'🗡️', tier:'gold', category:'genre',
+      unlockHint:'Play 15%+ of your time in Souls-like games',
       check:(g,s)=> genreMatch(g,['dark souls','elden ring','bloodborne','sekiro','demon souls']) },
     { id:'dungeon_crawler', name:'DUNGEON CRAWLER', description:"Down. Always further down.", icon:'🕳️', tier:'bronze', category:'genre',
+      unlockHint:'Play 15%+ of your time in dungeon crawling games',
       check:(g,s)=> genreMatch(g,['dungeon','crawler','darkest dungeon','pathfinder','grimrock','diablo']) },
     { id:'world_builder', name:'WORLD BUILDER', description:"You need to be in control of everything.", icon:'🏗️', tier:'silver', category:'genre',
+      unlockHint:'Play 15%+ of your time in city builder games',
       check:(g,s)=> genreMatch(g,['city','builder','sim','skylines','simcity','planet coaster','frostpunk','banished','anno']) },
     { id:'colony_manager', name:'COLONY MANAGER', description:"Your colonists will not starve. Probably.", icon:'🏘️', tier:'silver', category:'genre',
+      unlockHint:'Play 15%+ of your time in colony management games',
       check:(g,s)=> genreMatch(g,['colony','rimworld','oxygen','factorio','prison architect','dwarf fortress']) },
     { id:'dark_fantasy', name:'DARK FANTASY ENTHUSIAST', description:"You prefer your worlds broken and beautiful.", icon:'🌑', tier:'bronze', category:'genre',
+      unlockHint:'Play 15%+ of your time in dark fantasy games',
       check:(g,s)=> genreMatch(g,['dark fantasy','dark souls','elden ring','diablo','pathologic','blasphemous']) },
     { id:'space_cadet', name:'SPACE CADET', description:"The void calls and you answer.", icon:'🚀', tier:'bronze', category:'genre',
+      unlockHint:'Play 15%+ of your time in space games',
       check:(g,s)=> genreMatch(g,['space','stellaris','elite dangerous','no mans sky','eve','star citizen','kerbal','everspace']) },
     { id:'lore_goblin', name:'LORE GOBLIN', description:"You read every codex entry. Every one.", icon:'📖', tier:'gold', category:'genre',
+      unlockHint:'Play RPGs for 15%+ of time with 40+ avg hours per game',
       check:(g,s)=> genreMatch(g,['rpg','elder scrolls','witcher','mass effect','dragon age','divinity','pathfinder']) && s.avgHoursPerPlayed > 40 },
     { id:'tactician', name:'TACTICIAN', description:"You take your time. You make it count.", icon:'♟️', tier:'silver', category:'genre',
+      unlockHint:'Play 15%+ of your time in turn-based tactics games',
       check:(g,s)=> genreMatch(g,['turn-based','tactics','xcom','fire emblem','into the breach','civilization','advance wars']) },
     { id:'milsim_devotee', name:'MILSIM DEVOTEE', description:"Authenticity over fun. Always.", icon:'🎖️', tier:'silver', category:'genre',
+      unlockHint:'Play 15%+ of your time in military simulation games',
       check:(g,s)=> genreMatch(g,['milsim','arma','squad','post scriptum','dcs','il-2','war thunder']) },
     { id:'pixel_pilgrim', name:'PIXEL PILGRIM', description:"You find gold in small packages.", icon:'🎮', tier:'bronze', category:'genre',
+      unlockHint:'Play 15%+ of your time in indie games',
       check:(g,s)=> genreMatch(g,['indie','hollow knight','celeste','undertale','shovel knight','terraria','stardew','dead cells']) },
     { id:'warlord', name:'WARLORD', description:"War is just politics with better graphics.", icon:'⚔️', tier:'gold', category:'genre',
+      unlockHint:'Play strategy and tactics games for 15%+ each',
       check:(g,s)=> genreMatch(g,['total war','crusader kings','hearts of iron','civilization','stellaris']) && genreMatch(g,['tactics','xcom','command']) },
     { id:'mercenary_captain', name:'MERCENARY CAPTAIN', description:"Blood and iron. No contracts, no mercy.", icon:'🛡️', tier:'platinum', category:'genre',
+      unlockHint:'Have Battle Brothers in your top 5 most played games',
       check:(g,s)=> isInTop(g,'battle brothers',5) },
     { id:'chicken_dinner', name:'CHICKEN DINNER', description:"Winner winner. You live here.", icon:'🍗', tier:'platinum', category:'genre',
+      unlockHint:'Have PUBG in your top 3 most played games',
       check:(g,s)=> isInTop(g,'pubg',3) },
     { id:'eternal_exile', name:'ETERNAL EXILE', description:"Calradia is home now.", icon:'🏰', tier:'gold', category:'genre',
+      unlockHint:'Have Mount & Blade in your top 5 most played games',
       check:(g,s)=> isInTop(g,'bannerlord',5) || isInTop(g,'warband',5) },
     { id:'space_emperor', name:'SPACE EMPEROR', description:"The galaxy bends to your will. Eventually.", icon:'🌌', tier:'gold', category:'genre',
+      unlockHint:'Have Stellaris in your top 5 most played games',
       check:(g,s)=> isInTop(g,'stellaris',5) },
     { id:'dragonborn', name:'DRAGONBORN', description:"Fus Roh Dah is a lifestyle.", icon:'🐉', tier:'gold', category:'genre',
+      unlockHint:'Have Skyrim or Elder Scrolls in your top 5 most played',
       check:(g,s)=> isInTop(g,'skyrim',5) || isInTop(g,'elder scrolls',5) },
     { id:'witcher_badge', name:'WITCHER', description:"The White Wolf walks among us.", icon:'🐺', tier:'gold', category:'genre',
+      unlockHint:'Have The Witcher in your top 5 most played games',
       check:(g,s)=> isInTop(g,'witcher',5) },
     { id:'vault_dweller', name:'VAULT DWELLER', description:"War never changes. Neither do you.", icon:'☢️', tier:'gold', category:'genre',
+      unlockHint:'Have Fallout in your top 5 most played games',
       check:(g,s)=> isInTop(g,'fallout',5) },
     { id:'commander_badge', name:'COMMANDER', description:"Leading armies since day one.", icon:'🎖️', tier:'gold', category:'genre',
+      unlockHint:'Have Total War in your top 5 most played games',
       check:(g,s)=> isInTop(g,'total war',5) },
     { id:'architect_of_ruin', name:'ARCHITECT OF RUIN', description:"Build it up. Watch it fall. Repeat.", icon:'🏚️', tier:'silver', category:'genre',
+      unlockHint:'Play builder and survival games for 15%+ each',
       check:(g,s)=> genreMatch(g,['city','builder','sim','skylines','frostpunk']) && genreMatch(g,['survival','horror']) },
     { id:'dungeon_master', name:'DUNGEON MASTER', description:"RPG and strategy. The perfect combo.", icon:'🎲', tier:'gold', category:'genre',
+      unlockHint:'Play RPG and strategy games for 15%+ each',
       check:(g,s)=> genreMatch(g,['rpg','dungeon','pathfinder','divinity']) && genreMatch(g,['strategy','tactics']) },
     { id:'merchant_prince', name:'MERCHANT PRINCE', description:"Trading, economy, wheeling and dealing.", icon:'💰', tier:'silver', category:'genre',
+      unlockHint:'Play 15%+ of your time in economy/trading games',
       check:(g,s)=> genreMatch(g,['trading','economy','patrician','offworld','victoria','merchant']) },
 
     // ===== BEHAVIORAL BADGES =====
     { id:'sale_hoarder', name:'SALE HOARDER', description:"You bought it. You'll never play it. You know this.", icon:'🛒', tier:'silver', category:'behavioral',
+      unlockHint:'Have over 40% of your library never played',
       check:(g,s)=> s.neverPlayedPercent >= 40 },
     { id:'bundle_victim', name:'BUNDLE VICTIM', description:"The bundle seemed like a good deal at the time.", icon:'📦', tier:'bronze', category:'behavioral',
+      unlockHint:'Own 100+ games with under 5h average each',
       check:(g,s)=> s.totalGames > 100 && s.avgHoursPerGame < 5 },
     { id:'the_curator', name:'THE CURATOR', description:"You collect with intention. Rare.", icon:'🏛️', tier:'gold', category:'behavioral',
+      unlockHint:'Own 100+ games with 60%+ played',
       check:(g,s)=> s.totalGames > 100 && s.playedPercent >= 60 },
     { id:'completionist', name:'COMPLETIONIST', description:"If it can be done, you've done it.", icon:'✅', tier:'gold', category:'behavioral',
+      unlockHint:'Unlock over 70% of achievements across your library',
       check:(g,s)=> s.achievementPercent !== null && s.achievementPercent >= 70 },
     { id:'achievement_hunter', name:'ACHIEVEMENT HUNTER', description:"The checklist is the game.", icon:'🏆', tier:'silver', category:'behavioral',
+      unlockHint:'Unlock over 50% of achievements across your library',
       check:(g,s)=> s.achievementPercent !== null && s.achievementPercent >= 50 },
     { id:'achievement_ignorer', name:'ACHIEVEMENT IGNORER', description:"The game is the game. The list is noise.", icon:'🚫', tier:'bronze', category:'behavioral',
+      unlockHint:'Play 500+ hours with under 10% achievements unlocked',
       check:(g,s)=> s.totalHours > 500 && s.achievementPercent !== null && s.achievementPercent < 10 },
     { id:'the_purist', name:'THE PURIST', description:"You own what you play. Exactly what you play.", icon:'💎', tier:'platinum', category:'behavioral',
+      unlockHint:'Own under 30 games with over 80% played',
       check:(g,s)=> s.totalGames < 30 && s.playedPercent >= 80 },
     { id:'digital_hoarder', name:'DIGITAL HOARDER', description:"Your hard drive weeps.", icon:'💾', tier:'bronze', category:'behavioral',
+      unlockHint:'Own 500 or more games',
       check:(g,s)=> s.totalGames >= 500 },
     { id:'early_adopter', name:'EARLY ADOPTER', description:"You were there before it was good.", icon:'🚀', tier:'silver', category:'behavioral',
-      check:(g,s)=> s.totalGames > 20 }, // simplified - can't detect review counts
+      unlockHint:'Own more than 20 games',
+      check:(g,s)=> s.totalGames > 20 },
     { id:'franchise_collector', name:'FRANCHISE COLLECTOR', description:"When you find something good you go all in.", icon:'📚', tier:'silver', category:'behavioral',
+      unlockHint:'Collect 3+ franchises with 3+ entries each',
       check:(g,s)=> detectFranchise(g) >= 3 },
     { id:'hidden_gem_hunter', name:'HIDDEN GEM HUNTER', description:"You find what others miss.", icon:'💎', tier:'gold', category:'behavioral',
+      unlockHint:'Have a game with 10+ hours that few others play',
       check:(g,s)=> { const lowPlay = g.filter(x=>(x.playtime_forever||0)>600); return lowPlay.length > 0 && s.totalGames > 30; }},
     { id:'contrarian', name:'CONTRARIAN', description:"The crowd is usually wrong.", icon:'🤘', tier:'silver', category:'behavioral',
-      check:(g,s)=> false }, // can't detect review scores
+      unlockHint:'Play games that go against popular trends',
+      check:(g,s)=> false },
     { id:'parallel_player', name:'PARALLEL PLAYER', description:"Commitment is just one game at a time. Why limit yourself?", icon:'🔀', tier:'bronze', category:'behavioral',
+      unlockHint:'Play 5+ games in the last 2 weeks',
       check:(g,s)=> s.recentlyActive >= 5 },
     { id:'false_starter', name:'FALSE STARTER', description:"The beginning is always the best part anyway.", icon:'🏁', tier:'silver', category:'behavioral',
+      unlockHint:'Have 15+ games between 1-3 hours played',
       check:(g,s)=> s.gamesBetween1and3h > 15 },
     { id:'tutorial_dropout', name:'TUTORIAL DROPOUT', description:"15 minutes told you everything you needed to know.", icon:'🎓', tier:'bronze', category:'behavioral',
+      unlockHint:'Have 10+ games under 1 hour played',
       check:(g,s)=> s.gamesUnder1h > 10 },
     { id:'never_finishes', name:'NEVER FINISHES', description:"So close. Every time.", icon:'🚧', tier:'silver', category:'behavioral',
+      unlockHint:'Have 10+ games at 1-3h but under 5 games over 20h',
       check:(g,s)=> s.gamesBetween1and3h > 10 && s.gamesOver20h < 5 },
     { id:'genre_tourist', name:'GENRE TOURIST', description:"Why specialize when you can dabble in everything?", icon:'🗺️', tier:'bronze', category:'behavioral',
+      unlockHint:'Play games across 8+ different genres',
       check:(g,s)=> s.uniqueGenres > 8 },
     { id:'the_archaeologist', name:'THE ARCHAEOLOGIST', description:"The classics never die.", icon:'🦕', tier:'gold', category:'behavioral',
+      unlockHint:'Return to a game with 5+ hours after a long break',
       check:(g,s)=> g.some(x=>(x.playtime_forever||0)>300 && (x.playtime_2weeks||0)>0) },
     { id:'niche_lord', name:'NICHE LORD', description:"You found your corner of the universe.", icon:'🎯', tier:'gold', category:'behavioral',
+      unlockHint:'Play 20+ games in only 3 or fewer genres',
       check:(g,s)=> s.uniqueGenres <= 3 && s.totalGames > 20 },
     { id:'wishlist_warrior', name:'WISHLIST WARRIOR', description:"The wishlist is longer than the library.", icon:'📝', tier:'bronze', category:'behavioral',
+      unlockHint:'Own 50+ games with over 50% never played',
       check:(g,s)=> s.totalGames > 50 && s.neverPlayedPercent > 50 },
     { id:'impulse_buyer', name:'IMPULSE BUYER', description:"Buy now, think later. Much later.", icon:'💸', tier:'bronze', category:'behavioral',
+      unlockHint:'Own 50+ games with 50%+ never played',
       check:(g,s)=> s.neverPlayedPercent >= 50 && s.totalGames > 50 },
     { id:'humble_addict', name:'HUMBLE ADDICT', description:"Bundle after bundle after bundle...", icon:'🎁', tier:'bronze', category:'behavioral',
+      unlockHint:'Own 100+ games with under 3h average each',
       check:(g,s)=> s.totalGames > 100 && s.avgHoursPerGame < 3 },
 
     // ===== CHALLENGE BADGES =====
     { id:'first_step', name:'FIRST STEP', description:"It begins.", icon:'👣', tier:'bronze', category:'challenge',
+      unlockHint:'Launch a game you\'ve never played before',
       check:(g,s,ch)=> ch.gamesPlayedSinceFirst.length >= 1 },
     { id:'going_deeper', name:'GOING DEEPER', description:"You gave it a real chance.", icon:'🕳️', tier:'silver', category:'challenge',
+      unlockHint:'Play a previously unplayed game for 10+ hours',
       check:(g,s,ch)=> ch.gamesPlayedSinceFirst.some(appid => { const gm = g.find(x=>x.appid===appid); return gm && (gm.playtime_forever||0)/60 >= 10; })},
     { id:'committed', name:'COMMITTED', description:"This one stuck.", icon:'📌', tier:'gold', category:'challenge',
+      unlockHint:'Play a previously unplayed game for 50+ hours',
       check:(g,s,ch)=> ch.gamesPlayedSinceFirst.some(appid => { const gm = g.find(x=>x.appid===appid); return gm && (gm.playtime_forever||0)/60 >= 50; })},
     { id:'no_going_back', name:'NO GOING BACK', description:"This is part of you now.", icon:'⛓️', tier:'platinum', category:'challenge',
+      unlockHint:'Hit 100 hours in a previously unplayed game',
       check:(g,s,ch)=> ch.gamesPlayedSinceFirst.some(appid => { const gm = g.find(x=>x.appid===appid); return gm && (gm.playtime_forever||0)/60 >= 100; })},
     { id:'five_alive', name:'FIVE ALIVE', description:"The backlog fears you.", icon:'🖐️', tier:'silver', category:'challenge',
+      unlockHint:'Play 5 previously unplayed games',
       check:(g,s,ch)=> ch.gamesPlayedSinceFirst.length >= 5 },
     { id:'backlog_buster', name:'BACKLOG BUSTER', description:"Making a dent.", icon:'💪', tier:'silver', category:'challenge',
+      unlockHint:'Reduce unplayed game count by 10 since first session',
       check:(g,s,ch)=> ch.previousUnplayed - s.neverPlayed >= 10 },
     { id:'shame_eraser', name:'SHAME ERASER', description:"The pile shrinks.", icon:'🧹', tier:'gold', category:'challenge',
+      unlockHint:'Play 20 previously unplayed games',
       check:(g,s,ch)=> ch.gamesPlayedSinceFirst.length >= 20 },
     { id:'pile_shrinker', name:'PILE SHRINKER', description:"Progress.", icon:'📉', tier:'bronze', category:'challenge',
+      unlockHint:'Reduce unplayed percentage by 5% since first session',
       check:(g,s,ch)=> ch.previousUnplayedPercent - s.neverPlayedPercent >= 5 },
     { id:'zero_week', name:'ZERO WEEK', description:"You resisted the sale.", icon:'🛑', tier:'gold', category:'challenge',
+      unlockHint:'Improve your Backlog Shame Score since last session',
       check:(g,s,ch)=> ch.previousShameScore > 0 && s.shameScore > ch.previousShameScore },
     { id:'shame_reducer', name:'SHAME REDUCER', description:"Getting better.", icon:'📈', tier:'silver', category:'challenge',
+      unlockHint:'Improve your Backlog Shame Score by 10+ points',
       check:(g,s,ch)=> ch.previousShameScore > 0 && (s.shameScore - ch.previousShameScore) >= 10 },
     { id:'shame_free', name:'SHAME FREE', description:"You are the 1%.", icon:'🌟', tier:'platinum', category:'challenge',
+      unlockHint:'Achieve a Backlog Shame Score of 80 or higher',
       check:(g,s,ch)=> s.shameScore >= 80 },
     { id:'efficiency_expert', name:'EFFICIENCY EXPERT', description:"Maximum value extracted.", icon:'📊', tier:'gold', category:'challenge',
+      unlockHint:'Get your cost per hour under $0.15',
       check:(g,s,ch)=> s.costPerHour !== null && s.costPerHour < 0.15 },
     { id:'trophy_hunter', name:'TROPHY HUNTER', description:"The hunt is real.", icon:'🏅', tier:'silver', category:'challenge',
+      unlockHint:'Unlock over 40% of achievements across your library',
       check:(g,s,ch)=> s.achievementPercent !== null && s.achievementPercent >= 40 },
 
 ];
@@ -458,10 +529,26 @@ function filterBadges(category) {
     badgeState.filter = category;
     document.querySelectorAll('.badge-filter').forEach(b => {
         b.classList.remove('active');
-        b.classList.add('text-slate-500');
+        b.style.background = 'transparent';
+        b.style.color = 'var(--muted)';
+        if (b.dataset.filter === 'platinum') {
+            b.style.borderColor = '#9b59b6';
+            b.style.color = '#9b59b6';
+        }
     });
-    event.target.classList.add('active');
-    event.target.classList.remove('text-slate-500');
+    const active = document.querySelector(`.badge-filter[data-filter="${category}"]`);
+    if (active) {
+        active.classList.add('active');
+        if (category === 'platinum') {
+            active.style.background = '#9b59b6';
+            active.style.color = 'var(--bg)';
+            active.style.borderColor = '#9b59b6';
+        } else {
+            active.style.background = 'var(--accent)';
+            active.style.color = 'var(--bg)';
+            active.style.borderColor = 'var(--accent)';
+        }
+    }
     renderBadges();
 }
 
@@ -469,64 +556,120 @@ function renderBadges() {
     const earned = badgeState.earned;
     const filter = badgeState.filter;
     const stats = calculateBadgeStats(steamData.games);
-    const filtered = filter === 'all' ? BADGES : BADGES.filter(b => b.category === filter);
 
-    // Only show badges that have images
-    const visible = filtered.filter(b => BADGE_IMAGES[b.id]);
+    // Filter badges - platinum is a tier filter, not category
+    let filtered;
+    if (filter === 'all') {
+        filtered = BADGES.filter(b => BADGE_IMAGES[b.id]);
+    } else if (filter === 'platinum') {
+        filtered = BADGES.filter(b => b.tier === 'platinum' && BADGE_IMAGES[b.id]);
+    } else {
+        filtered = BADGES.filter(b => b.category === filter && BADGE_IMAGES[b.id]);
+    }
 
-    // Sort: earned first, then by tier rarity
-    const sorted = [...visible].sort((a, b) => {
-        const aEarned = earned.includes(a.id) ? 0 : 1;
-        const bEarned = earned.includes(b.id) ? 0 : 1;
-        if (aEarned !== bEarned) return aEarned - bEarned;
-        return (TIER_ORDER[a.tier]||3) - (TIER_ORDER[b.tier]||3);
-    });
+    const earnedFiltered = filtered.filter(b => earned.includes(b.id));
+    const lockedFiltered = filtered.filter(b => !earned.includes(b.id));
 
-    // Badge count (only count badges with images)
+    // Sort by tier rarity
+    const sortByTier = (a, b) => (TIER_ORDER[a.tier]||3) - (TIER_ORDER[b.tier]||3);
+    const earnedSorted = [...earnedFiltered].sort(sortByTier);
+    const lockedSorted = [...lockedFiltered].sort(sortByTier);
+
     const totalWithImages = BADGES.filter(b => BADGE_IMAGES[b.id]).length;
     const earnedWithImages = earned.filter(id => BADGE_IMAGES[id]).length;
+    const pct = totalWithImages > 0 ? (earnedWithImages / totalWithImages * 100) : 0;
+
+    // Progress bar
+    document.getElementById('badgeProgressBar').style.width = pct + '%';
     document.getElementById('badgeCount').textContent = `${earnedWithImages} / ${totalWithImages} EARNED`;
 
-    // Featured badges - top 3 rarest earned
-    const earnedBadges = BADGES.filter(b => earned.includes(b.id) && BADGE_IMAGES[b.id]).sort((a,b) => (TIER_ORDER[a.tier]||3) - (TIER_ORDER[b.tier]||3));
-    const featured = earnedBadges.slice(0, 3);
+    // Tier breakdown
+    const tierCounts = { platinum: 0, gold: 0, silver: 0, bronze: 0 };
+    earnedFiltered.forEach(b => { if (tierCounts[b.tier] !== undefined) tierCounts[b.tier]++; });
+    document.getElementById('badgeTierBreakdown').innerHTML =
+        `<span style="color:#e5e4e2">●</span> ${tierCounts.platinum} PLATINUM  ` +
+        `<span style="color:#ffd700">●</span> ${tierCounts.gold} GOLD  ` +
+        `<span style="color:#c0c0c0">●</span> ${tierCounts.silver} SILVER  ` +
+        `<span style="color:#cd7f32">●</span> ${tierCounts.bronze} BRONZE`;
+
+    // Trophy Shelf - top 3 rarest earned
+    const featured = earnedSorted.slice(0, 3);
     document.getElementById('featuredBadges').innerHTML = featured.length > 0 ? featured.map(b => {
         const imgSrc = BADGE_IMAGES[b.id];
         const explanation = getBadgeExplanation(b, steamData.games, stats);
+        const tierColor = TIER_COLORS[b.tier];
         return `
-        <div class="border border-[${TIER_COLORS[b.tier]}]/40 p-6 space-y-3 relative group/feat">
-            <div class="flex items-center gap-4">
-                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="w-[75px] h-[75px] object-contain"/>` : ''}
-                <div>
-                    <p class="font-headline font-bold text-white text-sm tracking-widest">${b.name}</p>
-                    <span class="inline-block w-2 h-2 rounded-full" style="background:${TIER_COLORS[b.tier]}"></span>
-                    <span class="text-[9px] font-label text-slate-500 ml-1 uppercase">${b.tier}</span>
+        <div class="trophy-card ${b.tier} p-6 space-y-3 relative group/feat" style="--tier-color:${tierColor}">
+            <div class="flex flex-col items-center text-center">
+                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" style="width:96px;height:96px;object-fit:contain"/>` : ''}
+                <p class="font-headline font-bold text-white text-base tracking-widest mt-3">${b.name}</p>
+                <div class="flex items-center gap-1 mt-1">
+                    <span class="inline-block w-3 h-3 rounded-sm" style="background:${tierColor}"></span>
+                    <span class="text-[11px] font-label text-slate-500 uppercase">${b.tier}</span>
                 </div>
+                <p class="text-[12px] font-body text-slate-400 italic mt-2">${b.description}</p>
             </div>
-            <p class="text-[11px] font-body text-slate-400 italic">${b.description}</p>
-            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 bg-black/95 border border-[${TIER_COLORS[b.tier]}]/40 rounded-lg text-[11px] font-body text-slate-300 max-w-[300px] opacity-0 group-hover/feat:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 bg-black/95 border rounded-lg text-[11px] font-body text-slate-300 max-w-[300px] opacity-0 group-hover/feat:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl" style="border-color:${tierColor}">
                 <p class="font-headline text-white text-xs mb-1">${b.name}</p>
                 <p>${explanation}</p>
             </div>
         </div>`;
-    }).join('') : '<p class="text-slate-500 font-label text-xs col-span-3">Play some games to earn your first badges!</p>';
+    }).join('') : '<p class="text-slate-500 font-label text-xs col-span-3 text-center py-8">Play some games to earn your first badges!</p>';
 
-    // Badge grid - 2.5x larger
-    document.getElementById('badgeGrid').innerHTML = sorted.map(b => {
-        const isEarned = earned.includes(b.id);
-        const imgSrc = BADGE_IMAGES[b.id];
-        const explanation = isEarned ? getBadgeExplanation(b, steamData.games, stats) : '???';
-        return `
-        <div class="badge-${b.tier} ${isEarned ? 'earned' : ''} group relative">
-            <div class="w-full aspect-square border ${isEarned ? `border-[${TIER_COLORS[b.tier]}]/60` : 'border-outline-variant/10'} flex flex-col items-center justify-center ${isEarned ? '' : 'opacity-20 grayscale'} transition-all hover:opacity-100 hover:grayscale-0">
-                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="w-[60px] h-[60px] object-contain"/>` : ''}
-                <p class="text-[8px] font-label text-slate-400 mt-1 tracking-wider text-center leading-tight px-1">${b.name}</p>
-                <span class="w-2 h-2 rounded-full mt-0.5" style="background:${TIER_COLORS[b.tier]}"></span>
-            </div>
-            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 bg-black/95 border border-[${TIER_COLORS[b.tier]}]/40 rounded-lg text-[11px] font-body text-slate-300 max-w-[280px] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
-                <p class="font-headline text-white text-xs mb-1">${b.name}</p>
-                <p>${explanation}</p>
-            </div>
-        </div>`;
-    }).join('');
+    // Earned label
+    document.getElementById('earnedLabel').textContent = `EARNED — ${earnedSorted.length} BADGES`;
+
+    // Earned grid
+    const earnedGrid = document.getElementById('earnedBadgeGrid');
+    if (earnedSorted.length === 0) {
+        const catName = filter === 'all' ? '' : ` ${filter.toUpperCase()}`;
+        earnedGrid.innerHTML = `<div class="col-span-full text-center py-8 text-[12px] font-body" style="color:var(--muted)">NO${catName} BADGES EARNED YET</div>`;
+    } else {
+        earnedGrid.innerHTML = earnedSorted.map(b => {
+            const imgSrc = BADGE_IMAGES[b.id];
+            const explanation = getBadgeExplanation(b, steamData.games, stats);
+            const tierColor = TIER_COLORS[b.tier];
+            return `
+            <div class="badge-card earned-card relative p-3" style="--tier-color:${tierColor}">
+                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="badge-img" style="width:64px;height:64px;object-fit:contain;display:block;margin:0 auto"/>` : ''}
+                <p class="font-headline text-[10px] tracking-[1px] uppercase text-center mt-2 text-white">${b.name}</p>
+                <span class="block w-[6px] h-[6px] rounded-full mx-auto mt-1" style="background:${tierColor}"></span>
+                <div class="badge-tooltip">
+                    <p class="font-headline text-white text-xs mb-1">${b.name}</p>
+                    <p>${explanation}</p>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    // Locked divider
+    document.getElementById('lockedDividerLabel').textContent = `🔒 LOCKED — ${lockedSorted.length} REMAINING`;
+
+    // Locked label
+    document.getElementById('lockedLabel').textContent = `LOCKED — ${lockedSorted.length} BADGES`;
+
+    // Locked grid
+    const lockedGrid = document.getElementById('lockedBadgeGrid');
+    if (lockedSorted.length === 0) {
+        const catName = filter === 'all' ? '' : ` ${filter.toUpperCase()}`;
+        lockedGrid.innerHTML = `<div class="col-span-full text-center py-8 text-[14px] font-headline" style="color:var(--green)">ALL${catName} BADGES EARNED — LEGENDARY</div>`;
+    } else {
+        lockedGrid.innerHTML = lockedSorted.map(b => {
+            const imgSrc = BADGE_IMAGES[b.id];
+            const tierColor = TIER_COLORS[b.tier];
+            const isChallenge = b.category === 'challenge';
+            const descText = isChallenge ? '???' : b.description;
+            return `
+            <div class="badge-card locked-card relative p-2" style="--tier-color:${tierColor}">
+                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="badge-img" style="width:48px;height:48px;object-fit:contain;display:block;margin:0 auto"/>` : ''}
+                <p class="font-headline text-[9px] tracking-[1px] uppercase text-center mt-1.5" style="color:var(--muted)">${b.name}</p>
+                <span class="block w-[4px] h-[4px] rounded-full mx-auto mt-1" style="background:${tierColor};opacity:0.4"></span>
+                <div class="badge-tooltip">
+                    <p class="font-headline text-white text-xs mb-1">${b.name}</p>
+                    <p>${descText}</p>
+                    <p class="mt-1" style="color:var(--accent)">Unlock: ${b.unlockHint || 'Unknown'}</p>
+                </div>
+            </div>`;
+        }).join('');
+    }
 }

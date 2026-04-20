@@ -123,7 +123,30 @@
 .stat-card{padding:24px;border-radius:8px}
 .grid-section{gap:24px}
 .body-text{letter-spacing:0.5px}
-.section-header{font-size:13px;color:var(--accent);border-left:2px solid var(--accent);padding-left:8px;margin-bottom:16px}
+.section-header{font-size:15px;color:var(--accent);border-left:2px solid var(--accent);padding-left:8px;margin-bottom:16px}
+/* Badge Cards */
+.badge-card{background:var(--panel,#131318);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;transition:all 0.2s}
+.badge-card:hover{transform:scale(1.05)}
+.badge-card .badge-tooltip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:8px;background:#1a2535;border:1px solid var(--border);padding:10px 14px;font-size:11px;font-family:'IBM Plex Mono',monospace;max-width:200px;border-radius:3px;z-index:100;pointer-events:none;opacity:0;transition:opacity 0.15s;color:#94a3b8}
+.badge-card:hover .badge-tooltip{opacity:1}
+.badge-card.earned-card{border-top:2px solid var(--tier-color)}
+.badge-card.earned-card:hover{border-color:var(--tier-color);box-shadow:0 0 12px color-mix(in srgb,var(--tier-color) 30%,transparent)}
+.badge-card.locked-card .badge-img{filter:grayscale(100%) brightness(0.4)}
+.badge-card.locked-card:hover .badge-img{filter:grayscale(60%) brightness(0.6)}
+@keyframes platinumPulse{0%,100%{box-shadow:0 0 5px rgba(229,228,226,0.2)}50%{box-shadow:0 0 20px rgba(229,228,226,0.4),0 0 40px rgba(229,228,226,0.15)}}
+.trophy-card.platinum{animation:platinumPulse 2s ease-in-out infinite}
+.trophy-card{background:var(--panel,#131318);border:1px solid var(--tier-color);box-shadow:0 0 12px color-mix(in srgb,var(--tier-color) 20%,transparent)}
+/* Font size increases */
+.hero-subtitle{font-size:12px!important}
+.hero-stat{font-size:14px!important}
+.hero-date{font-size:12px!important}
+.tab-btn{font-size:14px!important}
+.font-label{font-size:12px!important}
+.font-body{font-size:14px!important}
+.text-3xl{font-size:2rem!important}
+.brutal-stat-value{font-size:2.25rem!important}
+.graveyard-subtitle{font-size:12px!important}
+.shame-trend{font-size:12px!important}
 </style>
 </head>
 <body class="bg-background text-on-surface font-body body-text selection:bg-primary-container selection:text-on-primary-container overflow-x-hidden">
@@ -183,19 +206,6 @@
     </div>
 </div>
 
-<div class="section-divider"></div>
-
-<!-- DNA Tags -->
-<div id="dnaTagsSection" class="dna-tags-container hidden">
-    <h3 class="dna-title">YOUR GAMING DNA</h3>
-    <div id="dnaTags" class="flex flex-wrap gap-2"></div>
-    <button onclick="shareDNA()" class="dna-share bg-surface-container border border-outline-variant/30 px-4 py-2 text-[10px] font-label text-slate-400 hover:text-primary transition-all">
-        <span class="material-symbols-outlined text-xs mr-1">share</span> SHARE YOUR DNA
-    </button>
-</div>
-
-<div class="section-divider"></div>
-
 <!-- Hero + Shame Score -->
 <section class="grid grid-cols-12 gap-8">
     <div class="col-span-12 lg:col-span-7 space-y-4">
@@ -233,25 +243,69 @@
     </div>
 </section>
 
+<!-- Game Recommendation Engine (moved to Home tab) -->
+<section class="bg-[#050508] border border-outline-variant/30 p-12">
+    <div class="max-w-3xl mx-auto space-y-10">
+        <div class="text-center space-y-2"><h4 class="text-4xl font-headline font-bold text-white tracking-tighter uppercase">GAME_RECOMMENDATION_ENGINE</h4><p class="text-slate-500 font-label text-xs">SELECT YOUR TIME WINDOW</p></div>
+        <div class="space-y-4">
+            <label class="block font-label text-[10px] text-primary uppercase">Available_Window</label>
+            <select id="availableTime" class="w-full bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary"><option value="30">30 MINUTES</option><option value="60">1 HOUR</option><option value="120">2 HOURS</option><option value="240">4+ HOURS</option></select>
+        </div>
+        <button onclick="getRecommendations()" class="w-full bg-white text-black font-headline font-bold py-4 tracking-[0.4em] hover:bg-primary transition-all glitch-hover">EXECUTE_RECOMMENDATION</button>
+        <div id="recommendations"></div>
+    </div>
+</section>
+
 <div class="section-divider"></div>
 
 <!-- BADGES -->
 <section class="space-y-8">
-    <div class="flex items-center justify-between border-b border-outline-variant/10 pb-4">
-        <div class="flex items-center gap-4">
-            <h4 class="font-headline font-bold text-2xl text-white tracking-widest uppercase">BADGES</h4>
-            <span id="badgeCount" class="text-[11px] font-label text-primary">0 / 0 EARNED</span>
+    <!-- Badge Progress Bar Header -->
+    <div class="space-y-3">
+        <div class="flex items-center gap-6">
+            <h4 class="font-headline font-bold text-2xl text-white tracking-widest uppercase" style="color:var(--accent)">BADGES</h4>
+            <div class="flex-grow h-[6px] bg-[var(--border)] rounded-[3px] overflow-hidden">
+                <div id="badgeProgressBar" class="h-full rounded-[3px] transition-all duration-1000 ease-out" style="width:0%;background:var(--accent)"></div>
+            </div>
+            <span id="badgeCount" class="text-[12px] font-label text-[var(--muted)] whitespace-nowrap">0 / 0 EARNED</span>
         </div>
-        <div class="flex gap-1">
-            <button onclick="filterBadges('all')" class="badge-filter active px-3 py-1 text-[9px] font-label border border-outline-variant/20">ALL</button>
-            <button onclick="filterBadges('trait')" class="badge-filter px-3 py-1 text-[9px] font-label text-slate-500 border border-outline-variant/20 hover:text-primary transition-all">TRAIT</button>
-            <button onclick="filterBadges('genre')" class="badge-filter px-3 py-1 text-[9px] font-label text-slate-500 border border-outline-variant/20 hover:text-primary transition-all">GENRE</button>
-            <button onclick="filterBadges('behavioral')" class="badge-filter px-3 py-1 text-[9px] font-label text-slate-500 border border-outline-variant/20 hover:text-primary transition-all">BEHAVIORAL</button>
-            <button onclick="filterBadges('challenge')" class="badge-filter px-3 py-1 text-[9px] font-label text-slate-500 border border-outline-variant/20 hover:text-primary transition-all">CHALLENGE</button>
-        </div>
+        <div id="badgeTierBreakdown" class="text-[11px] font-label text-[var(--muted)]"></div>
     </div>
-    <div id="featuredBadges" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
-    <div id="badgeGrid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3"></div>
+
+    <!-- Category Filter Tabs -->
+    <div class="flex gap-1 flex-wrap">
+        <button onclick="filterBadges('all')" data-filter="all" class="badge-filter active px-3 py-1.5 text-[11px] font-headline tracking-[2px] uppercase border border-[var(--border)] rounded-[2px] cursor-pointer transition-all duration-150" style="color:var(--muted)">ALL</button>
+        <button onclick="filterBadges('trait')" data-filter="trait" class="badge-filter px-3 py-1.5 text-[11px] font-headline tracking-[2px] uppercase border border-[var(--border)] rounded-[2px] cursor-pointer transition-all duration-150" style="color:var(--muted)">TRAIT</button>
+        <button onclick="filterBadges('genre')" data-filter="genre" class="badge-filter px-3 py-1.5 text-[11px] font-headline tracking-[2px] uppercase border border-[var(--border)] rounded-[2px] cursor-pointer transition-all duration-150" style="color:var(--muted)">GENRE</button>
+        <button onclick="filterBadges('behavioral')" data-filter="behavioral" class="badge-filter px-3 py-1.5 text-[11px] font-headline tracking-[2px] uppercase border border-[var(--border)] rounded-[2px] cursor-pointer transition-all duration-150" style="color:var(--muted)">BEHAVIORAL</button>
+        <button onclick="filterBadges('challenge')" data-filter="challenge" class="badge-filter px-3 py-1.5 text-[11px] font-headline tracking-[2px] uppercase border border-[var(--border)] rounded-[2px] cursor-pointer transition-all duration-150" style="color:var(--muted)">CHALLENGE</button>
+        <button onclick="filterBadges('platinum')" data-filter="platinum" class="badge-filter px-3 py-1.5 text-[11px] font-headline tracking-[2px] uppercase border rounded-[2px] cursor-pointer transition-all duration-150" style="color:#9b59b6;border-color:#9b59b6">PLATINUM</button>
+    </div>
+
+    <!-- Trophy Shelf -->
+    <div>
+        <p class="text-[11px] font-headline tracking-[2px] uppercase" style="color:var(--muted)">◆ TROPHY SHELF — YOUR RAREST EARNED</p>
+        <div id="featuredBadges" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4"></div>
+    </div>
+
+    <!-- Earned Badges -->
+    <div>
+        <p id="earnedLabel" class="text-[13px] font-headline tracking-[2px] uppercase" style="color:var(--muted);border-left:2px solid var(--green);padding-left:8px;margin-bottom:16px">EARNED — 0 BADGES</p>
+        <div id="earnedBadgeGrid" class="grid gap-3" style="grid-template-columns:repeat(auto-fill,minmax(100px,1fr))"></div>
+    </div>
+
+    <!-- Section Divider -->
+    <div class="flex items-center gap-4" style="margin:32px 0">
+        <div class="flex-grow h-[1px]" style="background:var(--border)"></div>
+        <div id="lockedDividerLabel" class="text-[12px] font-headline tracking-[2px] whitespace-nowrap" style="color:var(--muted)">🔒 LOCKED — 0 REMAINING</div>
+        <div class="flex-grow h-[1px]" style="background:var(--border)"></div>
+    </div>
+
+    <!-- Locked Badges -->
+    <div>
+        <p id="lockedLabel" class="text-[13px] font-headline tracking-[2px] uppercase" style="color:var(--muted);border-left:2px solid var(--accent2);padding-left:8px;margin-bottom:16px">LOCKED — 0 BADGES</p>
+        <div id="lockedBadgeGrid" class="grid gap-2" style="grid-template-columns:repeat(auto-fill,minmax(80px,1fr))"></div>
+    </div>
 </section>
 </div>
 </div>
@@ -295,67 +349,6 @@
 <section id="graveyard" class="bg-surface-container border border-secondary/30 p-10 relative">
     <div class="flex items-center justify-between mb-8"><div><h4 class="graveyard-title text-3xl font-headline font-bold tracking-widest uppercase">THE GRAVEYARD</h4><p class="graveyard-subtitle text-slate-500 font-label text-[10px] mt-1">GAMES DISCONTINUED</p></div><button onclick="reviveRandomGame()" class="bg-secondary text-on-secondary font-headline font-bold px-6 py-2 tracking-widest text-xs hover:brightness-110">REVIVE ONE</button></div>
     <div id="graveyardList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"><div class="border border-outline-variant/20 bg-surface px-4 py-3"><p class="text-[10px] text-slate-500 font-label">Loading...</p></div></div>
-</section>
-<!-- Game Recommendation Engine -->
-<section class="bg-[#050508] border border-outline-variant/30 p-12">
-    <div class="max-w-3xl mx-auto space-y-10">
-        <div class="text-center space-y-2"><h4 class="text-4xl font-headline font-bold text-white tracking-tighter uppercase">GAME_RECOMMENDATION_ENGINE</h4><p class="text-slate-500 font-label text-xs">SELECT YOUR MOODS AND TIME WINDOW</p></div>
-        <div class="space-y-4">
-            <label class="block font-label text-[10px] text-primary uppercase">Available_Window</label>
-            <select id="availableTime" class="w-full bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary"><option value="30">30 MINUTES</option><option value="60">1 HOUR</option><option value="120">2 HOURS</option><option value="240">4+ HOURS</option></select>
-        </div>
-        <div class="space-y-6">
-            <div class="mood-group">
-                <p class="mood-group-label">ENERGY</p>
-                <div class="flex flex-wrap gap-2">
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="exhausted"><span class="mood-emoji">😴</span> EXHAUSTED</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="wired"><span class="mood-emoji">☕</span> WIRED</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="flow state"><span class="mood-emoji">🌊</span> FLOW STATE</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="euphoric"><span class="mood-emoji">⚡</span> EUPHORIC</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="angry"><span class="mood-emoji">💢</span> ANGRY</button>
-                </div>
-            </div>
-            <div class="mood-group">
-                <p class="mood-group-label">FEELING</p>
-                <div class="flex flex-wrap gap-2">
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="melancholic"><span class="mood-emoji">🌧️</span> MELANCHOLIC</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="anxious"><span class="mood-emoji">😰</span> ANXIOUS</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="contemplative"><span class="mood-emoji">🔮</span> CONTEMPLATIVE</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="nostalgic"><span class="mood-emoji">📼</span> NOSTALGIC</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="cozy"><span class="mood-emoji">🛋️</span> COZY</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="rainy day"><span class="mood-emoji">🌧️</span> RAINY DAY</button>
-                </div>
-            </div>
-            <div class="mood-group">
-                <p class="mood-group-label">CRAVING</p>
-                <div class="flex flex-wrap gap-2">
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="story hungry"><span class="mood-emoji">📖</span> STORY HUNGRY</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="just one more turn"><span class="mood-emoji">⏰</span> JUST ONE MORE TURN</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="power fantasy"><span class="mood-emoji">👑</span> POWER FANTASY</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="puzzle brain"><span class="mood-emoji">🧩</span> PUZZLE BRAIN</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="exploration"><span class="mood-emoji">🧭</span> EXPLORATION</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="chaos"><span class="mood-emoji">🌪️</span> CHAOS</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="grinding"><span class="mood-emoji">⚙️</span> GRINDING</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="challenge seeker"><span class="mood-emoji">💀</span> CHALLENGE SEEKER</button>
-                </div>
-            </div>
-            <div class="mood-group">
-                <p class="mood-group-label">CONTEXT</p>
-                <div class="flex flex-wrap gap-2">
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="solo"><span class="mood-emoji">🚪</span> SOLO</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="party mode"><span class="mood-emoji">🎉</span> PARTY MODE</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="background game"><span class="mood-emoji">🎮</span> BACKGROUND GAME</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="strategic"><span class="mood-emoji">♟️</span> STRATEGIC</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="social"><span class="mood-emoji">👥</span> SOCIAL</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="competitive"><span class="mood-emoji">⚔️</span> COMPETITIVE</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="late night"><span class="mood-emoji">🌙</span> LATE NIGHT</button>
-                    <button class="mood-btn px-3 py-1.5 border border-outline-variant/30 text-[10px] font-label text-slate-400 hover:text-primary hover:border-primary transition-all" data-mood="sunday morning"><span class="mood-emoji">☀️</span> SUNDAY MORNING</button>
-                </div>
-            </div>
-        </div>
-        <button onclick="getRecommendations()" class="w-full bg-white text-black font-headline font-bold py-4 tracking-[0.4em] hover:bg-primary transition-all glitch-hover">EXECUTE_RECOMMENDATION</button>
-        <div id="recommendations"></div>
-    </div>
 </section>
 </div>
 </div>
