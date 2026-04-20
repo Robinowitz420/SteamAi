@@ -4,66 +4,89 @@ const TIER_COLORS = { bronze: '#cd7f32', silver: '#c0c0c0', gold: '#ffd700', pla
 const TIER_ORDER = { platinum: 0, gold: 1, silver: 2, bronze: 3 };
 
 const BADGE_IMAGES = {
-    strategy_brain: 'FrontEnd/Badges/Badges1_r2_c2.png',
-    sale_hoarder: 'FrontEnd/Badges/Badges1_r2_c3.png',
-    grand_strategist: 'FrontEnd/Badges/Badges1_r2_c4.png',
-    survival_addict: 'FrontEnd/Badges/Badges1_r2_c5.png',
-    rpg_fanatic: 'FrontEnd/Badges/Badges1_r2_c6.png',
-    rogue_lover: 'FrontEnd/Badges/Badges1_r2_c7.png',
-    soulsborne_veteran: 'FrontEnd/Badges/Badges1_r2_c8.png',
-    dungeon_crawler: 'FrontEnd/Badges/Badges1_r2_c10.png',
-    world_builder: 'FrontEnd/Badges/Badges1_r2_c11.png',
-    colony_manager: 'FrontEnd/Badges/Badges1_r2_c12.png',
-    dark_fantasy: 'FrontEnd/Badges/Badges1_r2_c13.png',
-    space_cadet: 'FrontEnd/Badges/Badges1_r2_c14.png',
-    lore_goblin: 'FrontEnd/Badges/Badges1_r3_c2.png',
-    tactician: 'FrontEnd/Badges/Badges1_r3_c3.png',
-    milsim_devotee: 'FrontEnd/Badges/Badges1_r3_c4.png',
-    pixel_pilgrim: 'FrontEnd/Badges/Badges1_r3_c5.png',
-    warlord: 'FrontEnd/Badges/Badges1_r3_c6.png',
-    mercenary_captain: 'FrontEnd/Badges/Badges1_r3_c7.png',
-    chicken_dinner: 'FrontEnd/Badges/Badges1_r3_c8.png',
-    eternal_exile: 'FrontEnd/Badges/Badges1_r3_c10.png',
-    space_emperor: 'FrontEnd/Badges/Badges1_r3_c11.png',
-    dragonborn: 'FrontEnd/Badges/Badges1_r3_c12.png',
-    witcher_badge: 'FrontEnd/Badges/Badges1_r3_c13.png',
-    vault_dweller: 'FrontEnd/Badges/Badges1_r3_c14.png',
-    commander_badge: 'FrontEnd/Badges/Badges1_r4_c2.png',
-    architect_of_ruin: 'FrontEnd/Badges/Badges1_r4_c3.png',
-    dungeon_master: 'FrontEnd/Badges/Badges1_r4_c4.png',
-    merchant_prince: 'FrontEnd/Badges/Badges1_r4_c5.png',
-    bundle_victim: 'FrontEnd/Badges/Badges1_r4_c6.png',
-    the_curator: 'FrontEnd/Badges/Badges1_r4_c7.png',
-    completionist: 'FrontEnd/Badges/Badges1_r4_c8.png',
-    achievement_hunter: 'FrontEnd/Badges/Badges1_r4_c10.png',
-    achievement_ignorer: 'FrontEnd/Badges/Badges1_r4_c11.png',
-    the_purist: 'FrontEnd/Badges/Badges1_r4_c12.png',
-    digital_hoarder: 'FrontEnd/Badges/Badges1_r4_c13.png',
-    early_adopter: 'FrontEnd/Badges/Badges1_r4_c14.png',
-    franchise_collector: 'FrontEnd/Badges/Badges1_r5_c2.png',
-    hidden_gem_hunter: 'FrontEnd/Badges/Badges1_r5_c3.png',
-    contrarian: 'FrontEnd/Badges/Badges1_r5_c4.png',
-    parallel_player: 'FrontEnd/Badges/Badges1_r5_c5.png',
-    false_starter: 'FrontEnd/Badges/Badges1_r5_c6.png',
-    tutorial_dropout: 'FrontEnd/Badges/Badges1_r5_c7.png',
-    never_finishes: 'FrontEnd/Badges/Badges1_r5_c8.png',
-    genre_tourist: 'FrontEnd/Badges/Badges1_r5_c10.png',
-    the_archaeologist: 'FrontEnd/Badges/Badges1_r5_c11.png',
-    niche_lord: 'FrontEnd/Badges/Badges1_r5_c12.png',
-    wishlist_warrior: 'FrontEnd/Badges/Badges1_r5_c13.png',
-    impulse_buyer: 'FrontEnd/Badges/Badges1_r5_c14.png',
-    humble_addict: 'FrontEnd/Badges/Badges1_r6_c2.png',
-    obsessive: 'FrontEnd/Badges/Badges1_r6_c3.png',
-    one_trick_pony: 'FrontEnd/Badges/Badges1_r6_c4.png',
-    deep_diver: 'FrontEnd/Badges/Badges1_r6_c5.png',
-    butterfly: 'FrontEnd/Badges/Badges1_r6_c6.png',
-    binge_machine: 'FrontEnd/Badges/Badges1_r6_c7.png',
-    the_loyalist: 'FrontEnd/Badges/Badges1_r6_c8.png',
-    speed_runner: 'FrontEnd/Badges/Badges1_r6_c10.png',
-    the_ghost: 'FrontEnd/Badges/Badges1_r6_c11.png',
-    rubber_band: 'FrontEnd/Badges/Badges1_r6_c12.png',
-    the_monogamist: 'FrontEnd/Badges/Badges1_r6_c13.png',
-    chronic_returner: 'FrontEnd/Badges/Badges1_r6_c14.png'
+    // Row 1 (c1-c15)
+    first_step: 'FrontEnd/Badges2/badges1-Photoroom_r1_c1.png',
+    sale_hoarder: 'FrontEnd/Badges2/badges1-Photoroom_r1_c2.png',
+    grand_strategist: 'FrontEnd/Badges2/badges1-Photoroom_r1_c3.png',
+    survival_addict: 'FrontEnd/Badges2/badges1-Photoroom_r1_c4.png',
+    rpg_fanatic: 'FrontEnd/Badges2/badges1-Photoroom_r1_c5.png',
+    rogue_lover: 'FrontEnd/Badges2/badges1-Photoroom_r1_c6.png',
+    soulsborne_veteran: 'FrontEnd/Badges2/badges1-Photoroom_r1_c7.png',
+    dungeon_crawler: 'FrontEnd/Badges2/badges1-Photoroom_r1_c8.png',
+    world_builder: 'FrontEnd/Badges2/badges1-Photoroom_r1_c9.png',
+    colony_manager: 'FrontEnd/Badges2/badges1-Photoroom_r1_c10.png',
+    dark_fantasy: 'FrontEnd/Badges2/badges1-Photoroom_r1_c11.png',
+    space_cadet: 'FrontEnd/Badges2/badges1-Photoroom_r1_c12.png',
+    lore_goblin: 'FrontEnd/Badges2/badges1-Photoroom_r1_c13.png',
+    tactician: 'FrontEnd/Badges2/badges1-Photoroom_r1_c14.png',
+    milsim_devotee: 'FrontEnd/Badges2/badges1-Photoroom_r1_c15.png',
+    // Row 2 (c1-c15)
+    pixel_pilgrim: 'FrontEnd/Badges2/badges1-Photoroom_r2_c1.png',
+    bundle_victim: 'FrontEnd/Badges2/badges1-Photoroom_r2_c2.png',
+    hidden_gem_hunter: 'FrontEnd/Badges2/badges1-Photoroom_r2_c3.png',
+    contrarian: 'FrontEnd/Badges2/badges1-Photoroom_r2_c4.png',
+    parallel_player: 'FrontEnd/Badges2/badges1-Photoroom_r2_c5.png',
+    false_starter: 'FrontEnd/Badges2/badges1-Photoroom_r2_c6.png',
+    tutorial_dropout: 'FrontEnd/Badges2/badges1-Photoroom_r2_c7.png',
+    never_finishes: 'FrontEnd/Badges2/badges1-Photoroom_r2_c8.png',
+    genre_tourist: 'FrontEnd/Badges2/badges1-Photoroom_r2_c9.png',
+    the_archaeologist: 'FrontEnd/Badges2/badges1-Photoroom_r2_c10.png',
+    niche_lord: 'FrontEnd/Badges2/badges1-Photoroom_r2_c11.png',
+    wishlist_warrior: 'FrontEnd/Badges2/badges1-Photoroom_r2_c12.png',
+    impulse_buyer: 'FrontEnd/Badges2/badges1-Photoroom_r2_c13.png',
+    humble_addict: 'FrontEnd/Badges2/badges1-Photoroom_r2_c14.png',
+    obsessive: 'FrontEnd/Badges2/badges1-Photoroom_r2_c15.png',
+    // Row 3 (c1-c15)
+    one_trick_pony: 'FrontEnd/Badges2/badges1-Photoroom_r3_c1.png',
+    deep_diver: 'FrontEnd/Badges2/badges1-Photoroom_r3_c2.png',
+    butterfly: 'FrontEnd/Badges2/badges1-Photoroom_r3_c3.png',
+    binge_machine: 'FrontEnd/Badges2/badges1-Photoroom_r3_c4.png',
+    the_loyalist: 'FrontEnd/Badges2/badges1-Photoroom_r3_c5.png',
+    speed_runner: 'FrontEnd/Badges2/badges1-Photoroom_r3_c6.png',
+    the_ghost: 'FrontEnd/Badges2/badges1-Photoroom_r3_c7.png',
+    rubber_band: 'FrontEnd/Badges2/badges1-Photoroom_r3_c8.png',
+    the_monogamist: 'FrontEnd/Badges2/badges1-Photoroom_r3_c9.png',
+    chronic_returner: 'FrontEnd/Badges2/badges1-Photoroom_r3_c10.png',
+    // Row 4 (c1-c15)
+    strategy_brain: 'FrontEnd/Badges2/badges1-Photoroom_r4_c1.png',
+    warlord: 'FrontEnd/Badges2/badges1-Photoroom_r4_c10.png',
+    mercenary_captain: 'FrontEnd/Badges2/badges1-Photoroom_r4_c11.png',
+    chicken_dinner: 'FrontEnd/Badges2/badges1-Photoroom_r4_c12.png',
+    eternal_exile: 'FrontEnd/Badges2/badges1-Photoroom_r4_c13.png',
+    space_emperor: 'FrontEnd/Badges2/badges1-Photoroom_r4_c14.png',
+    dragonborn: 'FrontEnd/Badges2/badges1-Photoroom_r4_c15.png',
+    // Badges without images in new set - fallback to emoji or missing
+    witcher_badge: null, // 'WITCHER' - not found in new set
+    vault_dweller: null, // 'VAULT DWELLER' - not found in new set  
+    commander_badge: null, // 'COMMANDER' - not found in new set
+    architect_of_ruin: null, // 'ARCHITECT OF RUIN' - not found in new set
+    dungeon_master: null, // 'DUNGEON MASTER' - not found in new set
+    merchant_prince: null, // 'MERCHANT PRINCE' - not found in new set
+    completionist: null, // 'COMPLETIONIST' - not found in new set
+    achievement_hunter: null, // 'ACHIEVEMENT HUNTER' - not found in new set
+    achievement_ignorer: null, // 'ACHIEVEMENT IGNORER' - not found in new set
+    the_purist: null, // 'THE PURIST' - not found in new set
+    digital_hoarder: null, // 'DIGITAL HOARDER' - not found in new set
+    early_adopter: null, // 'EARLY ADOPTER' - not found in new set
+    franchise_collector: null, // 'FRANCHISE COLLECTOR' - not found in new set
+    tactician: 'FrontEnd/Badges2/badges1-Photoroom_r3_c2.png', // Found in row 3
+    milsim_devotee: 'FrontEnd/Badges2/badges1-Photoroom_r3_c3.png', // Found in row 3
+    // Challenge badges - none have images, will use emoji fallbacks
+    going_deeper: null,
+    committed: null,
+    no_going_back: null,
+    five_alive: null,
+    backlog_buster: null,
+    shame_eraser: null,
+    pile_shrinker: null,
+    zero_week: null,
+    shame_reducer: null,
+    shame_free: null,
+    efficiency_expert: null,
+    trophy_hunter: null,
+    perfectionist: null,
+    variety_week: null,
+    binge_breaker: null
 };
 
 const BADGES = [
