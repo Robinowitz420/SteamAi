@@ -3,6 +3,69 @@
 const TIER_COLORS = { bronze: '#cd7f32', silver: '#c0c0c0', gold: '#ffd700', platinum: '#e5e4e2' };
 const TIER_ORDER = { platinum: 0, gold: 1, silver: 2, bronze: 3 };
 
+const BADGE_IMAGES = {
+    strategy_brain: 'FrontEnd/Badges/Badges1_r2_c2.png',
+    sale_hoarder: 'FrontEnd/Badges/Badges1_r2_c3.png',
+    grand_strategist: 'FrontEnd/Badges/Badges1_r2_c4.png',
+    survival_addict: 'FrontEnd/Badges/Badges1_r2_c5.png',
+    rpg_fanatic: 'FrontEnd/Badges/Badges1_r2_c6.png',
+    rogue_lover: 'FrontEnd/Badges/Badges1_r2_c7.png',
+    soulsborne_veteran: 'FrontEnd/Badges/Badges1_r2_c8.png',
+    dungeon_crawler: 'FrontEnd/Badges/Badges1_r2_c10.png',
+    world_builder: 'FrontEnd/Badges/Badges1_r2_c11.png',
+    colony_manager: 'FrontEnd/Badges/Badges1_r2_c12.png',
+    dark_fantasy: 'FrontEnd/Badges/Badges1_r2_c13.png',
+    space_cadet: 'FrontEnd/Badges/Badges1_r2_c14.png',
+    lore_goblin: 'FrontEnd/Badges/Badges1_r3_c2.png',
+    tactician: 'FrontEnd/Badges/Badges1_r3_c3.png',
+    milsim_devotee: 'FrontEnd/Badges/Badges1_r3_c4.png',
+    pixel_pilgrim: 'FrontEnd/Badges/Badges1_r3_c5.png',
+    warlord: 'FrontEnd/Badges/Badges1_r3_c6.png',
+    mercenary_captain: 'FrontEnd/Badges/Badges1_r3_c7.png',
+    chicken_dinner: 'FrontEnd/Badges/Badges1_r3_c8.png',
+    eternal_exile: 'FrontEnd/Badges/Badges1_r3_c10.png',
+    space_emperor: 'FrontEnd/Badges/Badges1_r3_c11.png',
+    dragonborn: 'FrontEnd/Badges/Badges1_r3_c12.png',
+    witcher_badge: 'FrontEnd/Badges/Badges1_r3_c13.png',
+    vault_dweller: 'FrontEnd/Badges/Badges1_r3_c14.png',
+    commander_badge: 'FrontEnd/Badges/Badges1_r4_c2.png',
+    architect_of_ruin: 'FrontEnd/Badges/Badges1_r4_c3.png',
+    dungeon_master: 'FrontEnd/Badges/Badges1_r4_c4.png',
+    merchant_prince: 'FrontEnd/Badges/Badges1_r4_c5.png',
+    bundle_victim: 'FrontEnd/Badges/Badges1_r4_c6.png',
+    the_curator: 'FrontEnd/Badges/Badges1_r4_c7.png',
+    completionist: 'FrontEnd/Badges/Badges1_r4_c8.png',
+    achievement_hunter: 'FrontEnd/Badges/Badges1_r4_c10.png',
+    achievement_ignorer: 'FrontEnd/Badges/Badges1_r4_c11.png',
+    the_purist: 'FrontEnd/Badges/Badges1_r4_c12.png',
+    digital_hoarder: 'FrontEnd/Badges/Badges1_r4_c13.png',
+    early_adopter: 'FrontEnd/Badges/Badges1_r4_c14.png',
+    franchise_collector: 'FrontEnd/Badges/Badges1_r5_c2.png',
+    hidden_gem_hunter: 'FrontEnd/Badges/Badges1_r5_c3.png',
+    contrarian: 'FrontEnd/Badges/Badges1_r5_c4.png',
+    parallel_player: 'FrontEnd/Badges/Badges1_r5_c5.png',
+    false_starter: 'FrontEnd/Badges/Badges1_r5_c6.png',
+    tutorial_dropout: 'FrontEnd/Badges/Badges1_r5_c7.png',
+    never_finishes: 'FrontEnd/Badges/Badges1_r5_c8.png',
+    genre_tourist: 'FrontEnd/Badges/Badges1_r5_c10.png',
+    the_archaeologist: 'FrontEnd/Badges/Badges1_r5_c11.png',
+    niche_lord: 'FrontEnd/Badges/Badges1_r5_c12.png',
+    wishlist_warrior: 'FrontEnd/Badges/Badges1_r5_c13.png',
+    impulse_buyer: 'FrontEnd/Badges/Badges1_r5_c14.png',
+    humble_addict: 'FrontEnd/Badges/Badges1_r6_c2.png',
+    obsessive: 'FrontEnd/Badges/Badges1_r6_c3.png',
+    one_trick_pony: 'FrontEnd/Badges/Badges1_r6_c4.png',
+    deep_diver: 'FrontEnd/Badges/Badges1_r6_c5.png',
+    butterfly: 'FrontEnd/Badges/Badges1_r6_c6.png',
+    binge_machine: 'FrontEnd/Badges/Badges1_r6_c7.png',
+    the_loyalist: 'FrontEnd/Badges/Badges1_r6_c8.png',
+    speed_runner: 'FrontEnd/Badges/Badges1_r6_c10.png',
+    the_ghost: 'FrontEnd/Badges/Badges1_r6_c11.png',
+    rubber_band: 'FrontEnd/Badges/Badges1_r6_c12.png',
+    the_monogamist: 'FrontEnd/Badges/Badges1_r6_c13.png',
+    chronic_returner: 'FrontEnd/Badges/Badges1_r6_c14.png'
+};
+
 const BADGES = [
     // ===== TRAIT BADGES =====
     { id:'obsessive', name:'OBSESSIVE', description:"You don't play games. You inhabit them.", icon:'🔥', tier:'gold', category:'trait',
@@ -323,10 +386,12 @@ function renderBadges() {
     // Featured badges - top 3 rarest earned
     const earnedBadges = BADGES.filter(b => earned.includes(b.id)).sort((a,b) => (TIER_ORDER[a.tier]||3) - (TIER_ORDER[b.tier]||3));
     const featured = earnedBadges.slice(0, 3);
-    document.getElementById('featuredBadges').innerHTML = featured.length > 0 ? featured.map(b => `
+    document.getElementById('featuredBadges').innerHTML = featured.length > 0 ? featured.map(b => {
+        const imgSrc = BADGE_IMAGES[b.id];
+        return `
         <div class="bg-surface-container border border-[${TIER_COLORS[b.tier]}]/40 p-6 space-y-3">
             <div class="flex items-center gap-3">
-                <span class="text-4xl">${b.icon}</span>
+                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="w-12 h-12 object-contain"/>` : `<span class="text-4xl">${b.icon}</span>`}
                 <div>
                     <p class="font-headline font-bold text-white text-sm tracking-widest">${b.name}</p>
                     <span class="inline-block w-2 h-2 rounded-full" style="background:${TIER_COLORS[b.tier]}"></span>
@@ -334,15 +399,17 @@ function renderBadges() {
                 </div>
             </div>
             <p class="text-[11px] font-body text-slate-400 italic">${b.description}</p>
-        </div>`).join('') : '<p class="text-slate-500 font-label text-xs col-span-3">Play some games to earn your first badges!</p>';
+        </div>`;
+    }).join('') : '<p class="text-slate-500 font-label text-xs col-span-3">Play some games to earn your first badges!</p>';
 
     // Badge grid
     document.getElementById('badgeGrid').innerHTML = sorted.map(b => {
         const isEarned = earned.includes(b.id);
+        const imgSrc = BADGE_IMAGES[b.id];
         return `
         <div class="badge-${b.tier} ${isEarned ? 'earned' : ''} group relative" title="${isEarned ? b.description : '???'}">
             <div class="w-full aspect-square bg-surface-container border ${isEarned ? `border-[${TIER_COLORS[b.tier]}]/60` : 'border-outline-variant/10'} flex flex-col items-center justify-center ${isEarned ? '' : 'opacity-20 grayscale'} transition-all hover:opacity-100 hover:grayscale-0">
-                <span class="text-2xl">${b.icon}</span>
+                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="w-10 h-10 object-contain"/>` : `<span class="text-2xl">${b.icon}</span>`}
                 <p class="text-[7px] font-label text-slate-400 mt-1 tracking-wider text-center leading-tight px-1">${b.name}</p>
                 <span class="w-1.5 h-1.5 rounded-full mt-0.5" style="background:${TIER_COLORS[b.tier]}"></span>
             </div>
