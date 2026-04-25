@@ -266,25 +266,29 @@ async function callAI(prompt) {
 // ==================== HERO HEADLINE ====================
 async function generateHeroHeadline() {
     const top20 = [...steamData.games].sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)).slice(0, 20).map(g => `${g.name}: ${Math.round((g.playtime_forever || 0) / 60)}h`).join('\n');
-    const prompt = `You are a brutally funny roast comedian analyzing a Steam library. Write ONE savage, specific roast of this player based on their actual data. Be cruel but clever — reference specific games or numbers from their library.
+    const prompt = `You are a savage roast comedian. Roast this Steam user in ONE sentence using their actual data. 
 
 THEIR DATA:
-Top played: ${top20}
+Most played: ${steamData.games[0]?.name} (${Math.round((steamData.games[0]?.playtime_forever || 0) / 60)}h)
+Second most played: ${steamData.games[1]?.name} (${Math.round((steamData.games[1]?.playtime_forever || 0) / 60)}h)
 Total games owned: ${steamData.games.length}
 Never launched: ${steamData.games.filter(g => (g.playtime_forever || 0) === 0).length}
 Shame Score: ${analysisState.shameScore}/100
-Most played game: ${steamData.games[0]?.name} (${Math.round((steamData.games[0]?.playtime_forever || 0) / 60)}h)
+Never played games include: ${steamData.games.filter(g => !g.playtime_forever).slice(0,5).map(g => g.name).join(', ')}
 
-Rules:
-- ONE sentence only
-- No quotes around it
-- Max 25 words
-- Must reference something SPECIFIC from their data — a game name, a number, a pattern
-- Punchy ending, lands like a punchline
-- Do NOT start with "You" or "With"
-- Do NOT use the word "library"
+STRICT RULES:
+- ONE sentence, max 20 words
+- NEVER use the structure "[hours] in [game], probably because..."
+- NEVER mention teammates, relationships, or real life
+- NEVER start with a name or "THIS GUY"
+- DO NOT make it wholesome or end positively
+- Reference the CONTRAST between what they play and what they ignore
+- OR roast a specific never-played game they clearly bought and forgot
+- OR roast the gap between their top two games
+- Vary the sentence structure — questions, statements, and observations are all valid
+- Be clever, not just mean
 
-Respond with roast sentence only. Nothing else.`;
+Respond with the roast only. Nothing else. No quotes.`;
     try {
         const headline = await callAI(prompt);
         analysisState.heroHeadline = headline.trim();
