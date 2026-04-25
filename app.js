@@ -163,25 +163,60 @@ function shareDNA() {
 
 // ==================== SHAME SCORE ====================
 function calculateShameScore() {
-    let score = 0;
+    let score = 100;
     const total = steamData.games.length || 1;
-    steamData.games.forEach(game => {
-        const hours = (game.playtime_forever || 0) / 60;
-        if (hours === 0) score += 0;           // unplayed: 0 points
-        else if (hours < 1) score += 0.3;      // tried it briefly
-        else if (hours >= 1 && hours <= 5) score += 0.5;  // gave it a shot
-        else if (hours > 5 && hours <= 20) score += 0.7;  // decent commitment
-        else if (hours > 20) score += 1.0;     // fully committed
-    });
-    // Normalize to 0-100 based on total games (max = total * 1.0)
-    score = Math.round((score / total) * 100);
-    score = Math.max(0, Math.min(100, score));
+    const unplayed = steamData.games.filter(g => (g.playtime_forever || 0) === 0).length;
+    const unplayedPct = unplayed / total;
+
+    // --- PENALTIES ---
+    // Unplayed games (biggest factor)
+    score -= unplayed * 0.8;
+
+    // Barely touched
+    const under30min = steamData.games.filter(g => { const m = g.playtime_forever || 0; return m > 0 && m < 30; }).length;
+    const under2h = steamData.games.filter(g => { const m = g.playtime_forever || 0; return m >= 30 && m < 120; }).length;
+    score -= under30min * 0.5;
+    score -= under2h * 0.3;
+
+    // Hoarding behavior
+    if (unplayedPct > 0.5) score -= 10;
+    if (unplayedPct > 0.7) score -= 10;
+
+    // Recency (last 2 weeks — approximate via recent playtime)
+    const recentlyPlayed = steamData.games.filter(g => (g.playtime_2weeks || 0) > 0).length;
+    if (recentlyPlayed === 0) score -= 8;
+    else if (recentlyPlayed === 1) score -= 4;
+
+    // --- BONUSES ---
+    // Deep commitment
+    const over20h = steamData.games.filter(g => (g.playtime_forever || 0) >= 1200).length;
+    const over100h = steamData.games.filter(g => (g.playtime_forever || 0) >= 6000).length;
+    const over500h = steamData.games.filter(g => (g.playtime_forever || 0) >= 30000).length;
+    const over2000h = steamData.games.filter(g => (g.playtime_forever || 0) >= 120000).length;
+    const over3000h = steamData.games.filter(g => (g.playtime_forever || 0) >= 180000).length;
+    score += over20h * 0.5;
+    score += over100h * 1;
+    score += over500h * 2;
+    score += over2000h * 3;
+    score += over3000h * 4;
+
+    // Variety
+    const over10h = steamData.games.filter(g => (g.playtime_forever || 0) >= 600).length;
+    if (over10h >= 5) score += 5;
+    if (over10h >= 10) score += 5;
+
+    // Recent activity
+    if (recentlyPlayed >= 3) score += 5;
+    if (recentlyPlayed >= 5) score += 5;
+
+    // Clamp
+    score = Math.max(0, Math.min(100, Math.round(score)));
     analysisState.shameScore = score;
     renderShameScore(score);
 }
 
 function renderShameScore(score) {
-    let verdict = score >= 80 ? 'BACKLOG CRUSHER' : score >= 60 ? 'RESPECTABLE' : score >= 40 ? 'AVERAGE HOARDER' : score >= 20 ? 'CHRONIC HOARDER' : 'FULL SHAME';
+    let verdict = score >= 90 ? 'RESPECTABLE. You actually play what you buy.' : score >= 75 ? 'DECENT. Room for improvement.' : score >= 60 ? 'AVERAGE HOARDER. Steam sales are your weakness.' : score >= 40 ? 'CHRONIC HOARDER. Your backlog has a backlog.' : score >= 20 ? 'FULL SHAME. Your library is a graveyard.' : 'LEGENDARY SHAME. Future archaeologists will study you.';
     document.getElementById('shameScore').textContent = score;
     document.getElementById('shameVerdict').textContent = verdict;
     
