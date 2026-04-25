@@ -194,20 +194,20 @@ function calculateShameScore() {
     const over500h = steamData.games.filter(g => (g.playtime_forever || 0) >= 30000).length;
     const over2000h = steamData.games.filter(g => (g.playtime_forever || 0) >= 120000).length;
     const over3000h = steamData.games.filter(g => (g.playtime_forever || 0) >= 180000).length;
-    score += over20h * 0.5;
-    score += over100h * 1;
-    score += over500h * 2;
-    score += over2000h * 3;
-    score += over3000h * 4;
+    score += over20h * 0.25;
+    score += over100h * 0.5;
+    score += over500h * 1;
+    score += over2000h * 1.5;
+    score += over3000h * 2;
 
     // Variety
     const over10h = steamData.games.filter(g => (g.playtime_forever || 0) >= 600).length;
-    if (over10h >= 5) score += 5;
-    if (over10h >= 10) score += 5;
+    if (over10h >= 5) score += 2.5;
+    if (over10h >= 10) score += 2.5;
 
     // Recent activity
-    if (recentlyPlayed >= 3) score += 5;
-    if (recentlyPlayed >= 5) score += 5;
+    if (recentlyPlayed >= 3) score += 2.5;
+    if (recentlyPlayed >= 5) score += 2.5;
 
     // Clamp
     score = Math.max(0, Math.min(100, Math.round(score)));
