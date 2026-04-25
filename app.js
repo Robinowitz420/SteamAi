@@ -94,6 +94,7 @@ function updateStats() {
     checkAndRenderBadges();
     saveCurrentSession();
     loadChatHistory();
+    renderRoastHistory();
 }
 
 // ==================== HERO BANNER ====================
@@ -162,21 +163,25 @@ function shareDNA() {
 
 // ==================== SHAME SCORE ====================
 function calculateShameScore() {
-    let score = 100;
+    let score = 0;
+    const total = steamData.games.length || 1;
     steamData.games.forEach(game => {
         const hours = (game.playtime_forever || 0) / 60;
-        if (hours === 0) score -= 0.5;
-        else if (hours < 1) score -= 0.2;
-        else if (hours >= 1 && hours <= 5) score -= 0.1;
-        else if (hours > 20) score += 0.3;
+        if (hours === 0) score += 0;           // unplayed: 0 points
+        else if (hours < 1) score += 0.3;      // tried it briefly
+        else if (hours >= 1 && hours <= 5) score += 0.5;  // gave it a shot
+        else if (hours > 5 && hours <= 20) score += 0.7;  // decent commitment
+        else if (hours > 20) score += 1.0;     // fully committed
     });
-    score = Math.max(0, Math.min(100, Math.round(score)));
+    // Normalize to 0-100 based on total games (max = total * 1.0)
+    score = Math.round((score / total) * 100);
+    score = Math.max(0, Math.min(100, score));
     analysisState.shameScore = score;
     renderShameScore(score);
 }
 
 function renderShameScore(score) {
-    let verdict = score >= 80 ? 'RESPECTABLE' : score >= 60 ? 'AVERAGE HOARDER' : score >= 40 ? 'CHRONIC HOARDER' : 'FULL SHAME';
+    let verdict = score >= 80 ? 'BACKLOG CRUSHER' : score >= 60 ? 'RESPECTABLE' : score >= 40 ? 'AVERAGE HOARDER' : score >= 20 ? 'CHRONIC HOARDER' : 'FULL SHAME';
     document.getElementById('shameScore').textContent = score;
     document.getElementById('shameVerdict').textContent = verdict;
     
@@ -185,13 +190,13 @@ function renderShameScore(score) {
     if (analysisState.lastSession && analysisState.lastSession.shameScore) {
         const prevScore = analysisState.lastSession.shameScore;
         if (score > prevScore) {
-            trendEl.textContent = 'IMPROVED';
+            trendEl.textContent = '↑ IMPROVED';
             trendEl.className = 'shame-trend improved';
         } else if (score < prevScore) {
-            trendEl.textContent = 'DECLINED';
+            trendEl.textContent = '↓ DECLINED';
             trendEl.className = 'shame-trend declined';
         } else {
-            trendEl.textContent = 'UNCHANGED';
+            trendEl.textContent = '— UNCHANGED';
             trendEl.className = 'shame-trend';
         }
     }
@@ -284,9 +289,44 @@ Respond with roast sentence only. Nothing else.`;
         const headline = await callAI(prompt);
         analysisState.heroHeadline = headline.trim();
         document.getElementById('heroHeadline').textContent = headline.trim().toUpperCase();
+        // Save roast to history
+        saveRoastToHistory(headline.trim());
     } catch (e) {
         document.getElementById('heroHeadline').textContent = 'YOUR LIBRARY SPEAKS VOLUMES';
     }
+}
+
+// ==================== ROAST HISTORY ====================
+function saveRoastToHistory(roast) {
+    let history = JSON.parse(localStorage.getItem('steamai_roast_history') || '[]');
+    history.unshift({ text: roast, timestamp: Date.now(), score: analysisState.shameScore });
+    if (history.length > 20) history = history.slice(0, 20); // keep last 20
+    localStorage.setItem('steamai_roast_history', JSON.stringify(history));
+    renderRoastHistory();
+}
+
+function renderRoastHistory() {
+    const history = JSON.parse(localStorage.getItem('steamai_roast_history') || '[]');
+    const el = document.getElementById('roastHistoryList');
+    if (!el) return;
+    if (history.length === 0) {
+        el.innerHTML = '<p class="text-[9px] font-label text-slate-600 px-3 py-2">No roasts yet</p>';
+        return;
+    }
+    el.innerHTML = history.map(r => {
+        const date = new Date(r.timestamp);
+        const timeStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return `<div class="px-3 py-2 border-b border-outline-variant/5 hover:bg-white/5 cursor-pointer transition-colors" onclick="document.getElementById('heroHeadline').textContent='${r.text.replace(/'/g,"\\'").toUpperCase()}'">
+            <p class="text-[10px] font-body text-slate-400 leading-tight line-clamp-2">${r.text}</p>
+            <p class="text-[8px] font-label text-slate-600 mt-1">${timeStr} · Score: ${r.score}</p>
+        </div>`;
+    }).join('');
+}
+
+function toggleRoastHistory() {
+    const panel = document.getElementById('roastHistoryPanel');
+    if (!panel) return;
+    panel.classList.toggle('hidden');
 }
 
 // ==================== WEEKLY PICK ====================

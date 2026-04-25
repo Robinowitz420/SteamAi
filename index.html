@@ -156,7 +156,16 @@
 <!-- TOP BAR -->
 <header class="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/10 z-40 flex items-center justify-between px-8">
     <div class="flex items-center gap-4">
-        <h1 class="text-[22px] font-headline font-bold text-[#00d4ff] tracking-tighter">STEAM.AI</h1>
+        <div class="relative">
+            <h1 class="text-[22px] font-headline font-bold text-[#00d4ff] tracking-tighter cursor-pointer" onclick="toggleRoastHistory()">STEAM.AI</h1>
+            <div id="roastHistoryPanel" class="hidden absolute top-full left-0 mt-2 w-[280px] bg-[#0a0a0f] border border-outline-variant/20 rounded shadow-2xl z-50 max-h-[400px] overflow-y-auto custom-scrollbar">
+                <div class="p-3 border-b border-outline-variant/10 flex items-center justify-between">
+                    <span class="text-[10px] font-headline tracking-[2px] text-[var(--muted)] uppercase">ROAST_HISTORY</span>
+                    <span class="text-[8px] font-label text-slate-600">Click to replay</span>
+                </div>
+                <div id="roastHistoryList"></div>
+            </div>
+        </div>
         <div class="flex items-center gap-2 ml-4">
             <div class="w-8 h-8 bg-surface-container-high border border-outline-variant/30 flex items-center justify-center overflow-hidden">
                 <img id="topBarAvatar" class="w-full h-full object-cover hidden" alt="Avatar"/>
@@ -206,10 +215,23 @@
     </div>
 </div>
 
-<!-- Hero + Shame Score -->
+<!-- Hero + Shame Score + Recommendation Engine -->
 <section class="grid grid-cols-12 gap-8">
     <div class="col-span-12 lg:col-span-7 space-y-4">
         <h2 id="heroHeadline" class="text-5xl md:text-6xl font-headline font-bold text-white tracking-tighter leading-none">ANALYZING LIBRARY...</h2>
+        <!-- Shame Score under quote -->
+        <div class="bg-surface-container border-l-4 border-primary p-6 flex flex-col justify-center shame-card mt-4">
+            <div class="flex items-baseline gap-4">
+                <span id="shameScore" class="shame-number font-headline font-bold leading-none tracking-tighter">--</span>
+                <div class="space-y-1">
+                    <span class="block font-headline font-bold text-lg text-white uppercase">Backlog Score</span>
+                    <span id="shameVerdict" class="block font-label text-[10px] text-secondary">CALCULATING...</span>
+                    <span id="shameTrend" class="shame-trend"></span>
+                </div>
+            </div>
+            <div class="shame-progress"><div id="shameBar" class="shame-progress-fill" style="width:0%"></div></div>
+            <p id="shameExplanation" class="mt-3 text-[11px] font-body text-slate-400 leading-relaxed"></p>
+        </div>
         <div class="flex flex-wrap items-center gap-3 mt-4">
             <span class="text-[10px] font-label text-slate-500 mr-2">SHARE:</span>
             <button onclick="shareToSocial('twitter')" class="flex items-center gap-1 px-3 py-1.5 bg-[#1da1f2]/10 border border-[#1da1f2]/30 text-[#1da1f2] text-[10px] font-label hover:bg-[#1da1f2]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>X</button>
@@ -219,17 +241,26 @@
             <button onclick="shareToSocial('reddit')" class="flex items-center gap-1 px-3 py-1.5 bg-[#ff4500]/10 border border-[#ff4500]/30 text-[#ff4500] text-[10px] font-label hover:bg-[#ff4500]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>REDDIT</button>
         </div>
     </div>
-    <div class="col-span-12 lg:col-span-5 bg-surface-container border-l-4 border-primary p-8 flex flex-col justify-center shame-card">
-        <div class="flex items-baseline gap-4">
-            <span id="shameScore" class="shame-number font-headline font-bold leading-none tracking-tighter">--</span>
-            <div class="space-y-1">
-                <span class="block font-headline font-bold text-lg text-white uppercase">Backlog Shame Score</span>
-                <span id="shameVerdict" class="block font-label text-[10px] text-secondary">CALCULATING...</span>
-                <span id="shameTrend" class="shame-trend"></span>
+    <div class="col-span-12 lg:col-span-5">
+        <!-- Game Recommendation Engine (right of quote) -->
+        <section class="bg-[#050508] border border-outline-variant/30 p-8 h-full">
+            <div class="space-y-6">
+                <div class="text-center space-y-1"><h4 class="text-2xl font-headline font-bold text-white tracking-tighter uppercase">GAME_RECOMMENDATION_ENGINE</h4><p class="text-slate-500 font-label text-[10px]">SELECT YOUR TIME WINDOW</p></div>
+                <div class="space-y-3">
+                    <label class="block font-label text-[10px] text-primary uppercase">Available_Window</label>
+                    <select id="availableTime" class="w-full bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary"><option value="30">30 MINUTES</option><option value="60">1 HOUR</option><option value="120">2 HOURS</option><option value="240">4+ HOURS</option></select>
+                </div>
+                <div class="space-y-3">
+                    <label class="block font-label text-[10px] text-primary uppercase">Modal_Chat</label>
+                    <div class="relative">
+                        <input id="recChatInput" class="w-full bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary pr-12" placeholder="Tell the engine what you're in the mood for..." type="text"/>
+                        <button onclick="getRecommendations()" class="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-white transition-colors"><span class="material-symbols-outlined">send</span></button>
+                    </div>
+                </div>
+                <button onclick="getRecommendations()" class="w-full bg-white text-black font-headline font-bold py-3 tracking-[0.4em] hover:bg-primary transition-all glitch-hover text-sm">EXECUTE_RECOMMENDATION</button>
+                <div id="recommendations"></div>
             </div>
-        </div>
-        <div class="shame-progress"><div id="shameBar" class="shame-progress-fill" style="width:0%"></div></div>
-        <p id="shameExplanation" class="mt-3 text-[11px] font-body text-slate-400 leading-relaxed"></p>
+        </section>
     </div>
 </section>
 
@@ -243,27 +274,49 @@
     </div>
 </section>
 
-<!-- Game Recommendation Engine (moved to Home tab) -->
-<section class="bg-[#050508] border border-outline-variant/30 p-12">
-    <div class="max-w-3xl mx-auto space-y-10">
-        <div class="text-center space-y-2"><h4 class="text-4xl font-headline font-bold text-white tracking-tighter uppercase">GAME_RECOMMENDATION_ENGINE</h4><p class="text-slate-500 font-label text-xs">SELECT YOUR TIME WINDOW</p></div>
-        <div class="space-y-4">
-            <label class="block font-label text-[10px] text-primary uppercase">Available_Window</label>
-            <select id="availableTime" class="w-full bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary"><option value="30">30 MINUTES</option><option value="60">1 HOUR</option><option value="120">2 HOURS</option><option value="240">4+ HOURS</option></select>
-        </div>
-        <div class="space-y-4">
-            <label class="block font-label text-[10px] text-primary uppercase">Modal_Chat</label>
-            <div class="relative">
-                <input id="recChatInput" class="w-full bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary pr-12" placeholder="Tell the engine what you're in the mood for..." type="text"/>
-                <button onclick="getRecommendations()" class="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-white transition-colors"><span class="material-symbols-outlined">send</span></button>
-            </div>
-        </div>
-        <button onclick="getRecommendations()" class="w-full bg-white text-black font-headline font-bold py-4 tracking-[0.4em] hover:bg-primary transition-all glitch-hover">EXECUTE_RECOMMENDATION</button>
-        <div id="recommendations"></div>
+</div>
+</div>
+
+<!-- TAB: ANALYSIS -->
+<div id="tabAnalysis" class="tab-content hidden">
+<div class="p-12 space-y-16 max-w-[1400px] mx-auto grid-section">
+<section id="topGamesChart" class="bg-surface-container-low p-8 border-t-2 border-primary">
+    <h5 class="section-header">MAX_UTILIZATION</h5>
+    <p class="text-slate-500 font-label text-xs">Loading...</p>
+</section>
+<section id="brutalStats" class="bg-surface-container-low p-8 border-t-2 border-secondary">
+    <h5 class="section-header">BRUTAL_METRICS</h5>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">sports_esports</span><span class="text-3xl font-headline font-bold text-white">--</span><span class="text-[9px] font-label text-slate-500 uppercase">Total_Games</span></div>
+        <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">timer</span><span class="text-3xl font-headline font-bold text-white">--</span><span class="text-[9px] font-label text-slate-500 uppercase">In_Top_Game</span></div>
+        <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">skull</span><span class="text-3xl font-headline font-bold text-white">--</span><span class="text-[9px] font-label text-slate-500 uppercase">Never_Launched</span></div>
+        <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">show_chart</span><span class="text-3xl font-headline font-bold text-white">--</span><span class="text-[9px] font-label text-slate-500 uppercase">Played_10h+</span></div>
     </div>
 </section>
-
-<div class="section-divider"></div>
+<section id="momentumTracking" class="space-y-8">
+    <div class="flex items-center justify-between border-b border-outline-variant/10 pb-4"><h4 class="font-headline font-bold text-xl text-white tracking-widest uppercase">Momentum Tracking</h4></div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-surface-container-low p-6 border-t border-outline-variant/20"><p class="font-label text-[10px] text-primary mb-2">REVISITED</p><p class="text-3xl font-headline font-bold text-white">--</p></div>
+        <div class="bg-surface-container-low p-6 border-t border-outline-variant/20"><p class="font-label text-[10px] text-secondary mb-2">STILL NEGLECTED</p><p class="text-3xl font-headline font-bold text-white">--</p></div>
+        <div class="bg-surface-container-low p-6 border-t border-outline-variant/20"><p class="font-label text-[10px] text-primary mb-2">BACKLOG PROGRESS</p><p class="text-3xl font-headline font-bold text-white">--</p></div>
+    </div>
+</section>
+<section id="returnToGame" class="bg-surface-container border border-outline-variant/20 p-8 space-y-6">
+    <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-2xl">refresh</span><h4 class="font-headline font-bold text-xl text-white tracking-widest uppercase">Return to a Game</h4></div>
+    <div class="flex gap-4">
+        <select id="returnGameSelect" class="flex-1 bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary"><option value="">Select a game...</option></select>
+        <button onclick="generateReentryGuide()" class="bg-primary text-on-primary font-headline font-bold px-6 py-3 tracking-widest text-sm hover:brightness-110">HELP ME JUMP BACK IN</button>
+    </div>
+    <div id="reentryGuide"></div>
+</section>
+<section id="backlogBreakdown" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+    <div class="space-y-6"><h5 class="font-headline font-bold text-lg text-white border-b border-outline-variant/10 pb-2">CRITICAL_FAILURES</h5><table class="w-full text-left font-label text-[11px]"><thead><tr class="text-slate-500 border-b border-outline-variant/5"><th class="py-3">GAME</th><th class="py-3">TIME</th><th class="py-3 text-right">%</th></tr></thead><tbody id="lowCompletionBody"></tbody></table></div>
+    <div class="space-y-6"><h5 class="font-headline font-bold text-lg text-white border-b border-outline-variant/10 pb-2">STRATEGIC_TARGETS</h5><table class="w-full text-left font-label text-[11px]"><thead><tr class="text-slate-500 border-b border-outline-variant/5"><th class="py-3">GAME</th><th class="py-3">TIME</th><th class="py-3 text-right">%</th></tr></thead><tbody id="nearCompleteBody"></tbody></table></div>
+</section>
+<section id="graveyard" class="bg-surface-container border border-secondary/30 p-10 relative">
+    <div class="flex items-center justify-between mb-8"><div><h4 class="graveyard-title text-3xl font-headline font-bold tracking-widest uppercase">THE GRAVEYARD</h4><p class="graveyard-subtitle text-slate-500 font-label text-[10px] mt-1">GAMES DISCONTINUED</p></div><button onclick="reviveRandomGame()" class="bg-secondary text-on-secondary font-headline font-bold px-6 py-2 tracking-widest text-xs hover:brightness-110">REVIVE ONE</button></div>
+    <div id="graveyardList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"><div class="border border-outline-variant/20 bg-surface px-4 py-3"><p class="text-[10px] text-slate-500 font-label">Loading...</p></div></div>
+</section>
 
 <!-- BADGES -->
 <section class="space-y-8">
@@ -313,49 +366,6 @@
         <p id="lockedLabel" class="text-[13px] font-headline tracking-[2px] uppercase" style="color:var(--muted);border-left:2px solid var(--accent2);padding-left:8px;margin-bottom:16px">LOCKED — 0 BADGES</p>
         <div id="lockedBadgeGrid" class="grid gap-2" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr))"></div>
     </div>
-</section>
-</div>
-</div>
-
-<!-- TAB: ANALYSIS -->
-<div id="tabAnalysis" class="tab-content hidden">
-<div class="p-12 space-y-16 max-w-[1400px] mx-auto grid-section">
-<section id="topGamesChart" class="bg-surface-container-low p-8 border-t-2 border-primary">
-    <h5 class="section-header">MAX_UTILIZATION</h5>
-    <p class="text-slate-500 font-label text-xs">Loading...</p>
-</section>
-<section id="brutalStats" class="bg-surface-container-low p-8 border-t-2 border-secondary">
-    <h5 class="section-header">BRUTAL_METRICS</h5>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-        <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">sports_esports</span><span class="text-3xl font-headline font-bold text-white">--</span><span class="text-[9px] font-label text-slate-500 uppercase">Total_Games</span></div>
-        <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">timer</span><span class="text-3xl font-headline font-bold text-white">--</span><span class="text-[9px] font-label text-slate-500 uppercase">In_Top_Game</span></div>
-        <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">skull</span><span class="text-3xl font-headline font-bold text-white">--</span><span class="text-[9px] font-label text-slate-500 uppercase">Never_Launched</span></div>
-        <div class="flex flex-col"><span class="material-symbols-outlined text-secondary text-xl mb-1">show_chart</span><span class="text-3xl font-headline font-bold text-white">--</span><span class="text-[9px] font-label text-slate-500 uppercase">Played_10h+</span></div>
-    </div>
-</section>
-<section id="momentumTracking" class="space-y-8">
-    <div class="flex items-center justify-between border-b border-outline-variant/10 pb-4"><h4 class="font-headline font-bold text-xl text-white tracking-widest uppercase">Momentum Tracking</h4></div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-surface-container-low p-6 border-t border-outline-variant/20"><p class="font-label text-[10px] text-primary mb-2">REVISITED</p><p class="text-3xl font-headline font-bold text-white">--</p></div>
-        <div class="bg-surface-container-low p-6 border-t border-outline-variant/20"><p class="font-label text-[10px] text-secondary mb-2">STILL NEGLECTED</p><p class="text-3xl font-headline font-bold text-white">--</p></div>
-        <div class="bg-surface-container-low p-6 border-t border-outline-variant/20"><p class="font-label text-[10px] text-primary mb-2">BACKLOG PROGRESS</p><p class="text-3xl font-headline font-bold text-white">--</p></div>
-    </div>
-</section>
-<section id="returnToGame" class="bg-surface-container border border-outline-variant/20 p-8 space-y-6">
-    <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-2xl">refresh</span><h4 class="font-headline font-bold text-xl text-white tracking-widest uppercase">Return to a Game</h4></div>
-    <div class="flex gap-4">
-        <select id="returnGameSelect" class="flex-1 bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary"><option value="">Select a game...</option></select>
-        <button onclick="generateReentryGuide()" class="bg-primary text-on-primary font-headline font-bold px-6 py-3 tracking-widest text-sm hover:brightness-110">HELP ME JUMP BACK IN</button>
-    </div>
-    <div id="reentryGuide"></div>
-</section>
-<section id="backlogBreakdown" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-    <div class="space-y-6"><h5 class="font-headline font-bold text-lg text-white border-b border-outline-variant/10 pb-2">CRITICAL_FAILURES</h5><table class="w-full text-left font-label text-[11px]"><thead><tr class="text-slate-500 border-b border-outline-variant/5"><th class="py-3">GAME</th><th class="py-3">TIME</th><th class="py-3 text-right">%</th></tr></thead><tbody id="lowCompletionBody"></tbody></table></div>
-    <div class="space-y-6"><h5 class="font-headline font-bold text-lg text-white border-b border-outline-variant/10 pb-2">STRATEGIC_TARGETS</h5><table class="w-full text-left font-label text-[11px]"><thead><tr class="text-slate-500 border-b border-outline-variant/5"><th class="py-3">GAME</th><th class="py-3">TIME</th><th class="py-3 text-right">%</th></tr></thead><tbody id="nearCompleteBody"></tbody></table></div>
-</section>
-<section id="graveyard" class="bg-surface-container border border-secondary/30 p-10 relative">
-    <div class="flex items-center justify-between mb-8"><div><h4 class="graveyard-title text-3xl font-headline font-bold tracking-widest uppercase">THE GRAVEYARD</h4><p class="graveyard-subtitle text-slate-500 font-label text-[10px] mt-1">GAMES DISCONTINUED</p></div><button onclick="reviveRandomGame()" class="bg-secondary text-on-secondary font-headline font-bold px-6 py-2 tracking-widest text-xs hover:brightness-110">REVIVE ONE</button></div>
-    <div id="graveyardList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"><div class="border border-outline-variant/20 bg-surface px-4 py-3"><p class="text-[10px] text-slate-500 font-label">Loading...</p></div></div>
 </section>
 </div>
 </div>
