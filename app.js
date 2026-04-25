@@ -261,7 +261,25 @@ async function callAI(prompt) {
 // ==================== HERO HEADLINE ====================
 async function generateHeroHeadline() {
     const top20 = [...steamData.games].sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)).slice(0, 20).map(g => `${g.name}: ${Math.round((g.playtime_forever || 0) / 60)}h`).join('\n');
-    const prompt = `Analyze this Steam library and extract ONE brutally honest, funny sentence roasting this player for not playing games in their library.\n\nLIBRARY DATA:\n${top20}\n\nTotal games: ${steamData.games.length}\nUnplayed: ${steamData.games.filter(g => (g.playtime_forever || 0) === 0).length}\nShame Score: ${analysisState.shameScore}/100\n\nRespond with ONLY one sentence. No quotes. Max 15 words. Make fun of their backlog.`;
+    const prompt = `You are a brutally funny roast comedian analyzing a Steam library. Write ONE savage, specific roast of this player based on their actual data. Be cruel but clever — reference specific games or numbers from their library.
+
+THEIR DATA:
+Top played: ${top20}
+Total games owned: ${steamData.games.length}
+Never launched: ${steamData.games.filter(g => (g.playtime_forever || 0) === 0).length}
+Shame Score: ${analysisState.shameScore}/100
+Most played game: ${steamData.games[0]?.name} (${Math.round((steamData.games[0]?.playtime_forever || 0) / 60)}h)
+
+Rules:
+- ONE sentence only
+- No quotes around it
+- Max 25 words
+- Must reference something SPECIFIC from their data — a game name, a number, a pattern
+- Punchy ending, lands like a punchline
+- Do NOT start with "You" or "With"
+- Do NOT use the word "library"
+
+Respond with roast sentence only. Nothing else.`;
     try {
         const headline = await callAI(prompt);
         analysisState.heroHeadline = headline.trim();
