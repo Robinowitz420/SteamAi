@@ -154,7 +154,7 @@
 <div class="scanline"></div>
 
 <!-- TOP BAR -->
-<header class="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/10 z-40 flex items-center justify-between px-8">
+<header class="fixed top-0 left-0 right-0 h-14 md:h-16 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/10 z-40 flex items-center justify-between px-4 md:px-8">
     <div class="flex items-center gap-4">
         <div class="relative">
             <h1 class="text-[22px] font-headline font-bold text-[#00d4ff] tracking-tighter cursor-pointer" onclick="toggleRoastHistory()">STEAM.AI</h1>
@@ -175,26 +175,26 @@
         </div>
     </div>
     <div class="flex items-center gap-1">
-        <button onclick="switchTab('home')" class="tab-btn active px-6 py-5 font-headline font-bold text-sm tracking-[0.15em]" data-tab="home">HOME</button>
-        <button onclick="switchTab('analysis')" class="tab-btn px-6 py-5 font-headline font-bold text-sm tracking-[0.15em]" data-tab="analysis">ANALYSIS</button>
-        <button onclick="switchTab('terminal')" class="tab-btn px-6 py-5 font-headline font-bold text-sm tracking-[0.15em]" data-tab="terminal">AI TERMINAL</button>
+        <button onclick="switchTab('home')" class="tab-btn active px-3 md:px-6 py-4 md:py-5 font-headline font-bold text-[11px] md:text-sm tracking-[0.15em]" data-tab="home">HOME</button>
+        <button onclick="switchTab('analysis')" class="tab-btn px-3 md:px-6 py-4 md:py-5 font-headline font-bold text-[11px] md:text-sm tracking-[0.15em]" data-tab="analysis">ANALYSIS</button>
+        <button onclick="switchTab('terminal')" class="tab-btn px-3 md:px-6 py-4 md:py-5 font-headline font-bold text-[11px] md:text-sm tracking-[0.15em]" data-tab="terminal">AI TERMINAL</button>
     </div>
     <div class="flex items-center gap-6">
-        <button onclick="showHelp('privacy')" class="flex items-center gap-1 text-[9px] font-label text-[#2ecc71]/70 hover:text-[#2ecc71] transition-colors"><span class="material-symbols-outlined text-sm">shield</span>SECURE</button>
+        <button onclick="showHelp('privacy')" class="hidden md:flex items-center gap-1 text-[9px] font-label text-[#2ecc71]/70 hover:text-[#2ecc71] transition-colors"><span class="material-symbols-outlined text-sm">shield</span>SECURE</button>
         <span class="material-symbols-outlined text-slate-500 hover:text-primary cursor-pointer transition-colors" onclick="location.reload()">refresh</span>
     </div>
 </header>
 
 <!-- MAIN CONTENT -->
-<main id="mainContent" class="pt-16 min-h-screen hidden">
+<main id="mainContent" class="pt-14 md:pt-16 min-h-screen hidden">
 
 <!-- TAB: HOME -->
 <div id="tabHome" class="tab-content">
-<div class="p-12 space-y-16 max-w-[1400px] mx-auto grid-section">
+<div class="p-4 md:p-12 space-y-8 md:space-y-16 max-w-[1400px] mx-auto grid-section">
 <!-- Steam Profile Hero Banner -->
-<div id="heroBanner" class="hero-banner p-8 hidden">
-    <div class="flex items-center justify-between">
-        <div class="flex items-center gap-6">
+<div id="heroBanner" class="hero-banner p-4 md:p-8 hidden">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4 md:gap-6">
             <div class="hero-avatar">
                 <img id="heroAvatar" src="" alt="Steam Avatar"/>
             </div>
@@ -218,7 +218,7 @@
 <!-- Hero + Shame Score + Recommendation Engine -->
 <section class="grid grid-cols-12 gap-8">
     <div class="col-span-12 lg:col-span-7 space-y-4">
-        <h2 id="heroHeadline" class="text-5xl md:text-6xl font-headline font-bold text-white tracking-tighter leading-none">ANALYZING LIBRARY...</h2>
+        <h2 id="heroHeadline" class="text-3xl md:text-5xl lg:text-6xl font-headline font-bold text-white tracking-tighter leading-none">ANALYZING LIBRARY...</h2>
         <!-- Shame Score under quote -->
         <div class="bg-surface-container border-l-4 border-primary p-6 flex flex-col justify-center shame-card mt-4">
             <div class="flex items-baseline gap-4">
@@ -243,7 +243,7 @@
     </div>
     <div class="col-span-12 lg:col-span-5">
         <!-- Game Recommendation Engine (right of quote) -->
-        <section class="bg-[#050508] border border-outline-variant/30 p-8 h-full">
+        <section class="bg-[#050508] border border-outline-variant/30 p-4 md:p-8 h-full">
             <div class="space-y-6">
                 <div class="text-center space-y-1"><h4 class="text-2xl font-headline font-bold text-white tracking-tighter uppercase">GAME_RECOMMENDATION_ENGINE</h4><p class="text-slate-500 font-label text-[10px]">SELECT YOUR TIME WINDOW</p></div>
                 <div class="space-y-3">
@@ -265,7 +265,7 @@
 </section>
 
 <!-- Weekly Pick -->
-<section id="weeklyPick" class="bg-surface-container border border-[#2ecc71]/40 p-8 relative overflow-hidden group">
+<section id="weeklyPick" class="bg-surface-container border border-[#2ecc71]/40 p-4 md:p-8 relative overflow-hidden group">
     <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><span class="material-symbols-outlined text-[120px] text-[#2ecc71]">auto_awesome</span></div>
     <div class="relative z-10 space-y-4">
         <span class="bg-[#2ecc71]/10 text-[#2ecc71] font-label text-[10px] px-2 py-1 border border-[#2ecc71]/30">ANALYZING_LIBRARY</span>
@@ -279,7 +279,7 @@
 
 <!-- TAB: ANALYSIS -->
 <div id="tabAnalysis" class="tab-content hidden">
-<div class="p-12 space-y-16 max-w-[1400px] mx-auto grid-section">
+<div class="p-4 md:p-12 space-y-8 md:space-y-16 max-w-[1400px] mx-auto grid-section">
 <section id="topGamesChart" class="bg-surface-container-low p-8 border-t-2 border-primary">
     <h5 class="section-header">MAX_UTILIZATION</h5>
     <p class="text-slate-500 font-label text-xs">Loading...</p>
@@ -313,8 +313,8 @@
     <div class="space-y-6"><h5 class="font-headline font-bold text-lg text-white border-b border-outline-variant/10 pb-2">CRITICAL_FAILURES</h5><table class="w-full text-left font-label text-[11px]"><thead><tr class="text-slate-500 border-b border-outline-variant/5"><th class="py-3">GAME</th><th class="py-3">TIME</th><th class="py-3 text-right">%</th></tr></thead><tbody id="lowCompletionBody"></tbody></table></div>
     <div class="space-y-6"><h5 class="font-headline font-bold text-lg text-white border-b border-outline-variant/10 pb-2">STRATEGIC_TARGETS</h5><table class="w-full text-left font-label text-[11px]"><thead><tr class="text-slate-500 border-b border-outline-variant/5"><th class="py-3">GAME</th><th class="py-3">TIME</th><th class="py-3 text-right">%</th></tr></thead><tbody id="nearCompleteBody"></tbody></table></div>
 </section>
-<section id="graveyard" class="bg-surface-container border border-secondary/30 p-10 relative">
-    <div class="flex items-center justify-between mb-8"><div><h4 class="graveyard-title text-3xl font-headline font-bold tracking-widest uppercase">THE GRAVEYARD</h4><p class="graveyard-subtitle text-slate-500 font-label text-[10px] mt-1">GAMES DISCONTINUED</p></div><button onclick="reviveRandomGame()" class="bg-secondary text-on-secondary font-headline font-bold px-6 py-2 tracking-widest text-xs hover:brightness-110">REVIVE ONE</button></div>
+<section id="graveyard" class="bg-surface-container border border-secondary/30 p-4 md:p-10 relative">
+    <div class="flex items-center justify-between mb-4 md:mb-8"><div><h4 class="graveyard-title text-3xl font-headline font-bold tracking-widest uppercase">THE GRAVEYARD</h4><p class="graveyard-subtitle text-slate-500 font-label text-[10px] mt-1">GAMES DISCONTINUED</p></div><button onclick="reviveRandomGame()" class="bg-secondary text-on-secondary font-headline font-bold px-6 py-2 tracking-widest text-xs hover:brightness-110">REVIVE ONE</button></div>
     <div id="graveyardList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"><div class="border border-outline-variant/20 bg-surface px-4 py-3"><p class="text-[10px] text-slate-500 font-label">Loading...</p></div></div>
 </section>
 
@@ -372,13 +372,13 @@
 
 <!-- TAB: AI TERMINAL -->
 <div id="tabTerminal" class="tab-content hidden">
-<div class="flex h-[calc(100vh-64px)]">
-    <div class="w-[260px] bg-surface-container border-r border-outline-variant/10 flex flex-col">
+<div class="flex h-[calc(100vh-56px)] md:h-[calc(100vh-64px)]">
+    <div id="chatSidebar" class="hidden md:flex w-[260px] bg-surface-container border-r border-outline-variant/10 flex-col">
         <div class="p-4 border-b border-outline-variant/10"><button onclick="createNewChat()" class="w-full py-2 border border-primary/30 text-primary font-headline font-bold tracking-widest text-xs hover:bg-primary/10 transition-all flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">add</span>NEW CHAT</button></div>
         <div id="chatHistoryList" class="flex-1 overflow-y-auto custom-scrollbar"></div>
     </div>
     <div class="flex-1 flex flex-col">
-        <div class="p-4 border-b border-outline-variant/10 flex items-center gap-3 bg-surface/50"><div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div><span class="font-headline font-bold text-sm tracking-widest text-white uppercase">AI_TERMINAL_SESSION</span></div>
+        <div class="p-4 border-b border-outline-variant/10 flex items-center gap-3 bg-surface/50"><button onclick="document.getElementById('chatSidebar').classList.toggle('hidden');document.getElementById('chatSidebar').classList.toggle('flex')" class="md:hidden text-primary mr-2"><span class="material-symbols-outlined">menu</span></button><div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div><span class="font-headline font-bold text-sm tracking-widest text-white uppercase">AI_TERMINAL_SESSION</span></div>
         <div id="chatMessages" class="flex-1 p-8 overflow-y-auto space-y-8 custom-scrollbar">
             <div class="flex flex-col items-start max-w-2xl"><div class="text-[9px] font-label text-primary mb-2 uppercase">System_Observer</div><div class="bg-surface-container-high p-4 text-sm font-body leading-relaxed text-slate-300">Steam.AI terminal online. Ask me anything about your library.</div></div>
         </div>
