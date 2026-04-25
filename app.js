@@ -170,22 +170,22 @@ function calculateShameScore() {
 
     // --- PENALTIES ---
     // Unplayed games (biggest factor)
-    score -= unplayed * 0.8;
+    score -= unplayed * 1.6;
 
     // Barely touched
     const under30min = steamData.games.filter(g => { const m = g.playtime_forever || 0; return m > 0 && m < 30; }).length;
     const under2h = steamData.games.filter(g => { const m = g.playtime_forever || 0; return m >= 30 && m < 120; }).length;
-    score -= under30min * 0.5;
-    score -= under2h * 0.3;
+    score -= under30min * 1.0;
+    score -= under2h * 0.6;
 
     // Hoarding behavior
-    if (unplayedPct > 0.5) score -= 10;
-    if (unplayedPct > 0.7) score -= 10;
+    if (unplayedPct > 0.5) score -= 20;
+    if (unplayedPct > 0.7) score -= 20;
 
     // Recency (last 2 weeks — approximate via recent playtime)
     const recentlyPlayed = steamData.games.filter(g => (g.playtime_2weeks || 0) > 0).length;
-    if (recentlyPlayed === 0) score -= 8;
-    else if (recentlyPlayed === 1) score -= 4;
+    if (recentlyPlayed === 0) score -= 16;
+    else if (recentlyPlayed === 1) score -= 8;
 
     // --- BONUSES ---
     // Deep commitment
