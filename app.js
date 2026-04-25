@@ -170,7 +170,7 @@ function calculateShameScore() {
 
     // --- PENALTIES ---
     // Unplayed games (biggest factor)
-    score -= unplayed * 1.6;
+    score -= unplayed * 5;
 
     // Barely touched
     const under30min = steamData.games.filter(g => { const m = g.playtime_forever || 0; return m > 0 && m < 30; }).length;
