@@ -79,6 +79,109 @@ async function fetchSteamData() {
     updateStats();
 }
 
+// ==================== PRICE FETCHING ====================
+async function fetchAllPrices() {
+    // Check cache first (valid 24h)
+    const cached = localStorage.getItem('steamai_prices');
+    const cacheTs = localStorage.getItem('steamai_prices_timestamp');
+    if (cached && cacheTs && Date.now() - parseInt(cacheTs) < 86400000) {
+        try {
+            steamData.prices = JSON.parse(cached);
+            return;
+        } catch (e) { /* cache corrupt, re-fetch */ }
+    }
+
+    const appids = steamData.games.map(g => g.appid);
+    const prices = {};
+
+    // Steam allows batching — fetch in chunks of 50 to be safe
+    for (let i = 0; i < appids.length; i += 50) {
+        const chunk = appids.slice(i, i + 50);
+        try {
+            const r = await fetch(`/api/prices?appids=${chunk.join(',')}`);
+            if (r.ok) {
+                const data = await r.json();
+                Object.assign(prices, data);
+            }
+        } catch (e) { console.error('Price fetch chunk error:', e); }
+        // Small delay to avoid rate limiting
+        if (i + 50 < appids.length) await new Promise(r => setTimeout(r, 300));
+    }
+
+    steamData.prices = prices;
+    localStorage.setItem('steamai_prices', JSON.stringify(prices));
+    localStorage.setItem('steamai_prices_timestamp', Date.now().toString());
+}
+
+function calculateMoneyStats() {
+    if (!steamData.prices || Object.keys(steamData.prices).length === 0) return null;
+    let totalSpent = 0, wastedOnUnplayed = 0, wastedOnBarelyPlayed = 0;
+    const gameValues = [];
+
+    for (const game of steamData.games) {
+        const p = steamData.prices[game.appid];
+        const price = p?.price || 0;
+        totalSpent += price;
+        const hours = (game.playtime_forever || 0) / 60;
+        if (hours === 0) wastedOnUnplayed += price;
+        else if (hours < 1) wastedOnBarelyPlayed += price;
+        if (hours > 0 && price > 0) {
+            gameValues.push({ name: game.name, price, hours, valuePerHour: price / hours });
+        }
+    }
+
+    const totalHours = steamData.games.reduce((s, g) => s + (g.playtime_forever || 0), 0) / 60;
+    gameValues.sort((a, b) => a.valuePerHour - b.valuePerHour);
+
+    analysisState.moneyStats = {
+        totalSpent: totalSpent.toFixed(2),
+        wastedOnUnplayed: wastedOnUnplayed.toFixed(2),
+        wastedOnBarelyPlayed: wastedOnBarelyPlayed.toFixed(2),
+        costPerHour: totalHours > 0 ? (totalSpent / totalHours).toFixed(2) : '0',
+        bestValueGame: gameValues[0] || null,
+        worstValueGame: gameValues[gameValues.length - 1] || null
+    };
+    return analysisState.moneyStats;
+}
+
+function renderMoneyStats() {
+    const stats = analysisState.moneyStats;
+    if (!stats) return;
+    const el = document.getElementById('moneyStats');
+    if (!el) return;
+    el.innerHTML = `
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-surface-container p-4 border-l-4 border-primary">
+                <p class="text-[10px] font-label text-slate-500 uppercase">Total Spent</p>
+                <p class="text-2xl font-headline font-bold text-white">$${stats.totalSpent}</p>
+            </div>
+            <div class="bg-surface-container p-4 border-l-4 border-accent2">
+                <p class="text-[10px] font-label text-slate-500 uppercase">Wasted (Unplayed)</p>
+                <p class="text-2xl font-headline font-bold text-red-400">$${stats.wastedOnUnplayed}</p>
+            </div>
+            <div class="bg-surface-container p-4 border-l-4 border-yellow-500">
+                <p class="text-[10px] font-label text-slate-500 uppercase">Wasted (Under 1h)</p>
+                <p class="text-2xl font-headline font-bold text-yellow-400">$${stats.wastedOnBarelyPlayed}</p>
+            </div>
+            <div class="bg-surface-container p-4 border-l-4 border-green">
+                <p class="text-[10px] font-label text-slate-500 uppercase">Cost Per Hour</p>
+                <p class="text-2xl font-headline font-bold text-green">$${stats.costPerHour}</p>
+            </div>
+        </div>
+        ${stats.bestValueGame ? `<div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-surface-container p-4 border-l-4 border-green">
+                <p class="text-[10px] font-label text-slate-500 uppercase">Best Value</p>
+                <p class="text-sm font-headline font-bold text-white">${stats.bestValueGame.name}</p>
+                <p class="text-[11px] font-body text-slate-400">$${stats.bestValueGame.price} • ${Math.round(stats.bestValueGame.hours)}h • $${stats.bestValueGame.valuePerHour.toFixed(2)}/hr</p>
+            </div>
+            <div class="bg-surface-container p-4 border-l-4 border-accent2">
+                <p class="text-[10px] font-label text-slate-500 uppercase">Worst Value</p>
+                <p class="text-sm font-headline font-bold text-white">${stats.worstValueGame.name}</p>
+                <p class="text-[11px] font-body text-slate-400">$${stats.worstValueGame.price} • ${Math.round(stats.worstValueGame.hours)}h • $${stats.worstValueGame.valuePerHour.toFixed(2)}/hr</p>
+            </div>
+        </div>` : ''}`;
+}
+
 function updateStats() {
     calculateShameScore();
     renderHeroBanner();
@@ -90,6 +193,7 @@ function updateStats() {
     renderGraveyard();
     loadMomentumTracking();
     generateHeroHeadline();
+    fetchAllPrices().then(() => { calculateMoneyStats(); renderMoneyStats(); });
     loadOrGenerateWeeklyPick();
     checkAndRenderBadges();
     saveCurrentSession();
@@ -298,45 +402,56 @@ async function callAI(prompt) {
     return data.response;
 }
 
-// ==================== HERO HEADLINE ====================
+// ==================== HERO HEADLINE (PROFILE BURN) ====================
 async function generateHeroHeadline() {
-    // Get randomized data to avoid repetition
-    const neverPlayedGames = steamData.games.filter(g => !g.playtime_forever).map(g => g.name);
-    const randomNeverPlayed = neverPlayedGames.sort(() => Math.random() - 0.5).slice(0, 5);
-    const topGames = steamData.games.filter(g => g.playtime_forever > 0).slice(0, 5).map(g => `${g.name} (${Math.round(g.playtime_forever / 60)}h)`);
-    const wasted = neverPlayedGames.length * 12;
-    const unplayedPercent = Math.round((neverPlayedGames.length / steamData.games.length) * 100);
-    
-    const prompt = `You are a savage roast comedian. Write ONE roast sentence about this Steam user.
+    // Randomize all input data so every load produces different roasts
+    const shuffledNeverPlayed = steamData.games
+        .filter(g => !g.playtime_forever)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3);
 
-THEIR DATA:
-Top played games: ${topGames.join(', ')}
-Games they own but have NEVER launched (pick the funniest ones): ${randomNeverPlayed.join(', ')}
-Total games owned: ${steamData.games.length}
-Unplayed percentage: ${unplayedPercent}%
-Estimated money wasted on unplayed games: $${wasted}
-Shame score: ${analysisState.shameScore}/100
+    const shuffledBarely = steamData.games
+        .filter(g => g.playtime_forever > 0 && g.playtime_forever < 60)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 2);
 
-PICK ONE of these angles at random — do not always pick the same one:
-- Mock a specific never-played game from the list by name
-- Mock the gap between their #1 game hours and everyone else
-- Mock the dollar amount wasted
-- Mock the unplayed percentage
-- Mock the contrast between two specific games in their library
-- Mock how niche or embarrassing one of their never-played games is
-- Mock what the combination of their top games says about their personality
+    const randomTop = steamData.games
+        .filter(g => g.playtime_forever > 0)
+        .slice(0, 10)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 2);
 
-STRICT RULES:
-- ONE sentence, max 20 words
-- Never use the structure "X hours in Y, probably because..."
-- Never mention teammates, relationships, or real life
-- Never start with "This guy" or a name
-- No quotes around the output
-- Be specific — use actual game names and numbers from the data
-- Vary your sentence structure each time — sometimes a question, sometimes a statement, sometimes an observation
-- The randomly shuffled never-played games list changes every load — use whichever ones are funniest
+    const angles = [
+        'mock a never-played game by name',
+        'mock a game they started and immediately quit',
+        'mock the contrast between two of their top games',
+        'mock how long something has sat unplayed',
+        'mock what their taste in games says about their personality',
+        'mock their commitment issues across the library',
+    ];
+    const angle = angles[Math.floor(Math.random() * angles.length)];
 
-Respond with the roast sentence only.`;
+    const prompt = `Roast this Steam user in ONE sentence under 20 words.
+
+Angle to use: ${angle}
+
+Games they own but NEVER launched: ${shuffledNeverPlayed.map(g => g.name).join(', ')}
+Games they quit in under 1 hour: ${shuffledBarely.map(g => g.name).join(', ')}
+Two of their most played games: ${randomTop.map(g => `${g.name} (${Math.round(g.playtime_forever / 60)}h)`).join(', ')}
+Unplayed: ${steamData.games.filter(g => !g.playtime_forever).length} of ${steamData.games.length} games
+
+Rules:
+- One sentence, max 20 words
+- Use actual game names from the data
+- No made-up prices or statistics
+- No "X hours in Y, probably because Z" structure
+- No quotes around output
+
+Good example: "Bought Hollow Knight three years ago, still judging you from the library."
+Bad example: "With 3800 hours in PUBG, probably because real life..."
+
+Your roast:`;
+
     try {
         const headline = await callAI(prompt);
         analysisState.heroHeadline = headline.trim();
@@ -701,7 +816,9 @@ async function sendMessage() {
     input.value = '';
     renderChatMessages();
     const top10 = [...steamData.games].sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)).slice(0, 10).map(g => `${g.name}: ${Math.round((g.playtime_forever || 0) / 60)}h`).join(', ');
-    const context = `You are Steam.AI, a brutally honest gaming analyst. The user has ${steamData.games.length} games, shame score ${analysisState.shameScore}/100. Top games: ${top10}. Be concise, funny, and helpful. Roast their backlog.`;
+    const profileBurn = analysisState.heroHeadline || 'Not generated yet';
+    const moneyContext = analysisState.moneyStats ? ` Money stats: $${analysisState.moneyStats.totalSpent} spent, $${analysisState.moneyStats.wastedOnUnplayed} wasted on unplayed, $${analysisState.moneyStats.costPerHour}/hr average.` : '';
+    const context = `You are Steam.AI, a brutally honest gaming analyst. The user has ${steamData.games.length} games, shame score ${analysisState.shameScore}/100. Top games: ${top10}.${moneyContext}\n\nTheir PROFILE BURN (the roast shown on load): "${profileBurn}"\nIf they ask about the profile burn, clarify or expand on it — but never make up prices or stats you don't have. If you don't know something, say so.\n\nBe concise, funny, and helpful. Roast their backlog.`;
     const history = chat.messages.slice(-8).map(m => `${m.role}: ${m.content}`).join('\n');
     const prompt = `${context}\n\nConversation:\n${history}\n\nRespond concisely (max 3 sentences).`;
     try {
