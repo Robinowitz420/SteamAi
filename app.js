@@ -300,30 +300,43 @@ async function callAI(prompt) {
 
 // ==================== HERO HEADLINE ====================
 async function generateHeroHeadline() {
-    const top20 = [...steamData.games].sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0)).slice(0, 20).map(g => `${g.name}: ${Math.round((g.playtime_forever || 0) / 60)}h`).join('\n');
-    const prompt = `You are a savage roast comedian. Roast this Steam user in ONE sentence using their actual data. 
+    // Get randomized data to avoid repetition
+    const neverPlayedGames = steamData.games.filter(g => !g.playtime_forever).map(g => g.name);
+    const randomNeverPlayed = neverPlayedGames.sort(() => Math.random() - 0.5).slice(0, 5);
+    const topGames = steamData.games.filter(g => g.playtime_forever > 0).slice(0, 5).map(g => `${g.name} (${Math.round(g.playtime_forever / 60)}h)`);
+    const wasted = neverPlayedGames.length * 12;
+    const unplayedPercent = Math.round((neverPlayedGames.length / steamData.games.length) * 100);
+    
+    const prompt = `You are a savage roast comedian. Write ONE roast sentence about this Steam user.
 
 THEIR DATA:
-Most played: ${steamData.games[0]?.name} (${Math.round((steamData.games[0]?.playtime_forever || 0) / 60)}h)
-Second most played: ${steamData.games[1]?.name} (${Math.round((steamData.games[1]?.playtime_forever || 0) / 60)}h)
+Top played games: ${topGames.join(', ')}
+Games they own but have NEVER launched (pick the funniest ones): ${randomNeverPlayed.join(', ')}
 Total games owned: ${steamData.games.length}
-Never launched: ${steamData.games.filter(g => (g.playtime_forever || 0) === 0).length}
-Shame Score: ${analysisState.shameScore}/100
-Never played games include: ${steamData.games.filter(g => !g.playtime_forever).slice(0,5).map(g => g.name).join(', ')}
+Unplayed percentage: ${unplayedPercent}%
+Estimated money wasted on unplayed games: $${wasted}
+Shame score: ${analysisState.shameScore}/100
+
+PICK ONE of these angles at random — do not always pick the same one:
+- Mock a specific never-played game from the list by name
+- Mock the gap between their #1 game hours and everyone else
+- Mock the dollar amount wasted
+- Mock the unplayed percentage
+- Mock the contrast between two specific games in their library
+- Mock how niche or embarrassing one of their never-played games is
+- Mock what the combination of their top games says about their personality
 
 STRICT RULES:
 - ONE sentence, max 20 words
-- NEVER use the structure "[hours] in [game], probably because..."
-- NEVER mention teammates, relationships, or real life
-- NEVER start with a name or "THIS GUY"
-- DO NOT make it wholesome or end positively
-- Reference the CONTRAST between what they play and what they ignore
-- OR roast a specific never-played game they clearly bought and forgot
-- OR roast the gap between their top two games
-- Vary the sentence structure — questions, statements, and observations are all valid
-- Be clever, not just mean
+- Never use the structure "X hours in Y, probably because..."
+- Never mention teammates, relationships, or real life
+- Never start with "This guy" or a name
+- No quotes around the output
+- Be specific — use actual game names and numbers from the data
+- Vary your sentence structure each time — sometimes a question, sometimes a statement, sometimes an observation
+- The randomly shuffled never-played games list changes every load — use whichever ones are funniest
 
-Respond with the roast only. Nothing else. No quotes.`;
+Respond with the roast sentence only.`;
     try {
         const headline = await callAI(prompt);
         analysisState.heroHeadline = headline.trim();

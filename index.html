@@ -215,52 +215,49 @@
     </div>
 </div>
 
-<!-- Hero + Shame Score + Recommendation Engine -->
-<section class="grid grid-cols-12 gap-8">
-    <div class="col-span-12 lg:col-span-7 space-y-4">
-        <h2 id="heroHeadline" class="text-3xl md:text-5xl lg:text-6xl font-headline font-bold text-white tracking-tighter leading-none">ANALYZING LIBRARY...</h2>
-        <!-- Shame Score under quote -->
-        <div class="bg-surface-container border-l-4 border-primary p-6 flex flex-col justify-center shame-card mt-4">
-            <div class="flex items-baseline gap-4">
-                <span id="shameScore" class="shame-number font-headline font-bold leading-none tracking-tighter">--</span>
-                <div class="space-y-1">
-                    <span class="block font-headline font-bold text-lg text-white uppercase">Backlog Score</span>
-                    <span id="shameVerdict" class="block font-label text-[10px] text-secondary">CALCULATING...</span>
-                    <span id="shameTrend" class="shame-trend"></span>
-                </div>
+<!-- Hero + Shame Score -->
+<section class="space-y-6">
+    <h2 id="heroHeadline" class="text-3xl md:text-5xl lg:text-6xl font-headline font-bold text-white tracking-tighter leading-none">ANALYZING LIBRARY...</h2>
+    <!-- Shame Score under quote -->
+    <div class="bg-surface-container border-l-4 border-primary p-6 flex flex-col justify-center shame-card">
+        <div class="flex items-baseline gap-4">
+            <span id="shameScore" class="shame-number font-headline font-bold leading-none tracking-tighter">--</span>
+            <div class="space-y-1">
+                <span class="block font-headline font-bold text-lg text-white uppercase">Backlog Score</span>
+                <span id="shameVerdict" class="block font-label text-[10px] text-secondary">CALCULATING...</span>
+                <span id="shameTrend" class="shame-trend"></span>
             </div>
-            <div class="shame-progress"><div id="shameBar" class="shame-progress-fill" style="width:0%"></div></div>
-            <p id="shameExplanation" class="mt-3 text-[11px] font-body text-slate-400 leading-relaxed"></p>
         </div>
-        <div class="flex flex-wrap items-center gap-3 mt-4">
-            <span class="text-[10px] font-label text-slate-500 mr-2">SHARE:</span>
-            <button onclick="shareToSocial('twitter')" class="flex items-center gap-1 px-3 py-1.5 bg-[#1da1f2]/10 border border-[#1da1f2]/30 text-[#1da1f2] text-[10px] font-label hover:bg-[#1da1f2]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>X</button>
-            <button onclick="shareToSocial('facebook')" class="flex items-center gap-1 px-3 py-1.5 bg-[#1877f2]/10 border border-[#1877f2]/30 text-[#1877f2] text-[10px] font-label hover:bg-[#1877f2]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>FACEBOOK</button>
-            <button onclick="shareToSocial('instagram')" class="flex items-center gap-1 px-3 py-1.5 bg-[#e4405f]/10 border border-[#e4405f]/30 text-[#e4405f] text-[10px] font-label hover:bg-[#e4405f]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>INSTAGRAM</button>
-            <button onclick="shareToSocial('tiktok')" class="flex items-center gap-1 px-3 py-1.5 bg-[#00f2ea]/10 border border-[#00f2ea]/30 text-[#00f2ea] text-[10px] font-label hover:bg-[#00f2ea]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>TIKTOK</button>
-            <button onclick="shareToSocial('reddit')" class="flex items-center gap-1 px-3 py-1.5 bg-[#ff4500]/10 border border-[#ff4500]/30 text-[#ff4500] text-[10px] font-label hover:bg-[#ff4500]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>REDDIT</button>
-        </div>
+        <div class="shame-progress"><div id="shameBar" class="shame-progress-fill" style="width:0%"></div></div>
+        <p id="shameExplanation" class="mt-3 text-[11px] font-body text-slate-400 leading-relaxed"></p>
     </div>
-    <div class="col-span-12 lg:col-span-5">
-        <!-- Game Recommendation Engine (right of quote) -->
-        <section class="bg-[#050508] border border-outline-variant/30 p-4 md:p-8 h-full">
-            <div class="space-y-6">
-                <div class="text-center space-y-1"><h4 class="text-2xl font-headline font-bold text-white tracking-tighter uppercase">GAME_RECOMMENDATION_ENGINE</h4><p class="text-slate-500 font-label text-[10px]">SELECT YOUR TIME WINDOW</p></div>
-                <div class="space-y-3">
-                    <label class="block font-label text-[10px] text-primary uppercase">Available_Window</label>
-                    <select id="availableTime" class="w-full bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary"><option value="30">30 MINUTES</option><option value="60">1 HOUR</option><option value="120">2 HOURS</option><option value="240">4+ HOURS</option></select>
-                </div>
-                <div class="space-y-3">
-                    <label class="block font-label text-[10px] text-primary uppercase">Modal_Chat</label>
-                    <div class="relative">
-                        <input id="recChatInput" class="w-full bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary pr-12" placeholder="Tell the engine what you're in the mood for..." type="text"/>
-                        <button onclick="getRecommendations()" class="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-white transition-colors"><span class="material-symbols-outlined">send</span></button>
-                    </div>
-                </div>
-                <button onclick="getRecommendations()" class="w-full bg-white text-black font-headline font-bold py-3 tracking-[0.4em] hover:bg-primary transition-all glitch-hover text-sm">EXECUTE_RECOMMENDATION</button>
-                <div id="recommendations"></div>
+    <div class="flex flex-wrap items-center gap-3">
+        <span class="text-[10px] font-label text-slate-500 mr-2">SHARE:</span>
+        <button onclick="shareToSocial('twitter')" class="flex items-center gap-1 px-3 py-1.5 bg-[#1da1f2]/10 border border-[#1da1f2]/30 text-[#1da1f2] text-[10px] font-label hover:bg-[#1da1f2]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>X</button>
+        <button onclick="shareToSocial('facebook')" class="flex items-center gap-1 px-3 py-1.5 bg-[#1877f2]/10 border border-[#1877f2]/30 text-[#1877f2] text-[10px] font-label hover:bg-[#1877f2]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>FACEBOOK</button>
+        <button onclick="shareToSocial('instagram')" class="flex items-center gap-1 px-3 py-1.5 bg-[#e4405f]/10 border border-[#e4405f]/30 text-[#e4405f] text-[10px] font-label hover:bg-[#e4405f]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>INSTAGRAM</button>
+        <button onclick="shareToSocial('tiktok')" class="flex items-center gap-1 px-3 py-1.5 bg-[#00f2ea]/10 border border-[#00f2ea]/30 text-[#00f2ea] text-[10px] font-label hover:bg-[#00f2ea]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>TIKTOK</button>
+        <button onclick="shareToSocial('reddit')" class="flex items-center gap-1 px-3 py-1.5 bg-[#ff4500]/10 border border-[#ff4500]/30 text-[#ff4500] text-[10px] font-label hover:bg-[#ff4500]/20 transition-all"><span class="material-symbols-outlined text-xs">share</span>REDDIT</button>
+    </div>
+</section>
+
+<!-- Game Recommendation Engine (front and center) -->
+<section class="bg-[#050508] border border-outline-variant/30 p-8 md:p-12">
+    <div class="max-w-3xl mx-auto space-y-8 md:space-y-10">
+        <div class="text-center space-y-2"><h4 class="text-3xl md:text-4xl font-headline font-bold text-white tracking-tighter uppercase">GAME_RECOMMENDATION_ENGINE</h4><p class="text-slate-500 font-label text-xs md:text-[10px]">SELECT YOUR TIME WINDOW</p></div>
+        <div class="space-y-4">
+            <label class="block font-label text-[10px] text-primary uppercase">Available_Window</label>
+            <select id="availableTime" class="w-full bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary"><option value="30">30 MINUTES</option><option value="60">1 HOUR</option><option value="120">2 HOURS</option><option value="240">4+ HOURS</option></select>
+        </div>
+        <div class="space-y-4">
+            <label class="block font-label text-[10px] text-primary uppercase">Modal_Chat</label>
+            <div class="relative">
+                <input id="recChatInput" class="w-full bg-surface-container border border-outline-variant/30 px-4 py-3 text-white font-label focus:outline-none focus:border-primary pr-12" placeholder="Tell the engine what you're in the mood for..." type="text"/>
+                <button onclick="getRecommendations()" class="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-white transition-colors"><span class="material-symbols-outlined">send</span></button>
             </div>
-        </section>
+        </div>
+        <button onclick="getRecommendations()" class="w-full bg-white text-black font-headline font-bold py-4 tracking-[0.4em] hover:bg-primary transition-all glitch-hover">EXECUTE_RECOMMENDATION</button>
+        <div id="recommendations"></div>
     </div>
 </section>
 
@@ -342,29 +339,31 @@
         <button onclick="filterBadges('platinum')" data-filter="platinum" class="badge-filter px-3 py-1.5 text-[11px] font-headline tracking-[2px] uppercase border rounded-[2px] cursor-pointer transition-all duration-150" style="color:#9b59b6;border-color:#9b59b6">PLATINUM</button>
     </div>
 
-    <!-- Trophy Shelf -->
-    <div>
-        <p class="text-[11px] font-headline tracking-[2px] uppercase" style="color:var(--muted)">◆ TROPHY SHELF — YOUR RAREST EARNED</p>
-        <div id="featuredBadges" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4"></div>
-    </div>
+    <!-- Badge List (vertical by difficulty) -->
+    <div id="badgeList" class="space-y-6">
+        <!-- Platinum Badges -->
+        <div id="platinumSection" class="space-y-3">
+            <p class="text-[13px] font-headline tracking-[2px] uppercase" style="color:#9b59b6;border-left:2px solid #9b59b6;padding-left:8px">PLATINUM — 0 BADGES</p>
+            <div id="platinumBadges" class="space-y-2"></div>
+        </div>
 
-    <!-- Earned Badges -->
-    <div>
-        <p id="earnedLabel" class="text-[13px] font-headline tracking-[2px] uppercase" style="color:var(--muted);border-left:2px solid var(--green);padding-left:8px;margin-bottom:16px">EARNED — 0 BADGES</p>
-        <div id="earnedBadgeGrid" class="grid gap-3" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))"></div>
-    </div>
+        <!-- Gold Badges -->
+        <div id="goldSection" class="space-y-3">
+            <p class="text-[13px] font-headline tracking-[2px] uppercase" style="color:var(--gold);border-left:2px solid var(--gold);padding-left:8px">GOLD — 0 BADGES</p>
+            <div id="goldBadges" class="space-y-2"></div>
+        </div>
 
-    <!-- Section Divider -->
-    <div class="flex items-center gap-4" style="margin:32px 0">
-        <div class="flex-grow h-[1px]" style="background:var(--border)"></div>
-        <div id="lockedDividerLabel" class="text-[12px] font-headline tracking-[2px] whitespace-nowrap" style="color:var(--muted)">🔒 LOCKED — 0 REMAINING</div>
-        <div class="flex-grow h-[1px]" style="background:var(--border)"></div>
-    </div>
+        <!-- Silver Badges -->
+        <div id="silverSection" class="space-y-3">
+            <p class="text-[13px] font-headline tracking-[2px] uppercase" style="color:var(--silver);border-left:2px solid var(--silver);padding-left:8px">SILVER — 0 BADGES</p>
+            <div id="silverBadges" class="space-y-2"></div>
+        </div>
 
-    <!-- Locked Badges -->
-    <div>
-        <p id="lockedLabel" class="text-[13px] font-headline tracking-[2px] uppercase" style="color:var(--muted);border-left:2px solid var(--accent2);padding-left:8px;margin-bottom:16px">LOCKED — 0 BADGES</p>
-        <div id="lockedBadgeGrid" class="grid gap-2" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr))"></div>
+        <!-- Bronze Badges -->
+        <div id="bronzeSection" class="space-y-3">
+            <p class="text-[13px] font-headline tracking-[2px] uppercase" style="color:var(--bronze);border-left:2px solid var(--bronze);padding-left:8px">BRONZE — 0 BADGES</p>
+            <div id="bronzeBadges" class="space-y-2"></div>
+        </div>
     </div>
 </section>
 </div>

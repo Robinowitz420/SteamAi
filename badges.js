@@ -592,84 +592,63 @@ function renderBadges() {
         `<span style="color:#c0c0c0">●</span> ${tierCounts.silver} SILVER  ` +
         `<span style="color:#cd7f32">●</span> ${tierCounts.bronze} BRONZE`;
 
-    // Trophy Shelf - top 3 rarest earned
-    const featured = earnedSorted.slice(0, 3);
-    document.getElementById('featuredBadges').innerHTML = featured.length > 0 ? featured.map(b => {
-        const imgSrc = BADGE_IMAGES[b.id];
-        const explanation = getBadgeExplanation(b, steamData.games, stats);
-        const tierColor = TIER_COLORS[b.tier];
-        return `
-        <div class="trophy-card ${b.tier} p-6 space-y-3 relative group/feat" style="--tier-color:${tierColor}">
-            <div class="flex flex-col items-center text-center">
-                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" style="width:192px;height:192px;object-fit:contain"/>` : ''}
-                <p class="font-headline font-bold text-white text-base tracking-widest mt-3">${b.name}</p>
-                <div class="flex items-center gap-1 mt-1">
-                    <span class="inline-block w-3 h-3 rounded-sm" style="background:${tierColor}"></span>
-                    <span class="text-[11px] font-label text-slate-500 uppercase">${b.tier}</span>
-                </div>
-                <p class="text-[12px] font-body text-slate-400 italic mt-2">${b.description}</p>
-            </div>
-            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-3 bg-black/95 border rounded-lg text-[11px] font-body text-slate-300 max-w-[300px] opacity-0 group-hover/feat:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl" style="border-color:${tierColor}">
-                <p class="font-headline text-white text-xs mb-1">${b.name}</p>
-                <p>${explanation}</p>
-            </div>
-        </div>`;
-    }).join('') : '<p class="text-slate-500 font-label text-xs col-span-3 text-center py-8">Play some games to earn your first badges!</p>';
+    // Group badges by tier for vertical display
+    const badgesByTier = {
+        platinum: { earned: [], locked: [] },
+        gold: { earned: [], locked: [] },
+        silver: { earned: [], locked: [] },
+        bronze: { earned: [], locked: [] }
+    };
 
-    // Earned label
-    document.getElementById('earnedLabel').textContent = `EARNED — ${earnedSorted.length} BADGES`;
+    earnedSorted.forEach(b => {
+        if (badgesByTier[b.tier]) badgesByTier[b.tier].earned.push(b);
+    });
+    lockedSorted.forEach(b => {
+        if (badgesByTier[b.tier]) badgesByTier[b.tier].locked.push(b);
+    });
 
-    // Earned grid
-    const earnedGrid = document.getElementById('earnedBadgeGrid');
-    if (earnedSorted.length === 0) {
-        const catName = filter === 'all' ? '' : ` ${filter.toUpperCase()}`;
-        earnedGrid.innerHTML = `<div class="col-span-full text-center py-8 text-[12px] font-body" style="color:var(--muted)">NO${catName} BADGES EARNED YET</div>`;
-    } else {
-        earnedGrid.innerHTML = earnedSorted.map(b => {
+    // Render each tier section
+    ['platinum', 'gold', 'silver', 'bronze'].forEach(tier => {
+        const tierSection = document.getElementById(`${tier}Section`);
+        const tierBadges = document.getElementById(`${tier}Badges`);
+        const tierData = badgesByTier[tier];
+        const totalInTier = tierData.earned.length + tierData.locked.length;
+        
+        // Update section header
+        const headerEl = tierSection.querySelector('p');
+        headerEl.textContent = `${tier.toUpperCase()} — ${tierData.earned.length} / ${totalInTier} EARNED`;
+        
+        // Hide section if no badges in this tier and not "all" filter
+        if (totalInTier === 0 && filter !== 'all') {
+            tierSection.style.display = 'none';
+        } else {
+            tierSection.style.display = 'block';
+        }
+
+        // Render badges in this tier (earned first, then locked)
+        const allBadges = [...tierData.earned, ...tierData.locked];
+        tierBadges.innerHTML = allBadges.length > 0 ? allBadges.map(b => {
             const imgSrc = BADGE_IMAGES[b.id];
             const explanation = getBadgeExplanation(b, steamData.games, stats);
-            const tierColor = TIER_COLORS[b.tier];
-            return `
-            <div class="badge-card earned-card relative p-3" style="--tier-color:${tierColor}">
-                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="badge-img" style="width:128px;height:128px;object-fit:contain;display:block;margin:0 auto"/>` : ''}
-                <p class="font-headline text-[10px] tracking-[1px] uppercase text-center mt-2 text-white">${b.name}</p>
-                <span class="block w-[6px] h-[6px] rounded-full mx-auto mt-1" style="background:${tierColor}"></span>
-                <div class="badge-tooltip">
-                    <p class="font-headline text-white text-xs mb-1">${b.name}</p>
-                    <p>${explanation}</p>
-                </div>
-            </div>`;
-        }).join('');
-    }
-
-    // Locked divider
-    document.getElementById('lockedDividerLabel').textContent = `🔒 LOCKED — ${lockedSorted.length} REMAINING`;
-
-    // Locked label
-    document.getElementById('lockedLabel').textContent = `LOCKED — ${lockedSorted.length} BADGES`;
-
-    // Locked grid
-    const lockedGrid = document.getElementById('lockedBadgeGrid');
-    if (lockedSorted.length === 0) {
-        const catName = filter === 'all' ? '' : ` ${filter.toUpperCase()}`;
-        lockedGrid.innerHTML = `<div class="col-span-full text-center py-8 text-[14px] font-headline" style="color:var(--green)">ALL${catName} BADGES EARNED — LEGENDARY</div>`;
-    } else {
-        lockedGrid.innerHTML = lockedSorted.map(b => {
-            const imgSrc = BADGE_IMAGES[b.id];
-            const tierColor = TIER_COLORS[b.tier];
+            const tierColor = TIER_COLORS[tier];
+            const isEarned = tierData.earned.includes(b);
             const isChallenge = b.category === 'challenge';
-            const descText = isChallenge ? '???' : b.description;
+            const descText = isChallenge && !isEarned ? '???' : b.description;
+            
             return `
-            <div class="badge-card locked-card relative p-2" style="--tier-color:${tierColor}">
-                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" class="badge-img" style="width:96px;height:96px;object-fit:contain;display:block;margin:0 auto"/>` : ''}
-                <p class="font-headline text-[9px] tracking-[1px] uppercase text-center mt-1.5" style="color:var(--muted)">${b.name}</p>
-                <span class="block w-[4px] h-[4px] rounded-full mx-auto mt-1" style="background:${tierColor};opacity:0.4"></span>
-                <div class="badge-tooltip">
-                    <p class="font-headline text-white text-xs mb-1">${b.name}</p>
-                    <p>${descText}</p>
-                    <p class="mt-1" style="color:var(--accent)">Unlock: ${b.unlockHint || 'Unknown'}</p>
+            <div class="flex items-start gap-4 p-4 bg-surface-container border-l-4 ${isEarned ? 'border-opacity-100' : 'border-opacity-30'}" style="border-color:${tierColor};opacity:${isEarned ? '1' : '0.6'}">
+                ${imgSrc ? `<img src="${imgSrc}" alt="${b.name}" style="width:80px;height:80px;object-fit:contain;flex-shrink:0"/>` : '<div class="w-20 h-20 bg-surface border border-outline-variant/20 rounded flex items-center justify-center"><span class="material-symbols-outlined text-2xl" style="color:${tierColor}">military_tech</span></div>'}
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <p class="font-headline text-sm font-bold text-white tracking-wider uppercase">${b.name}</p>
+                        <span class="text-[10px] font-label px-2 py-0.5 rounded" style="background:${tierColor}20;color:${tierColor}">${tier.toUpperCase()}</span>
+                        ${isEarned ? '<span class="text-[10px] font-label text-green">✓ EARNED</span>' : '<span class="text-[10px] font-label text-slate-500">🔒 LOCKED</span>'}
+                    </div>
+                    <p class="text-[12px] font-body text-slate-300 mb-2">${descText}</p>
+                    <p class="text-[11px] font-body text-slate-400"><strong>Achieved:</strong> ${explanation}</p>
+                    ${!isEarned && b.unlockHint ? `<p class="text-[11px] font-body text-primary mt-1"><strong>How to unlock:</strong> ${b.unlockHint}</p>` : ''}
                 </div>
             </div>`;
-        }).join('');
-    }
+        }).join('') : `<p class="text-slate-500 font-label text-xs px-4 py-3 italic">No ${tier} badges available</p>`;
+    });
 }
