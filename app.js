@@ -405,17 +405,31 @@ async function callAI(prompt) {
 // ==================== HERO HEADLINE (PROFILE BURN) ====================
 async function generateHeroHeadline() {
     // Randomize all input data so every load produces different roasts
-    const shuffledNeverPlayed = steamData.games
+    // Note: Steam games array order is not guaranteed, so always sort when referencing "top".
+    const randInt = (max) => {
+        if (max <= 0) return 0;
+        const buf = new Uint32Array(1);
+        (crypto?.getRandomValues ? crypto.getRandomValues(buf) : (buf[0] = Math.floor(Math.random() * 2 ** 32)));
+        return buf[0] % max;
+    };
+
+    const neverPlayedAll = steamData.games
         .filter(g => !g.playtime_forever)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 5);
+        .slice()
+        .sort(() => Math.random() - 0.5);
 
-    const shuffledBarely = steamData.games
+    const barelyAll = steamData.games
         .filter(g => g.playtime_forever > 0 && g.playtime_forever < 60)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 3);
+        .slice()
+        .sort(() => Math.random() - 0.5);
 
-    const topGame = steamData.games[0];
+    // Take a random window from the shuffled list so it's not always the first few games
+    const neverStart = randInt(Math.max(1, neverPlayedAll.length - 5));
+    const barelyStart = randInt(Math.max(1, barelyAll.length - 3));
+    const shuffledNeverPlayed = neverPlayedAll.slice(neverStart, neverStart + 5);
+    const shuffledBarely = barelyAll.slice(barelyStart, barelyStart + 3);
+
+    const topGame = [...steamData.games].sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0))[0];
     const topHours = Math.round((topGame?.playtime_forever || 0) / 60);
 
     const angles = [
@@ -445,6 +459,18 @@ RULES:
 - Never use "probably because..." structure
 - No ALL CAPS output
 - Make it land like a punchline
+
+STRICT FORMAT RULES:
+- Never start with "You"
+- Never start with "With"
+- Never start with "Despite"
+- Never use "you have" or "you play" anywhere in the sentence
+- Write in third person or as an observation
+
+EXAMPLE GOOD: "117 hours in Civilization and Disco Elysium sits unopened, like a book you bought to impress yourself."
+EXAMPLE GOOD: "Brütal Legend has been installed for years, quietly waiting for the moment you become the person you pretend to be."
+EXAMPLE BAD: "You have 194 games but haven't played..."
+EXAMPLE BAD: "With 3800 hours in PUBG..."
 
 Respond with the roast sentence only. No quotes.`;
 
