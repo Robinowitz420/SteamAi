@@ -408,58 +408,71 @@ async function generateHeroHeadline() {
     const shuffledNeverPlayed = steamData.games
         .filter(g => !g.playtime_forever)
         .sort(() => Math.random() - 0.5)
-        .slice(0, 3);
+        .slice(0, 5);
 
     const shuffledBarely = steamData.games
         .filter(g => g.playtime_forever > 0 && g.playtime_forever < 60)
         .sort(() => Math.random() - 0.5)
-        .slice(0, 2);
+        .slice(0, 3);
 
-    const randomTop = steamData.games
-        .filter(g => g.playtime_forever > 0)
-        .slice(0, 10)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 2);
+    const topGame = steamData.games[0];
+    const topHours = Math.round((topGame?.playtime_forever || 0) / 60);
 
     const angles = [
-        'mock a never-played game by name',
-        'mock a game they started and immediately quit',
-        'mock the contrast between two of their top games',
-        'mock how long something has sat unplayed',
-        'mock what their taste in games says about their personality',
-        'mock their commitment issues across the library',
+        `mock a specific never-played game by name — why is it funny that they own it but never launched it`,
+        `mock a game they quit in under an hour — what does that say about them`,
+        `mock their top game obsession — ${topHours} hours in ${topGame?.name} is a lot`,
+        `mock the sheer volume of unplayed games`,
+        `mock what their taste in never-played games reveals about their self-image vs reality`,
     ];
     const angle = angles[Math.floor(Math.random() * angles.length)];
 
-    const prompt = `Roast this Steam user in ONE sentence under 20 words.
+    const prompt = `You are a sharp roast comedian who knows PC gaming deeply. Write ONE roast sentence about this Steam user.
 
-Angle to use: ${angle}
-
+THEIR DATA:
+Most played: ${topGame?.name} (${topHours}h)
 Games they own but NEVER launched: ${shuffledNeverPlayed.map(g => g.name).join(', ')}
 Games they quit in under 1 hour: ${shuffledBarely.map(g => g.name).join(', ')}
-Two of their most played games: ${randomTop.map(g => `${g.name} (${Math.round(g.playtime_forever / 60)}h)`).join(', ')}
-Unplayed: ${steamData.games.filter(g => !g.playtime_forever).length} of ${steamData.games.length} games
+Total owned: ${steamData.games.length} games
 
-Rules:
-- One sentence, max 20 words
-- Use actual game names from the data
-- No made-up prices or statistics
-- No "X hours in Y, probably because Z" structure
-- No quotes around output
+ANGLE: ${angle}
 
-Good example: "Bought Hollow Knight three years ago, still judging you from the library."
-Bad example: "With 3800 hours in PUBG, probably because real life..."
+RULES:
+- ONE sentence, max 20 words
+- Reference specific game names from the data above
+- Never invent stats or prices you don't have
+- Never compare unrelated games as if they're connected
+- Never use "probably because..." structure
+- No ALL CAPS output
+- Make it land like a punchline
 
-Your roast:`;
+Respond with the roast sentence only. No quotes.`;
 
     try {
-        const headline = await callAI(prompt);
-        analysisState.heroHeadline = headline.trim();
-        document.getElementById('heroHeadline').textContent = headline.trim().toUpperCase();
+        const res = await fetch('/api/roast', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                messages: [{ role: 'user', content: prompt }]
+            })
+        });
+        if (!res.ok) throw new Error(`Roast API error: ${res.status}`);
+        const data = await res.json();
+        const headline = data.content?.[0]?.text?.trim() || 'YOUR LIBRARY SPEAKS VOLUMES';
+        analysisState.heroHeadline = headline;
+        document.getElementById('heroHeadline').textContent = headline.toUpperCase();
         // Save roast to history
-        saveRoastToHistory(headline.trim());
+        saveRoastToHistory(headline);
     } catch (e) {
-        document.getElementById('heroHeadline').textContent = 'YOUR LIBRARY SPEAKS VOLUMES';
+        // Fallback to Groq if Anthropic fails
+        try {
+            const headline = await callAI(prompt);
+            analysisState.heroHeadline = headline.trim();
+            document.getElementById('heroHeadline').textContent = headline.trim().toUpperCase();
+            saveRoastToHistory(headline.trim());
+        } catch (e2) {
+            document.getElementById('heroHeadline').textContent = 'YOUR LIBRARY SPEAKS VOLUMES';
+        }
     }
 }
 
