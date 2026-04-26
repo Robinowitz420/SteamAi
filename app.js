@@ -464,15 +464,8 @@ Respond with the roast sentence only. No quotes.`;
         // Save roast to history
         saveRoastToHistory(headline);
     } catch (e) {
-        // Fallback to Groq if Anthropic fails
-        try {
-            const headline = await callAI(prompt);
-            analysisState.heroHeadline = headline.trim();
-            document.getElementById('heroHeadline').textContent = headline.trim().toUpperCase();
-            saveRoastToHistory(headline.trim());
-        } catch (e2) {
-            document.getElementById('heroHeadline').textContent = 'YOUR LIBRARY SPEAKS VOLUMES';
-        }
+        console.error('Profile burn error:', e);
+        document.getElementById('heroHeadline').textContent = 'PROFILE BURN ERROR — CHECK API KEY';
     }
 }
 
